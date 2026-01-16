@@ -1,0 +1,188 @@
+// 简体中文本地化资源文件
+// HomeView
+"baby_diary" = "宝宝日记";
+"today_statistics" = "今日统计";
+"feeding" = "喂养";
+"activity" = "活动";
+"ongoing" = "进行中";
+"ending" = "结束";
+"quick_actions" = "快速操作";
+"edit" = "编辑";
+"all_actions" = "所有操作";
+"weight" = "体重";
+"height" = "身高";
+"head_circumference" = "头围";
+"kg" = "kg";
+"cm" = "cm";
+"started_at" = "开始于: %@";
+
+// Quick Actions
+"direct_feeding" = "亲喂";
+"formula_milk" = "奶粉";
+"solid_food" = "辅食";
+"water" = "水";
+"sleep" = "睡觉";
+"diaper" = "纸尿裤";
+"bath" = "洗澡";
+"measure_height" = "身高";
+
+// All Actions Categories
+"feeding_category" = "喂养";
+"activity_category" = "活动";
+"growth_category" = "成长";
+"health_category" = "健康";
+"milestone_category" = "重要节点";
+
+// Feeding Actions
+"breastfeeding" = "亲喂";
+"formula" = "奶粉";
+"complementary_food" = "辅食";
+"water_intake" = "水";
+
+// Activity Actions
+"sleep_activity" = "睡觉";
+"diaper_change" = "纸尿裤";
+"bath_activity" = "洗澡";
+"walking" = "走路";
+"playing" = "玩耍";
+"pumping" = "吸奶";
+
+// Growth Actions
+"measure_height_action" = "身高";
+"measure_weight" = "体重";
+"measure_head" = "头围";
+
+// Health Actions
+"jaundice" = "黄疸";
+"medical_visit" = "就医";
+"vaccination" = "疫苗";
+"temperature" = "体温";
+"medication" = "用药";
+"supplement" = "补剂";
+
+// Milestone Actions
+"first_tooth" = "第一颗牙齿";
+"first_sit" = "第一次坐";
+"first_crawl" = "第一次爬";
+"first_roll" = "第一次翻身";
+"first_word" = "说第一句话";
+
+// Language Setting
+"select_language" = "选择语言";
+"language_setting" = "语言设置";
+
+// Today Stats
+"breast_milk" = "母乳";
+"formula_milk_stat" = "奶粉";
+"complementary_food_stat" = "辅食";
+"supplement_stat" = "补剂";
+"stool" = "大便";
+"urine" = "小便";
+"sleep_duration" = "睡觉时长";
+"sleep_count" = "睡觉次数";
+"hours" = "小时";
+"times" = "次";
+
+// Age Display
+"year" = "岁";
+"month" = "月";
+"day" = "天";
+
+// SettingsView
+"tap_to_edit_baby_info" = "点击编辑宝宝信息";
+"personalization_settings" = "个性化设置";
+"theme_color" = "主题颜色";
+"language_setting" = "语言设置";
+"mode_setting" = "模式设置";
+"membership_privileges" = "会员特权";
+"free" = "免费";
+"about" = "关于";
+"about_us" = "关于我们";
+"help_and_feedback" = "帮助与反馈";
+"privacy_policy" = "隐私政策";
+"user_agreement" = "用户协议";
+"settings" = "设置";
+
+// AppLanguage Names
+"system_language" = "跟随系统";
+"simplified_chinese" = "简体中文";
+"traditional_chinese" = "繁体中文";
+"english" = "English";
+"japanese" = "日本語";
+"korean" = "한국어";
+"french" = "Français";
+"portuguese" = "Português";
+"spanish" = "Español";
+
+// MainTabView
+"home" = "首页";
+"records" = "记录";
+"statistics" = "统计";
+"settings" = "设置";
+
+// RecordListView
+"today" = "今天";
+"yesterday" = "昨天";
+"left" = "左";
+"right" = "右";
+"minutes" = "分钟";
+
+// RecordEditView
+"create_record" = "创建记录";
+"edit_record" = "编辑记录";
+"start" = "开始";
+"end" = "结束";
+"save" = "保存";
+"cancel" = "取消";
+
+// RecordDetailView
+"record_detail" = "记录详情";
+
+// BabyCreationView
+"baby_name" = "宝宝名字";
+"enter_baby_name" = "请输入宝宝名字";
+"birthday" = "生日";
+"gender" = "性别";
+"male" = "男";
+"female" = "女";
+"prefer_not_to_say" = "不透露";
+"add_baby" = "添加宝宝";
+"complete" = "完成";
+"partner_device_tip" = "或从伴侣的设备上获取更多宝宝宝贵数据";
+
+// StatisticsView
+"feeding_trend" = "喂养趋势";
+"sleep_trend" = "睡眠趋势";
+"growth_statistics" = "成长统计";
+"daily_activity" = "每日活动";
+"7_days" = "7天";
+"30_days" = "30天";
+"90_days" = "90天";
+"12_months" = "12个月";
+
+// DailyActivityView
+"play" = "玩耍";
+"change_diaper" = "换尿布";
+"activity_details" = "活动详情";
+"date_format" = "日期: %d日";
+"time_format" = "时间: %d:00";
+"activity_format" = "活动: %@";
+
+// GrowthStatisticsView
+"bmi" = "BMI";
+"month_age_format" = "月龄: %d 个月";
+"weight_format" = "体重: %.1f kg";
+"height_format" = "身高: %.1f cm";
+"head_circumference_format" = "头围: %.1f cm";
+
+// SleepTrendView
+"sleep_duration_title" = "睡眠时间";
+"hours_unit" = "时长(小时)";
+"sleep_duration_format" = "睡眠时间: %.1f 小时";
+"sleep_count_title" = "睡眠次数";
+"times_unit" = "次数";
+"sleep_count_format" = "睡眠次数: %d 次";
+
+// FeedingTrendView
+"feeding_trend_title" = "奶量趋势";
+"milk_volume_unit" = "奶量(ml)";

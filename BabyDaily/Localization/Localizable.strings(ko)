@@ -1,0 +1,170 @@
+// 한국어 로컬라이제이션 리소스 파일
+// HomeView
+"baby_diary" = "아기 일기";
+"today_statistics" = "오늘의 통계";
+"feeding" = "수유";
+"activity" = "활동";
+"ongoing" = "진행 중";
+"ending" = "종료";
+"quick_actions" = "빠른 작업";
+"edit" = "편집";
+"all_actions" = "모든 작업";
+"weight" = "체중";
+"height" = "키";
+"head_circumference" = "두 둘레";
+"kg" = "kg";
+"cm" = "cm";
+"started_at" = "시작: %@";
+
+// Quick Actions
+"direct_feeding" = "직접 수유";
+"formula_milk" = "분유";
+"solid_food" = "이유식";
+"water" = "물";
+"sleep" = "수면";
+"diaper" = "기저귀";
+"bath" = "목욕";
+"measure_height" = "키";
+
+// All Actions Categories
+"feeding_category" = "수유";
+"activity_category" = "활동";
+"growth_category" = "성장";
+"health_category" = "건강";
+"milestone_category" = "마일스톤";
+
+// Feeding Actions
+"breastfeeding" = "직접 수유";
+"formula" = "분유";
+"complementary_food" = "이유식";
+"water_intake" = "물";
+
+// Activity Actions
+"sleep_activity" = "수면";
+"diaper_change" = "기저귀";
+"bath_activity" = "목욕";
+"walking" = "보행";
+"playing" = "놀이";
+"pumping" = "젖 빼기";
+
+// Growth Actions
+"measure_height_action" = "키";
+"measure_weight" = "체중";
+"measure_head" = "두 둘레";
+
+// Health Actions
+"jaundice" = "황달";
+"medical_visit" = "의료 방문";
+"vaccination" = "예방 접종";
+"temperature" = "체온";
+"medication" = "약물";
+"supplement" = "영양제";
+
+// Milestone Actions
+"first_tooth" = "첫 번째 이빨";
+"first_sit" = "첫 번째 앉기";
+"first_crawl" = "첫 번째 기어기";
+"first_roll" = "첫 번째 옆으로 돌기";
+"first_word" = "첫 번째 말";
+
+// Language Setting
+"select_language" = "언어 선택";
+"language_setting" = "언어 설정";
+
+// Today Stats
+"breast_milk" = "모유";
+"formula_milk_stat" = "분유";
+"complementary_food_stat" = "이유식";
+"supplement_stat" = "영양제";
+"stool" = "대변";
+"urine" = "소변";
+"sleep_duration" = "수면 시간";
+"sleep_count" = "수면 횟수";
+"hours" = "시간";
+"times" = "회";
+
+// Age Display
+"year" = "세";
+"month" = "개월";
+"day" = "일";
+
+// SettingsView
+"tap_to_edit_baby_info" = "아기 정보 편집";
+"personalization_settings" = "개인화";
+"theme_color" = "테마 색상";
+"language_setting" = "언어 설정";
+"mode_setting" = "모드 설정";
+"membership_privileges" = "회원 특권";
+"free" = "무료";
+"about" = "소개";
+"about_us" = "회사 소개";
+"help_and_feedback" = "도움말 및 피드백";
+"privacy_policy" = "개인정보 정책";
+"user_agreement" = "이용 약관";
+"settings" = "설정";
+
+// AppLanguage Names
+"system_language" = "시스템 따르기";
+"simplified_chinese" = "간체 중국어";
+"traditional_chinese" = "번체 중국어";
+"english" = "영어";
+"japanese" = "일본어";
+"korean" = "한국어";
+"french" = "프랑스어";
+"portuguese" = "포르투갈어";
+"spanish" = "스페인어";
+
+// MainTabView
+"home" = "홈";
+"records" = "기록";
+"statistics" = "통계";
+"settings" = "설정";
+
+// BabyCreationView
+"baby_name" = "아기 이름";
+"enter_baby_name" = "아기 이름을 입력하세요";
+"birthday" = "생일";
+"gender" = "성별";
+"male" = "남";
+"female" = "여";
+"prefer_not_to_say" = "공개하지 않음";
+"add_baby" = "아기 추가";
+"complete" = "완료";
+"partner_device_tip" = "또는 파트너의 기기에서 아기의 소중한 데이터를 가져오세요";
+
+// StatisticsView
+"feeding_trend" = "수유 추세";
+"sleep_trend" = "수면 추세";
+"growth_statistics" = "성장 통계";
+"daily_activity" = "일일 활동";
+"7_days" = "7일";
+"30_days" = "30일";
+"90_days" = "90일";
+"12_months" = "12개월";
+
+// DailyActivityView
+"play" = "놀이";
+"change_diaper" = "기저귀 교체";
+"activity_details" = "활동 상세";
+"date_format" = "날짜: %d일";
+"time_format" = "시간: %d:00";
+"activity_format" = "활동: %@";
+
+// GrowthStatisticsView
+"bmi" = "BMI";
+"month_age_format" = "연령: %d개월";
+"weight_format" = "체중: %.1f kg";
+"height_format" = "키: %.1f cm";
+"head_circumference_format" = "머리 둘레: %.1f cm";
+
+// SleepTrendView
+"sleep_duration_title" = "수면 시간";
+"hours_unit" = "시간(시간)";
+"sleep_duration_format" = "수면 시간: %.1f 시간";
+"sleep_count_title" = "수면 횟수";
+"times_unit" = "횟수";
+"sleep_count_format" = "수면 횟수: %d 회";
+
+// FeedingTrendView
+"feeding_trend_title" = "젖량 추세";
+"milk_volume_unit" = "젖량(ml)";

@@ -1,0 +1,170 @@
+// Archivo de recursos de localización en español
+// HomeView
+"baby_diary" = "Diario del Bebé";
+"today_statistics" = "Estadísticas de Hoy";
+"feeding" = "Alimentación";
+"activity" = "Actividad";
+"ongoing" = "En Curso";
+"ending" = "Terminar";
+"quick_actions" = "Acciones Rápidas";
+"edit" = "Editar";
+"all_actions" = "Todas las Acciones";
+"weight" = "Peso";
+"height" = "Altura";
+"head_circumference" = "Perímetro Cefálico";
+"kg" = "kg";
+"cm" = "cm";
+"started_at" = "Iniciado a las: %@";
+
+// Quick Actions
+"direct_feeding" = "Alimentación Directa";
+"formula_milk" = "Fórmula";
+"solid_food" = "Alimento Sólido";
+"water" = "Agua";
+"sleep" = "Sueño";
+"diaper" = "Pañal";
+"bath" = "Baño";
+"measure_height" = "Altura";
+
+// All Actions Categories
+"feeding_category" = "Alimentación";
+"activity_category" = "Actividad";
+"growth_category" = "Crecimiento";
+"health_category" = "Salud";
+"milestone_category" = "Hitos";
+
+// Feeding Actions
+"breastfeeding" = "Alimentación Directa";
+"formula" = "Fórmula";
+"complementary_food" = "Alimento Complementario";
+"water_intake" = "Agua";
+
+// Activity Actions
+"sleep_activity" = "Sueño";
+"diaper_change" = "Pañal";
+"bath_activity" = "Baño";
+"walking" = "Caminar";
+"playing" = "Jugar";
+"pumping" = "Extracción de Leche";
+
+// Growth Actions
+"measure_height_action" = "Altura";
+"measure_weight" = "Peso";
+"measure_head" = "Perímetro Cefálico";
+
+// Health Actions
+"jaundice" = "Ictericia";
+"medical_visit" = "Consulta Médica";
+"vaccination" = "Vacunación";
+"temperature" = "Temperatura";
+"medication" = "Medicación";
+"supplement" = "Suplemento";
+
+// Milestone Actions
+"first_tooth" = "Primer Diente";
+"first_sit" = "Primera Sentada";
+"first_crawl" = "Primer Gateo";
+"first_roll" = "Primer Volteo";
+"first_word" = "Primera Palabra";
+
+// Language Setting
+"select_language" = "Seleccionar Idioma";
+"language_setting" = "Configuración de Idioma";
+
+// Today Stats
+"breast_milk" = "Leche Materna";
+"formula_milk_stat" = "Fórmula";
+"complementary_food_stat" = "Alimento Complementario";
+"supplement_stat" = "Suplemento";
+"stool" = "Heces";
+"urine" = "Orina";
+"sleep_duration" = "Duración del Sueño";
+"sleep_count" = "Número de Sueños";
+"hours" = "horas";
+"times" = "veces";
+
+// Age Display
+"year" = "año";
+"month" = "mes";
+"day" = "día";
+
+// SettingsView
+"tap_to_edit_baby_info" = "Toca para editar información del bebé";
+"personalization_settings" = "Personalización";
+"theme_color" = "Color del tema";
+"language_setting" = "Configuración de idioma";
+"mode_setting" = "Configuración de modo";
+"membership_privileges" = "Privilegios de membresía";
+"free" = "Gratis";
+"about" = "Acerca de";
+"about_us" = "Acerca de nosotros";
+"help_and_feedback" = "Ayuda y comentarios";
+"privacy_policy" = "Política de privacidad";
+"user_agreement" = "Términos de uso";
+"settings" = "Configuración";
+
+// AppLanguage Names
+"system_language" = "Seguir sistema";
+"simplified_chinese" = "Chino simplificado";
+"traditional_chinese" = "Chino tradicional";
+"english" = "Inglés";
+"japanese" = "Japonés";
+"korean" = "Coreano";
+"french" = "Francés";
+"portuguese" = "Portugués";
+"spanish" = "Español";
+
+// MainTabView
+"home" = "Inicio";
+"records" = "Registros";
+"statistics" = "Estadísticas";
+"settings" = "Configuración";
+
+// BabyCreationView
+"baby_name" = "Nombre del Bebé";
+"enter_baby_name" = "Por favor, ingrese el nombre del bebé";
+"birthday" = "Cumpleaños";
+"gender" = "Género";
+"male" = "Masculino";
+"female" = "Femenino";
+"prefer_not_to_say" = "Prefiero no decir";
+"add_baby" = "Agregar Bebé";
+"complete" = "Completar";
+"partner_device_tip" = "O obtenga más datos valiosos del bebé desde el dispositivo de su pareja";
+
+// StatisticsView
+"feeding_trend" = "Tendencia de Alimentación";
+"sleep_trend" = "Tendencia de Sueño";
+"growth_statistics" = "Estadísticas de Crecimiento";
+"daily_activity" = "Actividad Diaria";
+"7_days" = "7 Días";
+"30_days" = "30 Días";
+"90_days" = "90 Días";
+"12_months" = "12 Meses";
+
+// DailyActivityView
+"play" = "Jugar";
+"change_diaper" = "Cambiar Pañal";
+"activity_details" = "Detalles de la Actividad";
+"date_format" = "Fecha: %d";
+"time_format" = "Hora: %d:00";
+"activity_format" = "Actividad: %@";
+
+// GrowthStatisticsView
+"bmi" = "IMC";
+"month_age_format" = "Edad: %d meses";
+"weight_format" = "Peso: %.1f kg";
+"height_format" = "Altura: %.1f cm";
+"head_circumference_format" = "Circunferencia Cefálica: %.1f cm";
+
+// SleepTrendView
+"sleep_duration_title" = "Duración del Sueño";
+"hours_unit" = "Duración (horas)";
+"sleep_duration_format" = "Duración del Sueño: %.1f horas";
+"sleep_count_title" = "Recuento de Sueño";
+"times_unit" = "Veces";
+"sleep_count_format" = "Recuento de Sueño: %d veces";
+
+// FeedingTrendView
+"feeding_trend_title" = "Tendencia del Volumen de Leche";
+"milk_volume_unit" = "Volumen de Leche (ml)";
