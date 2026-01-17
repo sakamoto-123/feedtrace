@@ -7,24 +7,24 @@
 "ongoing" = "Em Andamento";
 "ending" = "Terminar";
 "quick_actions" = "Ações Rápidas";
+"more_records" = "Mais Registros";
 "edit" = "Editar";
 "all_actions" = "Todas as Ações";
 "weight" = "Peso";
 "height" = "Altura";
-"head_circumference" = "Circunferência Cefálica";
+"head" = "Cabeça";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "Iniciado em: %@";
 
 // Quick Actions
-"direct_feeding" = "Amamentação Direta";
-"formula_milk" = "Fórmula";
+"breast_milk" = "Leite Materno";
 "solid_food" = "Alimento Sólido";
 "water" = "Água";
 "sleep" = "Sono";
 "diaper" = "Fralda";
 "bath" = "Banho";
-"measure_height" = "Altura";
+"note" = "Nota";
 
 // All Actions Categories
 "feeding_category" = "Alimentação";
@@ -34,23 +34,17 @@
 "milestone_category" = "Marcos";
 
 // Feeding Actions
-"breastfeeding" = "Amamentação Direta";
+"nursing" = "Amamentação Direta";
+"breast_bottle" = "LM Frasco";
 "formula" = "Fórmula";
-"complementary_food" = "Alimento Complementar";
 "water_intake" = "Água";
 
 // Activity Actions
-"sleep_activity" = "Sono";
-"diaper_change" = "Fralda";
-"bath_activity" = "Banho";
 "walking" = "Caminhada";
 "playing" = "Brincadeira";
 "pumping" = "Expressão de Leite";
 
 // Growth Actions
-"measure_height_action" = "Altura";
-"measure_weight" = "Peso";
-"measure_head" = "Circunferência Cefálica";
 
 // Health Actions
 "jaundice" = "Icterícia";
@@ -73,9 +67,6 @@
 
 // Today Stats
 "breast_milk" = "Leite Materno";
-"formula_milk_stat" = "Fórmula";
-"complementary_food_stat" = "Alimento Complementar";
-"supplement_stat" = "Suplemento";
 "stool" = "Fezes";
 "urine" = "Urina";
 "sleep_duration" = "Duração do Sono";
@@ -155,7 +146,7 @@
 "month_age_format" = "Idade: %d meses";
 "weight_format" = "Peso: %.1f kg";
 "height_format" = "Altura: %.1f cm";
-"head_circumference_format" = "Circunferência Cefálica: %.1f cm";
+"head_format" = "Circunferência Cefálica: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "Duração do Sono";
@@ -168,3 +159,12 @@
 // FeedingTrendView
 "feeding_trend_title" = "Tendência do Volume de Leite";
 "milk_volume_unit" = "Volume de Leite (ml)";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "℃";
+"tablet" = "tablete";
+"piece" = "peça";

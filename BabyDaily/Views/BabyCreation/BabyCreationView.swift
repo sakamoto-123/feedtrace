@@ -7,8 +7,8 @@ struct BabyCreationView: View {
     @ObservedObject private var themeManager = ThemeManager.shared
     
     @State private var name: String = ""
-    @State private var photo: Image?
-    @State private var photoData: Data?
+    @State private var photos: [Image] = []
+    @State private var photoDatas: [Data] = []
     @State private var birthday: Date = Date()
     @State private var gender: String = "male"
     @State private var height: String = ""
@@ -55,7 +55,12 @@ struct BabyCreationView: View {
                 // 移除了取消按钮
             }
             .sheet(isPresented: $showingImagePicker) {
-                ImagePicker(image: $photo, imageData: $photoData)
+                ImagePicker(
+                    images: $photos,
+                    imageDatas: $photoDatas,
+                    allowsMultipleSelection: false,
+                    allowsEditing: true
+                )
             }
         }
     }
@@ -65,7 +70,7 @@ struct BabyCreationView: View {
         Button(action: {
             showingImagePicker = true
         }) {
-            if let photo = photo {
+            if let photo = photos.first {
                 photo
                     .resizable()
                     .scaledToFill()
@@ -85,7 +90,7 @@ struct BabyCreationView: View {
                 }
             }
         }
-        .animation(.easeInOut, value: photo)
+        .animation(.easeInOut, value: photos)
     }
     
     // 表单卡片
@@ -340,7 +345,7 @@ struct BabyCreationView: View {
         
         let newBaby = Baby(
             name: name,
-            photo: photoData,
+            photo: photoDatas.first,
             birthday: birthday,
             gender: gender,
             weight: weightValue,

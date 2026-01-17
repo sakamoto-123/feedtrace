@@ -4,281 +4,409 @@ import SwiftData
 struct HomeView: View {
     let baby: Baby
     @Environment(\.modelContext) private var modelContext
-    @Query private var records: [Record] // 这里需要过滤当前宝宝的记录
+    @Query private var records: [Record]
     
-    // 计算宝宝年龄
-    private var babyAge: String {
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from: baby.birthday, to: now)
+    init(baby: Baby) {
+        self.baby = baby
+        let babyId = baby.id
+        _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
+    }
+    
+
+    
+    // 进行中记录（仅显示吸奶或亲喂）
+    /// 仍在进行的记录（仅保留未结束且为指定子类的记录）
+    private var ongoingRecords: [Record] {
+        // 需要展示的子类白名单
+        let ongoingSubCategories: Set<String> = ["nursing", "pumping", "sleep"]
         
-        if let years = components.year, years > 0 {
-            if let months = components.month, months > 0 {
-                return "\(years)\("year".localized)\(months)\("month".localized)"
-            } else {
-                return "\(years)\("year".localized)"
-            }
-        } else if let months = components.month, months > 0 {
-            if let days = components.day, days > 0 {
-                return "\(months)\("month".localized)\(days)\("day".localized)"
-            } else {
-                return "\(months)\("month".localized)"
-            }
-        } else if let days = components.day {
-            return "\(days)\("day".localized)"
-        } else {
-            return "0\("day".localized)"
+        return records.filter { record in
+            record.endTimestamp == nil && ongoingSubCategories.contains(record.subCategory)
         }
     }
     
-    // 模拟今天的统计数据
-    private var todayStats: (feeding: [String: Int], activity: [String: Int]) {
-        // 这里应该从records中过滤今天的记录并计算统计数据
-        return (
-            feeding: ["breast_milk".localized: 200, "formula_milk_stat".localized: 150, "complementary_food_stat".localized: 50, "supplement_stat".localized: 10],
-            activity: ["stool".localized: 2, "urine".localized: 5, "sleep_duration".localized: 12, "sleep_count".localized: 3]
-        )
+    // 今天的统计数据
+    private var todayStats: DailyStats {
+        return StatsCalculator.getDailyStats(from: records)
     }
     
-    // 模拟进行中记录
-    @State private var ongoingRecords: [Record] = []
+    // 快速操作列表（根据原型：母乳、瓶喂、睡眠、纸尿裤、辅食、笔记、体重、身高）
+    private var quickActions: [(icon: String, category: String, name: String, color: Color)] {
+        // 定义快速操作对应的本地化键
+        let quickActionKeys = [
+            "nursing",
+            "formula", 
+            "sleep", 
+            "diaper", 
+            "solid_food", 
+            "weight",
+            "height"
+        ]
+        
+        return Constants.allCategorys.reduce(into: [(icon: String, category: String, name: String, color: Color)]()) { result, categoryEntry in
+            let category = categoryEntry.key
+            let actions = categoryEntry.value
+            
+            // 过滤出匹配的快速操作，并添加category字段
+            let matchingActions = actions.filter { quickActionKeys.contains($0.name) }
+            for action in matchingActions {
+                result.append((
+                    icon: action.icon,
+                    category: category,
+                    name: action.name,
+                    color: action.color
+                ))
+            }
+        }
+    }
     
-    // 快速操作列表
-    private var quickActions: [(icon: String, name: String)] {
+    // 所有操作分类 - 保持原始顺序
+    private var allActions: [(category: String, actions: [(icon: String, name: String, color: Color)])] {
         return [
-            (icon: "🤱", name: "direct_feeding".localized),
-            (icon: "🍼", name: "formula_milk".localized),
-            (icon: "🥣", name: "solid_food".localized),
-            (icon: "💧", name: "water".localized),
-            (icon: "😴", name: "sleep".localized),
-            (icon: "🧻", name: "diaper".localized),
-            (icon: "🛁", name: "bath".localized),
-            (icon: "📏", name: "measure_height".localized)
+            (category: "feeding_category".localized, actions: Constants.allCategorys["feeding_category"] ?? []),
+            (category: "activity_category".localized, actions: Constants.allCategorys["activity_category"] ?? []),
+            (category: "growth_category".localized, actions: Constants.allCategorys["growth_category"] ?? []),
+            (category: "health_category".localized, actions: Constants.allCategorys["health_category"] ?? []),
+            (category: "milestone_category".localized, actions: Constants.allCategorys["milestone_category"] ?? [])
         ]
     }
     
-    // 所有操作分类
-    private var allActions: [String: [(icon: String, name: String)]] {
-        return [
-            "feeding_category".localized: [(icon: "🤱", name: "breastfeeding".localized), (icon: "🍼", name: "formula".localized), (icon: "🥣", name: "complementary_food".localized), (icon: "💧", name: "water_intake".localized)],
-            "activity_category".localized: [(icon: "😴", name: "sleep_activity".localized), (icon: "🧻", name: "diaper_change".localized), (icon: "🛁", name: "bath_activity".localized), (icon: "🚶", name: "walking".localized), (icon: "🧸", name: "playing".localized), (icon: "🥛", name: "pumping".localized)],
-            "growth_category".localized: [(icon: "📏", name: "measure_height_action".localized), (icon: "⚖️", name: "measure_weight".localized), (icon: "📐", name: "measure_head".localized)],
-            "health_category".localized: [(icon: "🟡", name: "jaundice".localized), (icon: "🏥", name: "medical_visit".localized), (icon: "💉", name: "vaccination".localized), (icon: "🌡️", name: "temperature".localized), (icon: "💊", name: "medication".localized), (icon: "🦴", name: "supplement".localized)],
-            "milestone_category".localized: [(icon: "🦷", name: "first_tooth".localized), (icon: "🪑", name: "first_sit".localized), (icon: "🐢", name: "first_crawl".localized), (icon: "🔄", name: "first_roll".localized), (icon: "🗣️", name: "first_word".localized)]
-        ]
+    // 最新生长数据
+    private var latestGrowthData: GrowthData {
+        baby.getLatestGrowthData(from: records)
     }
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // 模块1：宝宝基本信息
-                    HStack(alignment: .center, spacing: 12) {
-                        // 宝宝头像
-                        if let photoData = baby.photo, let uiImage = UIImage(data: photoData) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 80, height: 80)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.accentColor, lineWidth: 2))
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.gray)
-                                .overlay(Circle().stroke(Color.accentColor, lineWidth: 2))
-                        }
-                        
-                        // 宝宝名称和年龄
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(baby.name)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text(babyAge)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        // 宝宝体重、身高、头围
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("\("weight".localized): \(baby.weight)\("kg".localized)")
-                            .font(.subheadline)
-                        Text("\("height".localized): \(baby.height)\("cm".localized)")
-                            .font(.subheadline)
-                        Text("\("head_circumference".localized): \(baby.headCircumference)\("cm".localized)")
-                            .font(.subheadline)
-                    }
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    
-                    // 模块2：今天的记录统计
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("today_statistics".localized)
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        // 喂养信息
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("feeding".localized)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                            
-                            HStack(spacing: 16) {
-                                ForEach(todayStats.feeding.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                                    Text("\(key): \(value)ml")
-                                        .font(.caption)
+            VStack(spacing: 0) {
+                // 固定在顶部的宝宝基本信息模块
+                BabyInfoHeader(baby: baby, latestGrowthData: latestGrowthData)
+                
+                Divider()
+                
+                // 可滚动的内容区域
+                ScrollView {
+                    VStack(spacing: 4) {
+                        // 模块1：进行中区域
+                        if !ongoingRecords.isEmpty {
+                            VStack(alignment: .leading, spacing: 12) {
+                                ForEach(ongoingRecords, id: \.id) { record in
+                                    OngoingRecordCard(record: record)
                                 }
                             }
+                            .padding(.top, 16)
                         }
+
+                        // 今天的记录统计
+                        TodayStatistics(todayStats: todayStats)
                         
-                        Divider()
-                        
-                        // 活动信息
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("activity".localized)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                            
-                            HStack(spacing: 16) {
-                                ForEach(todayStats.activity.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                                    Text("\(key): \(value)\(key.contains("时长") ? "小时" : "次")")
-                                        .font(.caption)
-                                }
-                            }
-                        }
+                        // 快速操作区域
+                        QuickActionsSection(quickActions: quickActions, baby: baby)
+
+                         // 所有操作区域
+                        AllActionsSection(allActions: allActions, baby: baby)
                     }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    
-                    // 模块3：进行中区域
-                    if !ongoingRecords.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("ongoing".localized)
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            ForEach(ongoingRecords, id: \.id) { record in
-                                // 进行中记录卡片
-                                HStack(spacing: 12) {
-                                    Text(record.icon)
-                                        .font(.title)
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("\(record.subCategory)中")
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                        Text("started_at".localized + " " + record.startTimestamp.formatted(Date.FormatStyle(time: .shortened)))
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button("ending".localized) {
-                                    // 结束记录
-                                }
-                                    .buttonStyle(.borderedProminent)
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
-                    
-                    // 模块4：快速操作区域
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                        Text("quick_actions".localized)
-                            .font(.headline)
-                        Spacer()
-                        Button("edit".localized) {
-                            // 编辑快速操作
-                        }
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
-                    }
-                        .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(quickActions, id: \.name) { action in
-                                    VStack(spacing: 8) {
-                                        NavigationLink(destination: RecordEditView(baby: baby, recordType: (category: "喂养", subCategory: action.name, icon: action.icon))) {
-                                            Text(action.icon)
-                                                .font(.title)
-                                                .frame(width: 60, height: 60)
-                                                .background(Color(.systemGray6))
-                                                .cornerRadius(12)
-                                        }
-                                        Text(action.name)
-                                            .font(.caption)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    
-                    // 模块5：所有操作的区域
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("all_actions".localized)
-                        .font(.headline)
-                        .padding(.horizontal)
-                        
-                        ForEach(allActions.sorted(by: { $0.key < $1.key }), id: \.key) { category, actions in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(category)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .padding(.horizontal)
-                                
-                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                    ForEach(actions, id: \.name) { action in
-                                        NavigationLink(destination: RecordEditView(baby: baby, recordType: (category: category, subCategory: action.name, icon: action.icon))) {
-                                            VStack(spacing: 4) {
-                                                Text(action.icon)
-                                                    .font(.title2)
-                                                Text(action.name)
-                                                    .font(.caption2)
-                                                    .lineLimit(1)
-                                            }
-                                            .padding()
-                                            .frame(maxWidth: .infinity)
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(12)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
-                    .padding(.bottom, 20)
                 }
-                .padding(.top, 16)
             }
-            .navigationTitle("baby_diary".localized)
-        .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        // 切换宝宝
-                    }) {
-                        Image(systemName: "person.crop.circle")
+            .background(Color(.systemGray6))
+            .toolbar(.hidden, for: .navigationBar)
+        }
+    }
+}
+
+// 宝宝信息头部组件
+struct BabyInfoHeader: View {
+    let baby: Baby
+    let latestGrowthData: GrowthData
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 0) {
+            // 宝宝头像和名称区域
+            HStack(alignment: .center, spacing: 12) {
+                // 宝宝头像
+                if let photoData = baby.photo, let uiImage = UIImage(data: photoData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 44, height:44)
+                        .clipShape(Circle())
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 44, height: 44)
+                        .foregroundColor(.gray)
+                }
+                
+                // 宝宝名称和年龄
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(baby.name)
+                        .font(.system(size: 15))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    Text(calculateBabyAge(baby))
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+            }
+            .padding(.leading, 20)
+            .padding(.bottom, 12)
+            
+            // 体重、身高和头围信息（横向排列，固定在顶部）
+            VStack(alignment: .center, spacing: 6) {
+                // 体重
+                HStack(spacing: 8) {
+                    Image(systemName: "scalemass")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.2))
+                    Text(String(format: "%.1f", latestGrowthData.weight))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                    Text("kg".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                }
+                
+                // 身高
+                HStack(spacing: 8) {
+                    Image(systemName: "ruler")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(red: 0.4, green: 0.6, blue: 1.0))
+                    Text(latestGrowthData.height > 0 ? String(format: "%.0f", latestGrowthData.height) : "---")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                    Text("cm".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                }
+                
+                // 头围
+                HStack(spacing: 8) {
+                    Image(systemName: "circle.dashed")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(red: 0.6, green: 0.2, blue: 1.0))
+                    Text(latestGrowthData.headCircumference > 0 ? String(format: "%.0f", latestGrowthData.headCircumference) : "---")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                    Text("cm".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.top, 8)
+        .background(Color.white)
+    }
+}
+
+// 进行中记录卡片组件
+struct OngoingRecordCard: View {
+    let record: Record
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(record.icon)
+                .font(.title)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(record.subCategory.localized) · 进行中")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Button("ending".localized) {
+                // 结束记录
+            }
+            .font(.system(size: 14))
+            .buttonStyle(.borderedProminent)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
+    }
+}
+
+// 今日统计信息组件
+struct TodayStatistics: View {
+    let todayStats: DailyStats
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("today_statistics".localized)
+                .font(.headline)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], alignment: .leading, spacing: 24) {
+                
+                // 喂养信息
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("feeding".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("formula".localized + ": \(todayStats.formulaAmount.smartDecimal) ml")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("breast_milk".localized + ": \(todayStats.breastMilkAmount.smartDecimal) ml")
+                        .font(.system(size: 14, weight: .medium))       
+                }
+
+                // 睡眠信息
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("sleep".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("时长".localized + ": \(todayStats.sleepDurationInHours.smartDecimal) 小时")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("次数".localized + ": \(todayStats.sleepCount) 次")
+                        .font(.system(size: 14, weight: .medium))       
+                }
+
+                // 补剂信息
+               if !todayStats.supplementRecords.isEmpty {
+                    Text("supplement".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    ForEach(todayStats.supplementRecords, id: \.self) { record in
+                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) ml" : ""
+                        Text("\(record.name)\(valueText)")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+               }
+
+                // 辅食信息
+               if !todayStats.solidFoodRecords.isEmpty {
+                    Text("solid_food".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    ForEach(todayStats.solidFoodRecords, id: \.self) { record in
+                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) ml" : ""
+                        Text("\(record.name)\(valueText)")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+               }
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(Constants.cornerRadius)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+    }
+}
+
+// 快速操作区域组件
+struct QuickActionsSection: View {
+    let quickActions: [(icon: String, category: String, name: String, color: Color)]
+    let baby: Baby
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("quick_actions".localized)
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            // 自适应四列网格布局
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 12)], spacing: 20) {
+                ForEach(quickActions, id: \.name) { action in
+                    CategoryActionButton(
+                        icon: action.icon,
+                        name: action.name,
+                        color: action.color,
+                        category: action.category,
+                        baby: baby
+                    )
+                }
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+    }
+}
+
+// 所有操作区域组件
+struct AllActionsSection: View {
+    let allActions: [(category: String, actions: [(icon: String, name: String, color: Color)])]
+    let baby: Baby
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("all_actions".localized)
+                .font(.headline)
+            
+            ForEach(allActions, id: \.category) { categoryItem in
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(categoryItem.category)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 12)], spacing: 20) {
+                        ForEach(categoryItem.actions, id: \.name) { action in
+                            CategoryActionButton(
+                                icon: action.icon,
+                                name: action.name,
+                                color: action.color,
+                                category: categoryItem.category,
+                                baby: baby
+                            )
+                        }
                     }
                 }
             }
         }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+    }
+}
+
+// 快速操作按钮组件
+struct CategoryActionButton: View {
+    let icon: String
+    let name: String
+    let color: Color
+    let category: String
+    let baby: Baby
+    let size: CGFloat = 60
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            NavigationLink(destination: RecordEditView(baby: baby, recordType: (category: category, subCategory: name, icon: icon))) {
+                ZStack {
+                    Circle()
+                        .fill(color)
+                        .frame(width: size, height: size)
+                    
+                    Text(icon)
+                        .font(.system(size: 32))
+                    
+                    // 右下角的红色加号
+                    // Image(systemName: "plus.circle.fill")
+                    //     .font(.system(size: 18))
+                    //     .foregroundColor(.red)
+                    //     .offset(x: 25, y: 25)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            Text(name.localized)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.primary)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

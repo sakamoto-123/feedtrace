@@ -7,10 +7,6 @@ struct ThemeColorSettingView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
-                Text("选择主题颜色")
-                    .font(.headline)
-                    .padding(.horizontal)
-                
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                     ForEach(ThemeColor.allCases, id: \.self) { color in
                         Button(action: {
@@ -37,6 +33,8 @@ struct ThemeColorSettingView: View {
             }
             .navigationTitle("主题颜色")
             .navigationBarTitleDisplayMode(.inline)
+            .edgesIgnoringSafeArea(.bottom)
+            .toolbar(.hidden, for: .tabBar)
         }
     }
 }

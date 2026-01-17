@@ -7,24 +7,24 @@
 "ongoing" = "En cours";
 "ending" = "Terminer";
 "quick_actions" = "Actions rapides";
+"more_records" = "Plus d'enregistrements";
 "edit" = "Modifier";
 "all_actions" = "Toutes les actions";
 "weight" = "Poids";
 "height" = "Taille";
-"head_circumference" = "Circonférence de la tête";
+"head" = "Tête";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "Démarré à: %@";
 
 // Quick Actions
-"direct_feeding" = "Allaitement direct";
-"formula_milk" = "Lait en poudre";
+"breast_milk" = "Lait maternel";
 "solid_food" = "Aliments solides";
 "water" = "Eau";
 "sleep" = "Sommeil";
 "diaper" = "Couche";
 "bath" = "Bain";
-"measure_height" = "Taille";
+"note" = "Note";
 
 // All Actions Categories
 "feeding_category" = "Alimentation";
@@ -34,23 +34,17 @@
 "milestone_category" = "Jalons";
 
 // Feeding Actions
-"breastfeeding" = "Allaitement direct";
+"nursing" = "Allaitement direct";
+"breast_bottle" = "LM Bouteille";
 "formula" = "Lait en poudre";
-"complementary_food" = "Aliments complémentaires";
 "water_intake" = "Eau";
 
 // Activity Actions
-"sleep_activity" = "Sommeil";
-"diaper_change" = "Couche";
-"bath_activity" = "Bain";
 "walking" = "Marche";
 "playing" = "Jeux";
 "pumping" = "Pompage";
 
 // Growth Actions
-"measure_height_action" = "Taille";
-"measure_weight" = "Poids";
-"measure_head" = "Circonférence de la tête";
 
 // Health Actions
 "jaundice" = "Jaunisse";
@@ -73,9 +67,6 @@
 
 // Today Stats
 "breast_milk" = "Lait maternel";
-"formula_milk_stat" = "Lait en poudre";
-"complementary_food_stat" = "Aliments complémentaires";
-"supplement_stat" = "Complément";
 "stool" = "Selles";
 "urine" = "Urine";
 "sleep_duration" = "Durée du sommeil";
@@ -155,7 +146,7 @@
 "month_age_format" = "Âge: %d mois";
 "weight_format" = "Poids: %.1f kg";
 "height_format" = "Taille: %.1f cm";
-"head_circumference_format" = "Circonférence de la tête: %.1f cm";
+"head_format" = "Circonférence de la tête: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "Durée du sommeil";
@@ -168,3 +159,12 @@
 // FeedingTrendView
 "feeding_trend_title" = "Tendance du volume de lait";
 "milk_volume_unit" = "Volume de lait (ml)";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "℃";
+"tablet" = "comprimé";
+"piece" = "pièce";

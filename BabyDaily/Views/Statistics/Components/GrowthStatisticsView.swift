@@ -16,7 +16,7 @@ struct GrowthStatisticsCard: View {
                 
                 // 维度选择器
                 HStack(spacing: 12) {
-                    ForEach(["weight", "height", "head_circumference", "bmi"], id: \.self) {
+                    ForEach(["weight", "height", "head", "bmi"], id: \.self) {
                         dimension in
                         Button(action: {
                             selectedDimension = dimension
@@ -68,10 +68,10 @@ struct GrowthStatisticsCard: View {
                         y: .value("height_cm", $0.height)
                     )
                     .foregroundStyle(Color.blue.opacity(0.2))
-                } else if selectedDimension == "head_circumference" {
+                } else if selectedDimension == "head" {
                     LineMark(
                         x: .value("month_age", $0.month),
-                        y: .value("head_circumference_cm", $0.headCircumference)
+                        y: .value("head_cm", $0.headCircumference)
                     )
                     .foregroundStyle(.green)
                     .symbol(.circle)
@@ -80,7 +80,7 @@ struct GrowthStatisticsCard: View {
                     
                     AreaMark(
                         x: .value("month_age", $0.month),
-                        y: .value("head_circumference_cm", $0.headCircumference)
+                        y: .value("head_cm", $0.headCircumference)
                     )
                     .foregroundStyle(Color.green.opacity(0.2))
                 } else if selectedDimension == "bmi" {
@@ -151,7 +151,7 @@ struct GrowthStatisticsCard: View {
                         Text(String(format: "height_format".localized, selectedData.height))
                             .font(.system(size: 14))
                             .foregroundColor(.blue)
-                        Text(String(format: "head_circumference_format".localized, selectedData.headCircumference))
+                        Text(String(format: "head_format".localized, selectedData.headCircumference))
                             .font(.system(size: 14))
                             .foregroundColor(.green)
                     }
@@ -161,7 +161,7 @@ struct GrowthStatisticsCard: View {
             
             // 数据指标
             HStack(spacing: 24) {
-                ForEach(["weight", "height", "head_circumference", "bmi"], id: \.self) {
+                ForEach(["weight", "height", "head", "bmi"], id: \.self) {
                     dimension in
                     VStack(spacing: 8) {
                         Text(dimension.localized)
@@ -169,19 +169,19 @@ struct GrowthStatisticsCard: View {
                             .foregroundColor(.gray)
                         if let latestData = data.last {
                             if dimension == "weight" {
-                                Text(String(format: "%.1f kg", latestData.weight))
+                                Text("\(latestData.weight.smartDecimal) kg")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.black)
                             } else if dimension == "height" {
-                                Text(String(format: "%.1f cm", latestData.height))
+                                Text("\(latestData.height.smartDecimal) cm")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.black)
-                            } else if dimension == "head_circumference" {
-                                Text(String(format: "%.1f cm", latestData.headCircumference))
+                            } else if dimension == "head" {
+                                Text("\(latestData.headCircumference.smartDecimal) cm")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.black)
                             } else if dimension == "bmi" {
-                                Text(String(format: "%.1f", latestData.bmi.rounded(toPlaces: 1)))
+                                Text(latestData.bmi.smartDecimal(roundedTo: 1))
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.black)
                             }

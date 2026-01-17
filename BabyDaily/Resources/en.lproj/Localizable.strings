@@ -7,24 +7,24 @@
 "ongoing" = "Ongoing";
 "ending" = "End";
 "quick_actions" = "Quick Actions";
+"more_records" = "More Records";
 "edit" = "Edit";
 "all_actions" = "All Actions";
 "weight" = "Weight";
 "height" = "Height";
-"head_circumference" = "Head Circumference";
+"head" = "Head";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "Started at: %@";
 
 // Quick Actions
-"direct_feeding" = "Direct Feeding";
-"formula_milk" = "Formula";
-"solid_food" = "Solid Food";
+"breast_milk" = "Breast Milk";
+"solid_food" = "Solids";
 "water" = "Water";
 "sleep" = "Sleep";
 "diaper" = "Diaper";
 "bath" = "Bath";
-"measure_height" = "Height";
+"note" = "Note";
 
 // All Actions Categories
 "feeding_category" = "Feeding";
@@ -34,27 +34,21 @@
 "milestone_category" = "Milestones";
 
 // Feeding Actions
-"breastfeeding" = "Breastfeeding";
+"nursing" = "nursing";
+"breast_bottle" = "Breast Bottle";
 "formula" = "Formula";
-"complementary_food" = "Complementary Food";
 "water_intake" = "Water";
 
 // Activity Actions
-"sleep_activity" = "Sleep";
-"diaper_change" = "Diaper";
-"bath_activity" = "Bath";
 "walking" = "Walking";
 "playing" = "Playing";
 "pumping" = "Pumping";
 
 // Growth Actions
-"measure_height_action" = "Height";
-"measure_weight" = "Weight";
-"measure_head" = "Head Circumference";
 
 // Health Actions
 "jaundice" = "Jaundice";
-"medical_visit" = "Medical Visit";
+"medical_visit" = "Doctor";
 "vaccination" = "Vaccination";
 "temperature" = "Temperature";
 "medication" = "Medication";
@@ -73,9 +67,6 @@
 
 // Today Stats
 "breast_milk" = "Breast Milk";
-"formula_milk_stat" = "Formula";
-"complementary_food_stat" = "Complementary Food";
-"supplement_stat" = "Supplement";
 "stool" = "Stool";
 "urine" = "Urine";
 "sleep_duration" = "Sleep Duration";
@@ -155,7 +146,7 @@
 "month_age_format" = "Age: %d months";
 "weight_format" = "Weight: %.1f kg";
 "height_format" = "Height: %.1f cm";
-"head_circumference_format" = "Head Circumference: %.1f cm";
+"head_format" = "Head Circumference: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "Sleep Duration";
@@ -168,3 +159,12 @@
 // FeedingTrendView
 "feeding_trend_title" = "Milk Volume Trend";
 "milk_volume_unit" = "Milk Volume (ml)";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "℃";
+"tablet" = "tablet";
+"piece" = "piece";

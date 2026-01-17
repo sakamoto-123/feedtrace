@@ -7,24 +7,22 @@
 "ongoing" = "진행 중";
 "ending" = "종료";
 "quick_actions" = "빠른 작업";
+"more_records" = "더 많은 기록";
 "edit" = "편집";
 "all_actions" = "모든 작업";
 "weight" = "체중";
 "height" = "키";
-"head_circumference" = "두 둘레";
+"head" = "머리";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "시작: %@";
 
 // Quick Actions
-"direct_feeding" = "직접 수유";
-"formula_milk" = "분유";
 "solid_food" = "이유식";
 "water" = "물";
 "sleep" = "수면";
 "diaper" = "기저귀";
 "bath" = "목욕";
-"measure_height" = "키";
 
 // All Actions Categories
 "feeding_category" = "수유";
@@ -34,23 +32,17 @@
 "milestone_category" = "마일스톤";
 
 // Feeding Actions
-"breastfeeding" = "직접 수유";
+"nursing" = "직접 수유";
+"breast_bottle" = "병모유";
 "formula" = "분유";
-"complementary_food" = "이유식";
 "water_intake" = "물";
 
 // Activity Actions
-"sleep_activity" = "수면";
-"diaper_change" = "기저귀";
-"bath_activity" = "목욕";
 "walking" = "보행";
 "playing" = "놀이";
 "pumping" = "젖 빼기";
 
 // Growth Actions
-"measure_height_action" = "키";
-"measure_weight" = "체중";
-"measure_head" = "두 둘레";
 
 // Health Actions
 "jaundice" = "황달";
@@ -73,9 +65,6 @@
 
 // Today Stats
 "breast_milk" = "모유";
-"formula_milk_stat" = "분유";
-"complementary_food_stat" = "이유식";
-"supplement_stat" = "영양제";
 "stool" = "대변";
 "urine" = "소변";
 "sleep_duration" = "수면 시간";
@@ -155,7 +144,7 @@
 "month_age_format" = "연령: %d개월";
 "weight_format" = "체중: %.1f kg";
 "height_format" = "키: %.1f cm";
-"head_circumference_format" = "머리 둘레: %.1f cm";
+"head_format" = "머리 둘레: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "수면 시간";
@@ -168,3 +157,12 @@
 // FeedingTrendView
 "feeding_trend_title" = "젖량 추세";
 "milk_volume_unit" = "젖량(ml)";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "℃";
+"tablet" = "정";
+"piece" = "조각";

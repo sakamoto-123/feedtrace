@@ -3,89 +3,94 @@ import Combine
 
 // 语言枚举
 enum AppLanguage: String, CaseIterable, Identifiable {
-    case system = "system_language"
-    case simplifiedChinese = "simplified_chinese"
-    case traditionalChinese = "traditional_chinese"
-    case english = "english"
-    case japanese = "japanese"
-    case korean = "korean"
-    case french = "french"
-    case portuguese = "portuguese"
-    case spanish = "spanish"
+    case system = ""
+    case simplifiedChinese = "zh-Hans"
+    case traditionalChinese = "zh-Hant"
+    case english = "en"
+    case japanese = "ja"
+    case korean = "ko"
+    case french = "fr"
+    case portuguese = "pt"
+    case spanish = "es"
     
     var id: String {
         return self.rawValue
     }
     
-    // 本地化语言名称
-    var localizedName: String {
-        return self.rawValue.localized
+    // 语言显示名称
+    var displayName: String {
+        switch self {
+        case .system:
+            return "跟随系统"
+        case .simplifiedChinese:
+            return "简体中文"
+        case .traditionalChinese:
+            return "繁体中文"
+        case .english:
+            return "English"
+        case .japanese:
+            return "日本語"
+        case .korean:
+            return "한국어"
+        case .french:
+            return "Français"
+        case .portuguese:
+            return "Português"
+        case .spanish:
+            return "Español"
+        }
     }
 }
 
 // 语言管理工具类
 class LanguageManager: ObservableObject {
-    // 使用@AppStorage持久化语言设置，默认跟随系统
-    @AppStorage("selectedLanguage") var selectedLanguage: AppLanguage = .system {
-        willSet {
-            objectWillChange.send()
-        }
-    }
-    
     // 单例实例
     static let shared = LanguageManager()
     
-    private init() {}
+    // 语言设置存储键
+    private let languageKey = "appLanguage"
     
-    // 符合ObservableObject协议的objectWillChange发布者
-    let objectWillChange = PassthroughSubject<Void, Never>()
+    // 发布属性，用于观察语言变化
+    @Published var selectedLanguage: AppLanguage = .system
+    
+    private init() {
+        loadSettings()
+    }
+    
+    // 加载语言设置
+    private func loadSettings() {
+        let savedLanguage = UserDefaults.standard.string(forKey: languageKey) ?? ""
+        if savedLanguage.isEmpty {
+            selectedLanguage = .system
+        } else if let language = AppLanguage(rawValue: savedLanguage) {
+            selectedLanguage = language
+        }
+    }
+    
+    // 保存语言设置
+    private func saveSettings() {
+        // 如果是系统语言，保存空字符串
+        let languageToSave = selectedLanguage == .system ? "" : selectedLanguage.rawValue
+        UserDefaults.standard.set(languageToSave, forKey: languageKey)
+    }
     
     // 切换语言
     func switchLanguage(to language: AppLanguage) {
         selectedLanguage = language
+        saveSettings()
     }
     
-    // 获取当前语言的标识符
-    var currentLanguageCode: String? {
-        switch selectedLanguage {
-        case .system:
-            return nil // 跟随系统
-        case .simplifiedChinese:
-            return "zh-Hans"
-        case .traditionalChinese:
-            return "zh-Hant"
-        case .english:
-            return "en"
-        case .japanese:
-            return "ja"
-        case .korean:
-            return "ko"
-        case .french:
-            return "fr"
-        case .portuguese:
-            return "pt"
-        case .spanish:
-            return "es"
+    // 获取当前语言代码
+    var currentLanguageCode: String {
+        if selectedLanguage == .system {
+            return Locale.preferredLanguages.first ?? "en"
         }
+        return selectedLanguage.rawValue
     }
     
     // 获取当前语言环境
     var currentLocale: Locale {
-        if let code = currentLanguageCode {
-            return Locale(identifier: code)
-        } else {
-            return Locale.current
-        }
-    }
-    
-    // 获取本地化字符串
-    func localizedString(_ key: String, comment: String = "") -> String {
-        return NSLocalizedString(key, comment: comment)
-    }
-    
-    // 获取带参数的本地化字符串
-    func localizedString(_ key: String, arguments: [CVarArg], comment: String = "") -> String {
-        return String(format: localizedString(key, comment: comment), arguments: arguments)
+        return Locale(identifier: currentLanguageCode)
     }
     
     // 获取本地化日期格式
@@ -106,6 +111,17 @@ class LanguageManager: ObservableObject {
 // 便捷的字符串扩展，用于获取本地化字符串
 extension String {
     var localized: String {
+        let language = UserDefaults.standard.string(forKey: "appLanguage") ?? ""
+        
+        if language.isEmpty {
+            return NSLocalizedString(self, comment: "")
+        }
+        
+        if let path = Bundle.main.path(forResource: language, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            return bundle.localizedString(forKey: self, value: nil, table: nil)
+        }
+        
         return NSLocalizedString(self, comment: "")
     }
     
@@ -114,12 +130,24 @@ extension String {
     }
 }
 
-// 视图修饰符，用于监听语言变化
+// 视图修饰符，用于让视图能够响应语言变化
 extension View {
-    func onLanguageChange(perform action: @escaping () -> Void) -> some View {
-        self
-            .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
-                action()
-            }
+    func observeLanguage() -> some View {
+        self.modifier(LanguageObserver())
     }
+}
+
+// 语言观察者修饰符
+struct LanguageObserver: ViewModifier {
+    @EnvironmentObject var languageManager: LanguageManager
+    
+    func body(content: Content) -> some View {
+        content
+            .id(languageManager.selectedLanguage) // 使用 id 修饰符强制视图在语言变化时重新创建
+    }
+}
+
+// 通知扩展
+extension Notification.Name {
+    static let languageDidChange = Notification.Name("LanguageDidChangeNotification")
 }

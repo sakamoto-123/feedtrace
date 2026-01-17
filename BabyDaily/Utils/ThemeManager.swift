@@ -54,16 +54,32 @@ enum ThemeColor: String, CaseIterable, Identifiable {
 
 // 主题管理工具类
 class ThemeManager: ObservableObject {
-    // 使用@AppStorage持久化主题设置，默认跟随系统
-    @AppStorage("selectedThemeMode") var selectedThemeMode: ThemeMode = .system
+    // 使用@Published属性来触发视图更新
+    @Published var selectedThemeMode: ThemeMode {
+        didSet {
+            // 当主题模式改变时，更新AppStorage的值
+            UserDefaults.standard.set(selectedThemeMode.rawValue, forKey: "selectedThemeMode")
+        }
+    }
     
-    // 使用@AppStorage持久化主题颜色设置，默认蓝色
-    @AppStorage("selectedThemeColor") var selectedThemeColor: ThemeColor = .blue
+    @Published var selectedThemeColor: ThemeColor {
+        didSet {
+            // 当主题颜色改变时，更新AppStorage的值
+            UserDefaults.standard.set(selectedThemeColor.rawValue, forKey: "selectedThemeColor")
+        }
+    }
     
     // 单例实例
     static let shared = ThemeManager()
     
-    private init() {}
+    private init() {
+        // 从AppStorage中读取保存的值，如果没有则使用默认值
+        let savedMode = UserDefaults.standard.string(forKey: "selectedThemeMode") ?? ThemeMode.system.rawValue
+        self.selectedThemeMode = ThemeMode(rawValue: savedMode) ?? .system
+        
+        let savedColor = UserDefaults.standard.string(forKey: "selectedThemeColor") ?? ThemeColor.blue.rawValue
+        self.selectedThemeColor = ThemeColor(rawValue: savedColor) ?? .blue
+    }
     
     // 切换主题模式
     func switchTheme(to mode: ThemeMode) {

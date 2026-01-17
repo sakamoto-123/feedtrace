@@ -34,25 +34,25 @@ final class Baby {
 }
 
 @Model
-final class Record {
-    var id: UUID
-    var babyId: UUID
-    var icon: String
-    var category: String
-    var subCategory: String
-    var startTimestamp: Date
-    var endTimestamp: Date?
-    var name: String?
-    var value: Int?
-    var unit: String?
-    var remark: String?
-    var photos: [Data]?
-    var breastType: String? // LEFT/RIGHT/BOTH
-    var dayOrNight: String? // DAY/NIGHT
-    var acceptance: String? // LIKE/NEUTRAL/DISLIKE/ALLERGY
-    var excrementStatus: String? // URINE/STOOL/MIXED
+public final class Record {
+    public var id: UUID
+    public var babyId: UUID
+    public var icon: String
+    public var category: String
+    public var subCategory: String
+    public var startTimestamp: Date
+    public var endTimestamp: Date?
+    public var name: String?
+    public var value: Double?
+    public var unit: String?
+    public var remark: String?
+    public var photos: [Data]?
+    public var breastType: String? // LEFT/RIGHT/BOTH
+    public var dayOrNight: String? // DAY/NIGHT
+    public var acceptance: String? // LIKE/NEUTRAL/DISLIKE/ALLERGY
+    public var excrementStatus: String? // URINE/STOOL/MIXED
     
-    init(id: UUID = UUID(), babyId: UUID, icon: String, category: String, subCategory: String, startTimestamp: Date, endTimestamp: Date? = nil, name: String? = nil, value: Int? = nil, unit: String? = nil, remark: String? = nil, photos: [Data]? = nil, breastType: String? = nil, dayOrNight: String? = nil, acceptance: String? = nil, excrementStatus: String? = nil) {
+    public init(id: UUID = UUID(), babyId: UUID, icon: String, category: String, subCategory: String, startTimestamp: Date, endTimestamp: Date? = nil, name: String? = nil, value: Double? = nil, unit: String? = nil, remark: String? = nil, photos: [Data]? = nil, breastType: String? = nil, dayOrNight: String? = nil, acceptance: String? = nil, excrementStatus: String? = nil) {
         self.id = id
         self.babyId = babyId
         self.icon = icon
@@ -69,5 +69,53 @@ final class Record {
         self.dayOrNight = dayOrNight
         self.acceptance = acceptance
         self.excrementStatus = excrementStatus
+    }
+}
+
+// 生长数据结构体
+struct GrowthData {
+    let weight: Double
+    let height: Double
+    let headCircumference: Double
+}
+
+// Baby扩展，用于获取最新生长数据
+extension Baby {
+    func getLatestGrowthData(from records: [Record]) -> GrowthData {
+        var latestWeight: Double?
+        var latestHeight: Double?
+        var latestHeadCircumference: Double?
+        
+        // 遍历记录，找到最新的体重、身高、头围记录
+        for record in records {
+            switch record.subCategory {
+            case "weight":
+                if latestWeight == nil, let weight = record.value {
+                    latestWeight = weight
+                }
+            case "height":
+                if latestHeight == nil, let height = record.value {
+                    latestHeight = height
+                }
+            case "head":
+                if latestHeadCircumference == nil, let headCircumference = record.value {
+                    latestHeadCircumference = headCircumference
+                }
+            default:
+                break
+            }
+            
+            // 如果已经找到所有数据，提前退出循环
+            if latestWeight != nil && latestHeight != nil && latestHeadCircumference != nil {
+                break
+            }
+        }
+        
+        // 使用最新记录数据，如果没有则使用Baby信息中的数据
+        return GrowthData(
+            weight: latestWeight ?? self.weight,
+            height: latestHeight ?? self.height,
+            headCircumference: latestHeadCircumference ?? self.headCircumference
+        )
     }
 }

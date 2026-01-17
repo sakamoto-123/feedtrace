@@ -45,7 +45,7 @@ struct SettingsView: View {
                 Section("personalization_settings".localized) {
                     NavigationLink(destination: ThemeColorSettingView()) {
                         HStack {
-                            Image(systemName: "palette.fill")
+                            Image(systemName: "paintpalette.fill")
                                 .foregroundColor(.accentColor)
                             Text("theme_color".localized)
                             Spacer()

@@ -77,6 +77,7 @@ struct MembershipPrivilegesView: View {
             }
             .navigationTitle("会员特权")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .tabBar)
         }
     }
 }

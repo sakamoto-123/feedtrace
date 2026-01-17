@@ -7,60 +7,44 @@
 "ongoing" = "进行中";
 "ending" = "结束";
 "quick_actions" = "快速操作";
+"more_records" = "更多记录";
 "edit" = "编辑";
 "all_actions" = "所有操作";
-"weight" = "体重";
-"height" = "身高";
-"head_circumference" = "头围";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "开始于: %@";
 
-// Quick Actions
-"direct_feeding" = "亲喂";
-"formula_milk" = "奶粉";
-"solid_food" = "辅食";
-"water" = "水";
-"sleep" = "睡觉";
-"diaper" = "纸尿裤";
-"bath" = "洗澡";
-"measure_height" = "身高";
-
-// All Actions Categories
 "feeding_category" = "喂养";
 "activity_category" = "活动";
 "growth_category" = "成长";
 "health_category" = "健康";
 "milestone_category" = "重要节点";
 
-// Feeding Actions
-"breastfeeding" = "亲喂";
+"breast_milk" = "母乳";
+"solid_food" = "辅食";
+"water" = "水";
+"sleep" = "睡觉";
+"diaper" = "纸尿裤";
+"bath" = "洗澡";
+"note" = "笔记";
+"weight" = "体重";
+"height" = "身高";
+"head" = "头";
+"nursing" = "亲喂";
+"breast_bottle" = "母乳瓶喂";
 "formula" = "奶粉";
-"complementary_food" = "辅食";
 "water_intake" = "水";
-
-// Activity Actions
-"sleep_activity" = "睡觉";
-"diaper_change" = "纸尿裤";
-"bath_activity" = "洗澡";
 "walking" = "走路";
 "playing" = "玩耍";
 "pumping" = "吸奶";
-
-// Growth Actions
-"measure_height_action" = "身高";
-"measure_weight" = "体重";
-"measure_head" = "头围";
-
-// Health Actions
 "jaundice" = "黄疸";
 "medical_visit" = "就医";
 "vaccination" = "疫苗";
 "temperature" = "体温";
 "medication" = "用药";
 "supplement" = "补剂";
+"breast_milk" = "母乳";
 
-// Milestone Actions
 "first_tooth" = "第一颗牙齿";
 "first_sit" = "第一次坐";
 "first_crawl" = "第一次爬";
@@ -72,10 +56,6 @@
 "language_setting" = "语言设置";
 
 // Today Stats
-"breast_milk" = "母乳";
-"formula_milk_stat" = "奶粉";
-"complementary_food_stat" = "辅食";
-"supplement_stat" = "补剂";
 "stool" = "大便";
 "urine" = "小便";
 "sleep_duration" = "睡觉时长";
@@ -173,7 +153,7 @@
 "month_age_format" = "月龄: %d 个月";
 "weight_format" = "体重: %.1f kg";
 "height_format" = "身高: %.1f cm";
-"head_circumference_format" = "头围: %.1f cm";
+"head_format" = "头围: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "睡眠时间";
@@ -186,3 +166,77 @@
 // FeedingTrendView
 "feeding_trend_title" = "奶量趋势";
 "milk_volume_unit" = "奶量(ml)";
+
+// RecordEditView - Sections
+"time" = "时间信息";
+"information" = "信息";
+"additional_information" = "补充信息";
+
+// RecordEditView - Time
+"start_time" = "开始时间";
+"end_time" = "结束时间";
+
+// RecordEditView - Information
+"name" = "名称";
+"breast_side" = "喂养侧";
+"both_sides" = "双侧";
+"left_side" = "左侧";
+"right_side" = "右侧";
+"amount" = "用量";
+"day_night" = "时段";
+"daytime" = "白天";
+"night" = "黑夜";
+"acceptance_level" = "接受程度";
+"like" = "喜欢";
+"neutral" = "一般";
+"dislike" = "不喜欢";
+"allergy" = "过敏";
+"excrement_type" = "排泄物类型";
+"urine" = "小便";
+"stool" = "大便";
+"mixed" = "混合";
+
+// RecordEditView - Additional Information
+"remark" = "备注";
+"photos" = "照片";
+
+// RecordEditView - Buttons and Navigation
+"save" = "保存";
+"delete" = "删除";
+
+// RecordEditView - Error Messages
+"save_failed" = "保存失败";
+"please_enter_name" = "请输入名称";
+"please_enter_amount" = "请输入用量";
+"please_enter_valid_number" = "请输入有效的数字";
+"record_type_incomplete" = "记录类型信息不完整";
+"unknown_error" = "未知错误";
+"ok" = "确定";
+
+// RecordDetailView
+"record_detail" = "记录详情";
+
+// RecordListView - Record Content
+"in_progress" = "进行中";
+"hours" = "小时";
+"minutes" = "分钟";
+"left" = "左";
+"right" = "右";
+
+// RecordListView - Navigation
+"records" = "记录";
+"edit" = "编辑";
+"delete" = "删除";
+
+// RecordDetailView
+"duration" = "持续时间";
+"detailed_information" = "详细信息";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "度";
+"tablet" = "片";
+"piece" = "块";

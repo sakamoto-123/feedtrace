@@ -7,10 +7,6 @@ struct ModeSettingView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
-                Text("选择显示模式")
-                    .font(.headline)
-                    .padding(.horizontal)
-                
                 List {
                     ForEach(ThemeMode.allCases, id: \.self) { mode in
                         HStack {
@@ -31,8 +27,10 @@ struct ModeSettingView: View {
                 
                 Spacer()
             }
-            .navigationTitle("模式设置")
+            .navigationTitle("mode_setting".localized)
             .navigationBarTitleDisplayMode(.inline)
+            .edgesIgnoringSafeArea(.bottom)
+            .toolbar(.hidden, for: .tabBar)
         }
     }
 }

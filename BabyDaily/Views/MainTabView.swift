@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     let selectedBaby: Baby
+    @EnvironmentObject var languageManager: LanguageManager
     
     var body: some View {
         TabView {

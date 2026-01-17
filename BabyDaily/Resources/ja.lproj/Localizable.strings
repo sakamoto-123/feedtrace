@@ -7,24 +7,24 @@
 "ongoing" = "進行中";
 "ending" = "終了";
 "quick_actions" = "クイックアクション";
+"more_records" = "その他の記録";
 "edit" = "編集";
 "all_actions" = "すべてのアクション";
 "weight" = "体重";
 "height" = "身長";
-"head_circumference" = "頭囲";
+"head" = "頭";
 "kg" = "kg";
 "cm" = "cm";
 "started_at" = "開始: %@";
 
 // Quick Actions
-"direct_feeding" = "直接授乳";
-"formula_milk" = "ミルク";
+"breast_milk" = "母乳";
 "solid_food" = "離乳食";
 "water" = "水";
 "sleep" = "睡眠";
 "diaper" = "おむつ";
 "bath" = "お風呂";
-"measure_height" = "身長";
+"note" = "メモ";
 
 // All Actions Categories
 "feeding_category" = "授乳";
@@ -34,27 +34,21 @@
 "milestone_category" = "マイルストーン";
 
 // Feeding Actions
-"breastfeeding" = "直接授乳";
+"nursing" = "授乳";
+"breast_bottle" = "瓶授乳";
 "formula" = "ミルク";
-"complementary_food" = "離乳食";
 "water_intake" = "水";
 
 // Activity Actions
-"sleep_activity" = "睡眠";
-"diaper_change" = "おむつ";
-"bath_activity" = "お風呂";
 "walking" = "歩行";
 "playing" = "遊び";
 "pumping" = "搾乳";
 
 // Growth Actions
-"measure_height_action" = "身長";
-"measure_weight" = "体重";
-"measure_head" = "頭囲";
 
 // Health Actions
 "jaundice" = "黄疸";
-"medical_visit" = "医療受診";
+"medical_visit" = "受診";
 "vaccination" = "予防接種";
 "temperature" = "体温";
 "medication" = "投薬";
@@ -73,9 +67,6 @@
 
 // Today Stats
 "breast_milk" = "母乳";
-"formula_milk_stat" = "ミルク";
-"complementary_food_stat" = "離乳食";
-"supplement_stat" = "サプリメント";
 "stool" = "おしっこ";
 "urine" = "おむつ";
 "sleep_duration" = "睡眠時間";
@@ -155,7 +146,7 @@
 "month_age_format" = "年齢: %dヶ月";
 "weight_format" = "体重: %.1f kg";
 "height_format" = "身長: %.1f cm";
-"head_circumference_format" = "頭囲: %.1f cm";
+"head_format" = "頭囲: %.1f cm";
 
 // SleepTrendView
 "sleep_duration_title" = "睡眠時間";
@@ -168,3 +159,12 @@
 // FeedingTrendView
 "feeding_trend_title" = "ミルク量の傾向";
 "milk_volume_unit" = "ミルク量(ml)";
+
+// Units
+"ml" = "ml";
+"g" = "g";
+"kg" = "kg";
+"cm" = "cm";
+"degree" = "度";
+"tablet" = "錠";
+"piece" = "個";
