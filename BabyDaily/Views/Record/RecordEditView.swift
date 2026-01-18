@@ -24,22 +24,22 @@ struct RecordTypeSelector: View {
                 onTap()
             } label: {
                 VStack(spacing: 8) {
-                     ZStack {
-                         Circle()
-                             .fill(isSelected ? action.color.opacity(0.8) : Color.gray.opacity(0.1))
-                             .frame(width: 50, height: 50)
-                             .overlay(
+                    ZStack {
+                        Circle()
+                            .fill(isSelected ? action.color.opacity(0.8) : Color.gray.opacity(0.1))
+                            .frame(width: 50, height: 50)
+                            .overlay(
                                 Circle()
                                     .stroke(isSelected ? action.color : Color.gray.opacity(0.2), lineWidth: 2)
                             )
-                                            
-                         Text(action.icon)
-                             .font(.system(size: 24))
-                     }
-                      
-                     Text(action.name.localized)
-                         .font(.system(size: 14, weight: .medium))
-                         .foregroundColor(isSelected ? .accentColor : .secondary)
+                        
+                        Text(action.icon)
+                            .font(.system(size: 24))
+                    }
+                    
+                    Text(action.name.localized)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(isSelected ? action.color : .secondary)
                 }
             }
             .id("\(category)\(action.name)")
@@ -47,47 +47,42 @@ struct RecordTypeSelector: View {
     }
     
     var body: some View {
-        Section {
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        // 将所有分类下的记录类型合并到一个列表
-                        ForEach(Constants.allCategorys.sorted(by: { $0.key < $1.key }), id: \.key) { category, actions in
-                            ForEach(actions, id: \.name) { action in
-                                ActionButton(
-                                    category: category,
-                                    action: action,
-                                    isSelected: currentSelectedType?.subCategory == action.name,
-                                    onTap: {
-                                        // 选择或重新选择记录类型
-                                        selectedRecordType = (category: category, subCategory: action.name, icon: action.icon)
-                                    }
-                                )
-                            }
+        
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    // 将所有分类下的记录类型合并到一个列表
+                    ForEach(Constants.allCategorys.sorted(by: { $0.key < $1.key }), id: \.key) { category, actions in
+                        ForEach(actions, id: \.name) { action in
+                            ActionButton(
+                                category: category,
+                                action: action,
+                                isSelected: currentSelectedType?.subCategory == action.name,
+                                onTap: {
+                                    // 选择或重新选择记录类型
+                                    selectedRecordType = (category: category, subCategory: action.name, icon: action.icon)
+                                }
+                            )
                         }
                     }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 0)
-                    .onAppear {
-                        // 当视图出现时，滚动到初始记录类型位置
-                        if let scrollType = selectedRecordType ?? initialRecordType {
-                            let scrollId = "\(scrollType.category)\(scrollType.subCategory)"
-                            DispatchQueue.main.async {
-                                withAnimation {
-                                    proxy.scrollTo(scrollId, anchor: .center)
-                                }
+                }
+                .padding(.vertical, 8)
+                .onAppear {
+                    // 当视图出现时，滚动到初始记录类型位置
+                    if let scrollType = selectedRecordType ?? initialRecordType {
+                        let scrollId = "\(scrollType.category)\(scrollType.subCategory)"
+                        // 延迟0.1秒执行滚动，确保视图完全布局完成
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                proxy.scrollTo(scrollId, anchor: .center)
                             }
                         }
                     }
                 }
             }
-            .cornerRadius(Constants.cornerRadius)
-        } header: {
-            Text("记录类型".localized)
-                .font(.caption)
-                .foregroundColor(.secondary)
-
         }
+        
+        
     }
 }
 
@@ -97,95 +92,44 @@ struct RecordTimeSelector: View {
     @Binding var endTimestamp: Date?
     @Binding var showEndTimePicker: Bool
     
-    // 获取时间段标签
-    private func getTimePeriod(date: Date) -> String {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: date)
-        
-        if hour >= 6 && hour < 12 {
-            return "早上"
-        } else if hour >= 12 && hour < 14 {
-            return "中午"
-        } else if hour >= 14 && hour < 18 {
-            return "下午"
-        } else if hour >= 18 && hour < 22 {
-            return "晚上"
-        } else {
-            return "凌晨"
-        }
-    }
+    // 控制日期选择sheet的显示状态
+    @State private var showStartTimeSheet = false
+    @State private var showEndTimeSheet = false
     
-    // 格式化日期显示
-    private func formatDate(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
-        
-        // 检查是否为今天
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "今天 " + formatter.string(from: date)
-        } else {
-            return formatter.string(from: date)
-        }
-    }
     
     var body: some View {
-        Section("time".localized) {
+        Section {
             // 开始时间
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("start_time".localized)
-                    Spacer()
-                    Text(formatDate(date: startTimestamp))
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
-                }
+            VStack(alignment: .leading, spacing: 12) {
+                Text("start_time".localized)
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
                 
-                HStack {
-                    DatePicker(
-                        "", 
-                        selection: $startTimestamp, 
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    .labelsHidden()
-                    .datePickerStyle(.compact)
-                    
-                    Text(getTimePeriod(date: startTimestamp))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.leading, 8)
-                }
+                
+                Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .shortened))
+                    .font(.title)
+                    .foregroundColor(.primary)
             }
             .padding(.vertical, 8)
             
             // 结束时间
             if showEndTimePicker {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("end_time".localized)
-                        Spacer()
-                        Text(formatDate(date: endTimestamp ?? Date()))
-                            .font(.subheadline)
-                            .foregroundColor(.blue)
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
                     }
                     
-                    HStack {
-                        DatePicker(
-                            "", 
-                            selection: Binding(
-                                get: { endTimestamp ?? Date() },
-                                set: { endTimestamp = $0 }
-                            ), 
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
-                        
-                        Text(getTimePeriod(date: endTimestamp ?? Date()))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.leading, 8)
+                    Button {
+                        showEndTimeSheet.toggle()
+                    } label: {
+                        Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .shortened))
+                            .font(.title)
+                            .foregroundColor(.primary)
                     }
+                    
+                    
                 }
                 .padding(.vertical, 8)
             }
@@ -201,6 +145,7 @@ struct RecordTimeSelector: View {
                 }
             } label: {
                 HStack {
+                    Spacer()
                     Image(systemName: showEndTimePicker ? "minus.circle.fill" : "plus.circle.fill")
                         .foregroundColor(.blue)
                     Text(showEndTimePicker ? "移除结束时间" : "添加结束时间")
@@ -210,6 +155,29 @@ struct RecordTimeSelector: View {
                 .padding(.vertical, 8)
             }
         }
+        // 开始时间选择 - 使用 sheet + presentation detents 控制高度
+        .sheet(isPresented: $showStartTimeSheet) {
+            DatePickerSheet(
+                title: "选择开始时间",
+                date: $startTimestamp,
+                isPresented: $showStartTimeSheet,
+                displayedComponents: [.date]
+            )
+            .presentationDetents([.height(460)])
+            .presentationDragIndicator(.visible)
+        }
+        // 结束时间选择 - 使用 sheet + presentation detents 控制高度
+        .sheet(isPresented: $showEndTimeSheet) {
+            DatePickerSheet(
+                title: "选择结束时间",
+                optionalDate: $endTimestamp,
+                isPresented: $showEndTimeSheet,
+                displayedComponents: [.hourAndMinute]
+            )
+            .presentationDetents([.height(400)])
+            .presentationDragIndicator(.visible)
+        }
+        
     }
 }
 
@@ -236,69 +204,69 @@ struct RecordInfoSection: View {
     private let unitOptions: [String] = ["ml", "g", "kg", "cm", "degree", "tablet", "piece"]
     
     var body: some View {
-        Section("information".localized) {
-            // 名称输入
-            if needsName {
-                TextField("name".localized, text: $name)
+        
+        // 名称输入
+        if needsName {
+            TextField("name".localized, text: $name)
+        }
+        
+        // 喂养侧选择
+        if needsBreastType {
+            Picker("breast_side".localized, selection: $breastType) {
+                Text("both_sides".localized).tag("BOTH")
+                Text("left_side".localized).tag("LEFT")
+                Text("right_side".localized).tag("RIGHT")
             }
-            
-            // 喂养侧选择
-            if needsBreastType {
-                Picker("breast_side".localized, selection: $breastType) {
-                    Text("both_sides".localized).tag("BOTH")
-                    Text("left_side".localized).tag("LEFT")
-                    Text("right_side".localized).tag("RIGHT")
-                }
-                .pickerStyle(.segmented)
-            }
-            
-            // 用量输入
-            if needsValue {
-                HStack {
-                    TextField("amount".localized, text: $value)
-                        .keyboardType(.decimalPad)
-                    
-                    Picker("", selection: $unit) {
-                        ForEach(unitOptions, id: \.self) {
-                            Text($0.localized)
-                        }
+            .pickerStyle(.segmented)
+        }
+        
+        // 用量输入
+        if needsValue {
+            HStack {
+                TextField("amount".localized, text: $value)
+                    .keyboardType(.decimalPad)
+                
+                Picker("", selection: $unit) {
+                    ForEach(unitOptions, id: \.self) {
+                        Text($0.localized)
                     }
-                    .pickerStyle(.menu)
-                    .frame(width: 80)
                 }
-            }
-            
-            // 白天/黑夜选择
-            if needsDayOrNight {
-                Picker("day_night".localized, selection: $dayOrNight) {
-                    Text("daytime".localized).tag("DAY")
-                    Text("night".localized).tag("NIGHT")
-                }
-                .pickerStyle(.segmented)
-            }
-            
-            // 接受程度选择
-            if needsAcceptance {
-                Picker("acceptance_level".localized, selection: $acceptance) {
-                    Text("like".localized).tag("LIKE")
-                    Text("neutral".localized).tag("NEUTRAL")
-                    Text("dislike".localized).tag("DISLIKE")
-                    Text("allergy".localized).tag("ALLERGY")
-                }
-                .pickerStyle(.segmented)
-            }
-            
-            // 排泄物类型选择
-            if needsExcrementStatus {
-                Picker("excrement_type".localized, selection: $excrementStatus) {
-                    Text("urine".localized).tag("URINE")
-                    Text("stool".localized).tag("STOOL")
-                    Text("mixed".localized).tag("MIXED")
-                }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
+                .frame(width: 80)
             }
         }
+        // 白天/黑夜选择
+        
+        if needsDayOrNight {
+            Picker("day_night".localized, selection: $dayOrNight) {
+                Text("daytime".localized).tag("DAY")
+                Text("night".localized).tag("NIGHT")
+            }
+            .pickerStyle(.segmented)
+        }
+        
+        // 接受程度选择
+        if needsAcceptance {
+            Picker("acceptance_level".localized, selection: $acceptance) {
+                Text("like".localized).tag("LIKE")
+                Text("neutral".localized).tag("NEUTRAL")
+                Text("dislike".localized).tag("DISLIKE")
+                Text("allergy".localized).tag("ALLERGY")
+            }
+            .pickerStyle(.segmented)
+        }
+        
+        // 排泄物类型选择
+        if needsExcrementStatus {
+            Picker("excrement_type".localized, selection: $excrementStatus) {
+                Text("urine".localized).tag("URINE")
+                Text("stool".localized).tag("STOOL")
+                Text("mixed".localized).tag("MIXED")
+            }
+            .pickerStyle(.segmented)
+        }
     }
+    
 }
 
 // MARK: - 补充信息组件
@@ -310,54 +278,53 @@ struct RecordAdditionalInfoSection: View {
     @Binding var tempImageDatas: [Data]
     
     var body: some View {
-        Section("additional_information".localized) {
-            // 备注
-            TextField("remark".localized, text: $remark, axis: .vertical)
-                .lineLimit(3, reservesSpace: true)
+        
+        // 备注
+        TextField("remark".localized, text: $remark, axis: .vertical)
+            .lineLimit(3, reservesSpace: true)
+        
+        // 照片
+        VStack(alignment: .leading, spacing: 8) {
+            Text("photos".localized)
+                .font(.headline)
             
-            // 照片
-            VStack(alignment: .leading, spacing: 8) {
-                Text("photos".localized)
-                    .font(.headline)
-                
-                LazyVGrid(columns: [GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80))], spacing: 12) {
-                    ForEach(photos.indices, id: \.self) { index in
-                        let photoData = photos[index]
-                        if let uiImage = UIImage(data: photoData) {
-                            ZStack(alignment: .topLeading) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 80, height: 80)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                
-                                Button(action: {
-                                    // 删除照片
-                                    photos.remove(at: index)
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.red)
-                                        .background(Color.white)
-                                        .clipShape(Circle())
-                                        .shadow(radius: 2)
-                                }
-                                .offset(x: -4, y: -4)
-                                .zIndex(1)
+            LazyVGrid(columns: [GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80))], spacing: 12) {
+                ForEach(photos.indices, id: \.self) { index in
+                    let photoData = photos[index]
+                    if let uiImage = UIImage(data: photoData) {
+                        ZStack(alignment: .topLeading) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            
+                            Button(action: {
+                                // 删除照片
+                                photos.remove(at: index)
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
                             }
+                            .offset(x: -4, y: -4)
+                            .zIndex(1)
                         }
                     }
-                    
-                    // 添加照片按钮
-                    ImagePickerMenu(
-                        images: $tempImages,
-                        imageDatas: $tempImageDatas,
-                        allowsMultipleSelection: true,
-                        allowsEditing: false
-                    )
                 }
+                
+                // 添加照片按钮
+                ImagePickerMenu(
+                    images: $tempImages,
+                    imageDatas: $tempImageDatas,
+                    allowsMultipleSelection: true,
+                    allowsEditing: false
+                )
             }
         }
     }
+    
 }
 
 // MARK: - 主编辑视图
@@ -589,7 +556,7 @@ struct RecordEditView: View {
                 }
             }
             .toolbar(.hidden, for: .tabBar)
-
+            
             .onChange(of: tempImageDatas) { oldValue, newValue in
                 if !newValue.isEmpty {
                     photos.append(contentsOf: newValue)
@@ -636,8 +603,8 @@ struct RecordEditView: View {
         // 获取当前有效的记录类型（优先使用用户选择的，其次使用传入的，最后使用现有记录的）
         let finalRecordType = currentRecordType
         
-        guard let category = finalRecordType?.category ?? existingRecord?.category, 
-              let subCategory = finalRecordType?.subCategory ?? existingRecord?.subCategory, 
+        guard let category = finalRecordType?.category ?? existingRecord?.category,
+              let subCategory = finalRecordType?.subCategory ?? existingRecord?.subCategory,
               let icon = finalRecordType?.icon ?? existingRecord?.icon else {
             errorMessage = "record_type_incomplete".localized
             showingErrorAlert = true

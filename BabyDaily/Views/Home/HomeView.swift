@@ -63,11 +63,11 @@ struct HomeView: View {
     // 所有操作分类 - 保持原始顺序
     private var allActions: [(category: String, actions: [(icon: String, name: String, color: Color)])] {
         return [
-            (category: "feeding_category".localized, actions: Constants.allCategorys["feeding_category"] ?? []),
-            (category: "activity_category".localized, actions: Constants.allCategorys["activity_category"] ?? []),
-            (category: "growth_category".localized, actions: Constants.allCategorys["growth_category"] ?? []),
-            (category: "health_category".localized, actions: Constants.allCategorys["health_category"] ?? []),
-            (category: "milestone_category".localized, actions: Constants.allCategorys["milestone_category"] ?? [])
+            (category: "feeding_category", actions: Constants.allCategorys["feeding_category"] ?? []),
+            (category: "activity_category", actions: Constants.allCategorys["activity_category"] ?? []),
+            (category: "growth_category", actions: Constants.allCategorys["growth_category"] ?? []),
+            (category: "health_category", actions: Constants.allCategorys["health_category"] ?? []),
+            (category: "milestone_category", actions: Constants.allCategorys["milestone_category"] ?? [])
         ]
     }
     
@@ -183,17 +183,17 @@ struct BabyInfoHeader: View {
                 }
                 
                 // 头围
-                HStack(spacing: 8) {
-                    Image(systemName: "circle.dashed")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(red: 0.6, green: 0.2, blue: 1.0))
-                    Text(latestGrowthData.headCircumference > 0 ? String(format: "%.0f", latestGrowthData.headCircumference) : "---")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Text("cm".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                }
+                // HStack(spacing: 8) {
+                //     Image(systemName: "circle.dashed")
+                //         .font(.system(size: 14))
+                //         .foregroundColor(Color(red: 0.6, green: 0.2, blue: 1.0))
+                //     Text(latestGrowthData.headCircumference > 0 ? String(format: "%.0f", latestGrowthData.headCircumference) : "---")
+                //         .font(.system(size: 14, weight: .medium))
+                //         .foregroundColor(.secondary)
+                //     Text("cm".localized)
+                //         .font(.system(size: 14))
+                //         .foregroundColor(.secondary)
+                // }
             }
             .padding(.horizontal, 20)
         }
@@ -348,7 +348,7 @@ struct AllActionsSection: View {
             
             ForEach(allActions, id: \.category) { categoryItem in
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(categoryItem.category)
+                    Text(categoryItem.category.localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                     
