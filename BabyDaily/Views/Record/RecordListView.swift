@@ -205,48 +205,80 @@ struct RecordListView: View {
     @State private var isNavigatingToEdit = false
     @State private var isNavigatingToCreate = false
     @State private var selectedRecord: Record?
+    @State private var showConfetti = false
     
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(recordsByDay.sorted(by: { $0.key > $1.key }), id: \.key) { date, dayRecords in
-                    Section(header: Text(formatDate(date))) {
-                        ForEach(dayRecords.sorted(by: { $0.startTimestamp > $1.startTimestamp }), id: \.id) { record in
-                            RecordItem(
-                                record: record,
-                                onEdit: {
-                                    selectedRecord = record
-                                    isNavigatingToEdit = true
-                                },
-                                onDelete: {
-                                    deleteRecord(record)
-                                }
-                            )
+        ZStack {
+            NavigationStack {
+                List {
+                    ForEach(recordsByDay.sorted(by: { $0.key > $1.key }), id: \.key) { date, dayRecords in
+                        Section(header: Text(formatDate(date))) {
+                            ForEach(dayRecords.sorted(by: { $0.startTimestamp > $1.startTimestamp }), id: \.id) { record in
+                                RecordItem(
+                                    record: record,
+                                    onEdit: {
+                                        selectedRecord = record
+                                        isNavigatingToEdit = true
+                                    },
+                                    onDelete: {
+                                        deleteRecord(record)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("records".localized)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            // 导航到创建记录页面
+                            isNavigatingToCreate = true
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+                // 编辑页面以 sheet 形式弹出
+                .sheet(isPresented: $isNavigatingToEdit) {
+                    if let record = selectedRecord {
+                        RecordEditView(baby: baby, existingRecord: record)
+                    }
+                }
+                // 创建页面以 sheet 形式弹出
+                .sheet(isPresented: $isNavigatingToCreate) {
+                    RecordEditView(baby: baby) {
+                        subCategory in
+                        if subCategory.hasPrefix("first_") {
+                            showConfetti = true
                         }
                     }
                 }
             }
-            .navigationTitle("records".localized)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        // 导航到创建记录页面
-                        isNavigatingToCreate = true
-                    }) {
-                        Image(systemName: "plus")
-                    }
+            
+            ConfettiCannon(
+                trigger: $showConfetti,
+                num: 50,
+                confettis: ConfettiType.allCases,
+                colors: [.red, .green, .blue, .yellow, .purple, .orange, .pink],
+                confettiSize: 8.0,
+                rainHeight: 600.0,
+                fadesOut: true,
+                opacity: 1.0,
+                openingAngle: Angle(degrees: 0),
+                closingAngle: Angle(degrees: 360),
+                radius: 200.0,
+                repetitions: 3,
+                repetitionInterval: 0.5,
+                hapticFeedback: true
+            )
+        }
+        .onChange(of: showConfetti) {
+            if $0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    showConfetti = false
                 }
-            }
-            // 编辑页面以 sheet 形式弹出
-            .sheet(isPresented: $isNavigatingToEdit) {
-                if let record = selectedRecord {
-                    RecordEditView(baby: baby, existingRecord: record)
-                }
-            }
-            // 创建页面以 sheet 形式弹出
-            .sheet(isPresented: $isNavigatingToCreate) {
-                RecordEditView(baby: baby)
             }
         }
     }

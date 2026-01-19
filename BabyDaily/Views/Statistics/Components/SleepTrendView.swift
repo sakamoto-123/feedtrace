@@ -1,186 +1,157 @@
 import SwiftUI
 import Charts
 
-// 睡眠时间卡片
-struct SleepDurationCard: View {
-    let data: [(date: Date, duration: Double, count: Int)]
-    @Binding var selectedData: (date: Date, duration: Double)?
-    let timeRange: String
+// 睡眠时长图表子组件
+private struct SleepDurationChart: View {
+    let data: [(date: Date, duration: Int, count: Int)]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // 标题
-            ChartTitleView(title: "sleep_duration_title", timeRange: timeRange)
-                .padding(.horizontal, 20)
-            
-            // 图表区域
-            Chart(data, id: \.date) {
-                LineMark(
-                    x: .value("date", $0.date),
-                    y: .value("hours_unit", $0.duration)
-                )
-                .foregroundStyle(.purple)
-                .symbol(.circle)
-                .interpolationMethod(.catmullRom)
-                .lineStyle(StrokeStyle(lineWidth: 2))
-                
-                AreaMark(
-                    x: .value("date", $0.date),
-                    y: .value("hours_unit", $0.duration)
-                )
-                .foregroundStyle(Color.purple.opacity(0.2))
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: .dateTime.month().day())
+        Chart(data, id: \.date) {item in
+            BarMark(
+                x: .value("date", item.date),
+                y: .value("hours_unit", item.duration),
+                width: 28,            )
+            .foregroundStyle(.green.opacity(0.8))
+            .cornerRadius(4)
+            .annotation(position: .overlay, alignment: .top) {
+                if item.duration > 0 {
+                    Text("\(item.duration)")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white)
                 }
-            }
-            .chartYAxis {
-                AxisMarks() {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel()
-                }
-            }
-            .chartOverlay {
-                proxy in
-                GeometryReader {
-                    geometry in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .onContinuousHover {
-                            hover in
-                            guard case .active(let location) = hover,
-                                  let date: Date = proxy.value(atX: location.x)
-                            else {
-                                selectedData = nil
-                                return
-                            }
-                            if let data = self.data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                                selectedData = (date: data.date, duration: data.duration)
-                            }
-                        }
-                }
-            }
-            .frame(height: 220)
-            .padding(.horizontal, 16)
-            
-            // 选中数据显示
-            if let selectedData = selectedData {
-                HStack(spacing: 24) {
-                    Text(String(format: "sleep_duration_format".localized, selectedData.duration))
-                        .font(.system(size: 14))
-                        .foregroundColor(.purple)
-                    Spacer()
-                    Text(selectedData.date, format: .dateTime.month().day())
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 20)
             }
         }
-        .background(.background)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 16)
+        .frame(height: 240)
+        .padding(.horizontal, 8)
+        .chartScrollableAxes(.horizontal)
+        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
+//        .chartYScale(domain: .automatic(includesZero: true))
+        .chartYScale(domain: 0...20)
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .day)) {
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel(format: .dateTime.month(.defaultDigits).day(.defaultDigits))
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.secondary)
+            }
+        }
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 5)) {
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel()
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.secondary)
+            }
+        }
+    }
+}
+
+// 睡眠次数图表子组件
+private struct SleepCountChart: View {
+    let data: [(date: Date, duration: Int, count: Int)]
+    
+    var body: some View {
+        Chart(data, id: \.date) {item in 
+            BarMark(
+                x: .value("date", item.date),
+                y: .value("times_unit", item.count),
+                width: 28,            )
+            .foregroundStyle(.green.opacity(0.8))
+            .cornerRadius(4)
+            .annotation(position: .overlay, alignment: .top) {
+                if item.count > 0 {
+                    Text("\(item.count)")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .frame(height: 240)
+        .padding(.horizontal, 8)
+//        .chartYScale(domain: .automatic(includesZero: true))
+        .chartYScale(domain: 0...16)
+        .chartScrollableAxes(.horizontal)
+        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .day)) {
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel(format: .dateTime.month(.defaultDigits).day(.defaultDigits))
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.secondary)
+            }
+        }
+      
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 5)) {
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel()
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.secondary)
+            }
+        }
+    }
+}
+
+// 睡眠时间卡片
+struct SleepDurationCard: View {
+    let data: [(date: Date, duration: Int, count: Int)]
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // 标题
+            HStack {
+                Text("睡眠时长(" + "小时" + ")")
+                    .font(.system(size: 17, weight: .semibold))
+                Spacer()
+            }
+            
+            // 使用提取的子组件
+            SleepDurationChart(data: data)
+        }
+        .padding()
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .cornerRadius(Constants.cornerRadius)
+        .padding(.horizontal)
     }
 }
 
 // 睡眠次数卡片
 struct SleepCountCard: View {
-    let data: [(date: Date, duration: Double, count: Int)]
-    @Binding var selectedData: (date: Date, count: Int)?
-    let timeRange: String
+    let data: [(date: Date, duration: Int, count: Int)]
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             // 标题
-            ChartTitleView(title: "sleep_count_title", timeRange: timeRange)
-                .padding(.horizontal, 20)
+            HStack {
+                Text("睡眠次数")
+                    .font(.system(size: 17, weight: .semibold))
+                Spacer()
+            }
             
-            // 图表区域
-            Chart(data, id: \.date) {
-                BarMark(
-                    x: .value("date", $0.date),
-                    y: .value("times_unit", $0.count)
-                )
-                .foregroundStyle(.green.opacity(0.8))
-                .cornerRadius(4)
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: .dateTime.month().day())
-                }
-            }
-            .chartYAxis {
-                AxisMarks() {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel()
-                }
-            }
-            .chartOverlay {
-                proxy in
-                GeometryReader {
-                    geometry in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .onContinuousHover {
-                            hover in
-                            guard case .active(let location) = hover,
-                                  let date: Date = proxy.value(atX: location.x)
-                            else {
-                                selectedData = nil
-                                return
-                            }
-                            if let data = self.data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                                selectedData = (date: data.date, count: data.count)
-                            }
-                        }
-                }
-            }
-            .frame(height: 220)
-            .padding(.horizontal, 16)
-            
-            // 选中数据显示
-            if let selectedData = selectedData {
-                HStack(spacing: 24) {
-                    Text(String(format: "sleep_count_format".localized, selectedData.count))
-                        .font(.system(size: 14))
-                        .foregroundColor(.green)
-                    Spacer()
-                    Text(selectedData.date, format: .dateTime.month().day())
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 20)
-            }
+            // 使用提取的子组件
+            SleepCountChart(data: data)
         }
-        .background(.background)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 16)
+        .padding()
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .cornerRadius(Constants.cornerRadius)
+        .padding(.horizontal)
     }
 }
 
 // 睡眠趋势组合视图
 struct SleepTrendView: View {
-    let data: [(date: Date, duration: Double, count: Int)]
-    @Binding var selectedDuration: (date: Date, duration: Double)?
-    @Binding var selectedCount: (date: Date, count: Int)?
-    let timeRange: String
+    let data: [(date: Date, duration: Int, count: Int)]
     
     var body: some View {
-        VStack(spacing: 20) {
-            SleepDurationCard(data: data, selectedData: $selectedDuration, timeRange: timeRange)
-            SleepCountCard(data: data, selectedData: $selectedCount, timeRange: timeRange)
+        VStack(spacing: 16) {
+            SleepDurationCard(data: data)
+            SleepCountCard(data: data)
         }
-        .padding(.bottom, 20)
     }
 }

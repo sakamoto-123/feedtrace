@@ -16,7 +16,7 @@ extension NumberFormatter {
         formatter.numberStyle = .decimal
         formatter.minimumIntegerDigits = 1
         formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 16
+        formatter.maximumFractionDigits = 1
         formatter.usesGroupingSeparator = false
         formatter.locale = LanguageManager.shared.currentLocale
         return formatter

@@ -28,6 +28,29 @@ enum ThemeColor: String, CaseIterable, Identifiable {
     case pink = "粉色"
     case orange = "橙色"
     case red = "红色"
+    case lightYellow = "浅黄色"
+    case lightPurple = "浅紫色"
+    case skyBlue = "天蓝色"
+    case paleBlue = "淡蓝色"
+    case grayBlue = "灰蓝色"
+    case brown = "棕色"
+    case deepBlue = "深蓝色"
+    case lavender = "薰衣草紫"
+    case teal = "青绿色"
+    case mintGreen = "薄荷绿"
+    case darkGreen = "深绿色"
+    case yellowGreen = "黄绿色"
+    case beige = "米色"
+    case emeraldGreen = "翠绿色"
+    case magenta = "紫红色"
+    case gray = "灰色"
+    case aquaGreen = "水绿色"
+    case peach = "桃色"
+    case coral = "珊瑚色"
+    case taupe = "灰褐色"
+    case slateBlue = "蓝灰色"
+    case violet = "紫罗兰色"
+    case lightPink = "浅粉色"
     
     var id: String {
         return self.rawValue
@@ -48,6 +71,52 @@ enum ThemeColor: String, CaseIterable, Identifiable {
             return .orange
         case .red:
             return .red
+        case .lightYellow:
+            return Color.fromHex("#ffc76b")
+        case .lightPurple:
+            return Color.fromHex("#b0a4e3")
+        case .skyBlue:
+            return Color.fromHex("#b7dbff")
+        case .paleBlue:
+            return Color.fromHex("#aad9f2")
+        case .grayBlue:
+            return Color.fromHex("#87a8c3")
+        case .brown:
+            return Color.fromHex("#955539")
+        case .deepBlue:
+            return Color.fromHex("#4b9be1")
+        case .lavender:
+            return Color.fromHex("#cea6e3")
+        case .teal:
+            return Color.fromHex("#88ada6")
+        case .mintGreen:
+            return Color.fromHex("#b9dec9")
+        case .darkGreen:
+            return Color.fromHex("#84ae64")
+        case .yellowGreen:
+            return Color.fromHex("#b7d07a")
+        case .beige:
+            return Color.fromHex("#EBCDA8")
+        case .emeraldGreen:
+            return Color.fromHex("#55bb8a")
+        case .magenta:
+            return Color.fromHex("#ad6598")
+        case .gray:
+            return Color.fromHex("#b2bbbe")
+        case .aquaGreen:
+            return Color.fromHex("#6cb09e")
+        case .peach:
+            return Color.fromHex("#ffb658")
+        case .coral:
+            return Color.fromHex("#ff9066")
+        case .taupe:
+            return Color.fromHex("#b19f8f")
+        case .slateBlue:
+            return Color.fromHex("#a7a8bd")
+        case .violet:
+            return Color.fromHex("#ae88c3")
+        case .lightPink:
+            return Color.fromHex("#ffbeba")
         }
     }
 }

@@ -7,20 +7,20 @@ struct ThemeColorSettingView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 50), spacing: 12)], alignment: .leading, spacing: 24) {
                     ForEach(ThemeColor.allCases, id: \.self) { color in
                         Button(action: {
                             // 更新主题管理器中的主题颜色
                             themeManager.switchThemeColor(to: color)
                         }) {
                             ZStack {
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: 25)
                                     .fill(color.color)
-                                    .frame(height: 100)
+                                    .frame(width: 50, height: 50)
                                 
                                 if themeManager.selectedThemeColor == color {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .font(.title)
+                                        .font(.system(size: 22))
                                         .foregroundColor(.white)
                                 }
                             }

@@ -105,6 +105,7 @@ struct TimeLabelsRow: View {
 struct ActivityGrid: View {
     let data: [(day: Int, weekday: String, activities: [String])]
     let onSelectActivity: ((day: Int, activity: String, hour: Int)) -> Void
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(spacing: 12) {
@@ -117,7 +118,7 @@ struct ActivityGrid: View {
             }
         }
         .padding(.horizontal, 16)
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)

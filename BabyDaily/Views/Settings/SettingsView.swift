@@ -2,6 +2,38 @@ import SwiftUI
 
 struct SettingsView: View {
     let baby: Baby
+    @State private var showShareSheet = false
+    
+    private func shareApp() {
+        let shareText = "推荐你使用 BabyDaily - 宝宝成长记录助手"
+        if let url = URL(string: "https://apps.apple.com") {
+            let activityVC = UIActivityViewController(activityItems: [shareText, url], applicationActivities: nil)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = windowScene.windows.first?.rootViewController {
+                rootVC.present(activityVC, animated: true)
+            }
+        }
+    }
+    
+    private let privacyPolicyURL = URL(string: "https://example.com/privacy")!
+    private let userAgreementURL = URL(string: "https://example.com/terms")!
+    
+    private func openPrivacyPolicy() {
+        UIApplication.shared.open(privacyPolicyURL)
+    }
+    
+    private func openUserAgreement() {
+        UIApplication.shared.open(userAgreementURL)
+    }
+    
+    private func openAppStoreReview() {
+        // 替换为你的App ID
+        let appID = "1234567890"
+        let urlString = "itms-apps://apps.apple.com/app/id\(appID)?action=write-review"
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -46,7 +78,7 @@ struct SettingsView: View {
                     NavigationLink(destination: ThemeColorSettingView()) {
                         HStack {
                             Image(systemName: "paintpalette.fill")
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(Color.fromHex("#ad6598"))
                             Text("theme_color".localized)
                             Spacer()
                         }
@@ -54,8 +86,8 @@ struct SettingsView: View {
                     
                     NavigationLink(destination: LanguageSettingView()) {
                         HStack {
-                            Image(systemName: "textformat")
-                                .foregroundColor(.accentColor)
+                            Image(systemName: "globe")
+                                .foregroundStyle(Color.fromHex("#55bb8a"))
                             Text("language_setting".localized)
                             Spacer()
                         }
@@ -64,7 +96,7 @@ struct SettingsView: View {
                     NavigationLink(destination: ModeSettingView()) {
                         HStack {
                             Image(systemName: "moon.fill")
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(Color.fromHex("#b7dbff"))
                             Text("mode_setting".localized)
                             Spacer()
                         }
@@ -73,7 +105,7 @@ struct SettingsView: View {
                     NavigationLink(destination: UnitSettingView()) {
                         HStack {
                             Image(systemName: "ruler.fill")
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(Color.fromHex("#ffbeba"))
                             Text("unit_setting".localized)
                             Spacer()
                         }
@@ -95,43 +127,49 @@ struct SettingsView: View {
                 }
                 
                 // 关于
-                Section("about".localized) {
-                    HStack {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(.accentColor)
-                        Text("about_us".localized)
-                            Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
+                Section {
+                    Button(action: shareApp) {
+                        HStack {
+                            Image(systemName: "square.and.arrow.up.circle.fill")
+                                .foregroundColor(Color.fromHex("#ffc76b"))
+                            Text("write_review".localized)
+                                Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    
-                    HStack {
-                        Image(systemName: "questionmark.circle.fill")
-                            .foregroundColor(.accentColor)
-                        Text("help_and_feedback".localized)
-                            Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
+                    .buttonStyle(.plain)
+
+                    Button(action: openAppStoreReview) {
+                        HStack {
+                            Image(systemName: "questionmark.circle.fill")
+                                .foregroundColor(Color.fromHex("#ff9066"))
+                            Text("help_and_feedback".localized)
+                                Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    
-                    HStack {
-                        Image(systemName: "shield.fill")
-                            .foregroundColor(.accentColor)
-                        Text("privacy_policy".localized)
-                            Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    HStack {
-                        Image(systemName: "doc.text.fill")
-                            .foregroundColor(.accentColor)
-                        Text("user_agreement".localized)
-                            Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                    }
+                    .buttonStyle(.plain)                  
                 }
+
+                HStack(alignment: .center, spacing: 12) {
+                    Spacer()
+                     Button(action: openPrivacyPolicy) {
+                        Text("privacy_policy".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: openUserAgreement) {
+                        Text("user_agreement".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    Spacer()
+                }.listRowBackground(Color.clear)
             }
             .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)

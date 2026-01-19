@@ -72,6 +72,7 @@ struct ChartHeaderView: View {
     @Binding var selectedTab: String
     @Binding var timeRange: String
     @Binding var selectedDimension: String
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(spacing: 8) {
@@ -95,6 +96,7 @@ struct ChartHeaderView: View {
             }
         }
         .padding()
-        .background(.background)
+        .padding(.top, 0)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
     }
 }

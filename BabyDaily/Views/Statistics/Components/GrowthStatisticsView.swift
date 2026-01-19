@@ -7,6 +7,7 @@ struct GrowthStatisticsCard: View {
     @Binding var selectedData: (month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)?
     @Binding var selectedDimension: String
     let timeRange: String
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(spacing: 16) {
@@ -173,7 +174,7 @@ struct GrowthStatisticsCard: View {
             }
             .padding(.horizontal, 20)
         }
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)

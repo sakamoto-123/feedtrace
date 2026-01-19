@@ -486,13 +486,14 @@ struct RecordInfoSection: View {
     
 }
 
-// MARK: - 补充信息组件
+// 补充信息组件
 struct RecordAdditionalInfoSection: View {
     // 绑定参数
     @Binding var remark: String
     @Binding var photos: [Data]
     @Binding var tempImages: [Image]
     @Binding var tempImageDatas: [Data]
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         // 备注
@@ -531,7 +532,7 @@ struct RecordAdditionalInfoSection: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.red)
-                                    .background(.background)
+                                    .background(colorScheme == .light ? Color.white : Color(.systemGray6))
                                     .clipShape(Circle())
                             }
                             .offset(x: 4, y: -4)
@@ -557,9 +558,11 @@ struct RecordEditView: View {
     let baby: Baby
     let recordType: (category: String, subCategory: String, icon: String)?
     let existingRecord: Record?
+    var onSaveSuccess: ((String) -> Void)?
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     
     // 单位管理
     @StateObject private var unitManager = UnitManager.shared
@@ -639,10 +642,11 @@ struct RecordEditView: View {
     }
     
     // 初始化现有记录数据
-    init(baby: Baby, recordType: (category: String, subCategory: String, icon: String)? = nil, existingRecord: Record? = nil) {
+    init(baby: Baby, recordType: (category: String, subCategory: String, icon: String)? = nil, existingRecord: Record? = nil, onSaveSuccess: ((String) -> Void)? = nil) {
         self.baby = baby
         self.recordType = recordType
         self.existingRecord = existingRecord
+        self.onSaveSuccess = onSaveSuccess
         
         if let record = existingRecord {
             _startTimestamp = State(initialValue: record.startTimestamp)
@@ -672,7 +676,7 @@ struct RecordEditView: View {
             )
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
     }
     
     private var timeSection: some View {
@@ -689,7 +693,7 @@ struct RecordEditView: View {
                 )
             } 
             .padding()
-            .background(.background)
+            .background(colorScheme == .light ? Color.white : Color(.systemGray6))
             .cornerRadius(Constants.cornerRadius)
         }
     }
@@ -724,7 +728,7 @@ struct RecordEditView: View {
                         )
                     }
                     .padding()
-                    .background(.background)
+                    .background(colorScheme == .light ? Color.white : Color(.systemGray6))
                     .cornerRadius(Constants.cornerRadius)
             })
         } else {
@@ -747,7 +751,7 @@ struct RecordEditView: View {
                 )
             }
             .padding()
-            .background(.background)
+            .background(colorScheme == .light ? Color.white : Color(.systemGray6))
             .cornerRadius(Constants.cornerRadius)
         }
     }
@@ -758,7 +762,7 @@ struct RecordEditView: View {
                     recordTypeSection
                     mainScrollView
                 }
-                .background(Color(.systemGray6))
+                .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
                 .navigationTitle(getNavigationTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbarContent() }
@@ -938,6 +942,9 @@ struct RecordEditView: View {
             }
             
             // 保存成功，关闭视图
+            if existingRecord == nil {
+                onSaveSuccess?(subCategory)
+            }
             dismiss()
         } catch {
             errorMessage = "save_failed".localized + "：\(error.localizedDescription)"

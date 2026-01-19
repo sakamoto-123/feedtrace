@@ -73,7 +73,7 @@ private struct FeedingBaseChart: View {
             BarMark(
                 x: .value("date", item.date),
                 y: .value("volume", item.value),
-                width: 30,
+                width: 28,
             )
             .foregroundStyle(item.type.color)
             .annotation(position: .overlay, alignment: .center) {
@@ -84,18 +84,17 @@ private struct FeedingBaseChart: View {
                 }
             }
         }
-        .frame(height: 250)
+        .frame(height: 240)
         .padding(.horizontal, 8)
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
         .chartXAxis {
-            AxisMarks(values: .stride(by: .day)) { value in
+            AxisMarks(values: .stride(by: .day)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
-                AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                AxisValueLabel(format: .dateTime.month(.defaultDigits).day(.defaultDigits))
                     .font(.system(size: 10))
                     .foregroundStyle(Color.secondary)
-                    .offset(x: -4) 
             }
         }
         .chartYAxis {
@@ -113,6 +112,10 @@ private struct FeedingBaseChart: View {
 // 奶量趋势卡片
 struct FeedingVolumeCard: View {
     let data: [(date: Date, breastMilk: Int, formula: Int, water: Int)]
+    @Environment(\.colorScheme) private var colorScheme
+    // 单位管理
+    @StateObject private var unitManager = UnitManager.shared
+
     // 添加明确的类型注解
     private var stackedData: [FeedingStackItem] {
         data.flatMap {
@@ -128,7 +131,7 @@ struct FeedingVolumeCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // 标题
             HStack{
-                Text("喂养数量")
+                Text("数量(" + unitManager.volumeUnit.rawValue + ")")
                     .font(.system(size: 17, weight: .semibold))
                 Spacer()
                 ChartLegend()
@@ -138,7 +141,7 @@ struct FeedingVolumeCard: View {
             FeedingBaseChart(stackedData: stackedData)
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(16)
         .padding(.horizontal)
     }
@@ -147,6 +150,7 @@ struct FeedingVolumeCard: View {
 // 喂养次数卡片
 struct FeedingCountCard: View {
       let data: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
+    @Environment(\.colorScheme) private var colorScheme
     // 添加明确的类型注解
     private var stackedData: [FeedingStackItem] {
         data.flatMap {
@@ -174,7 +178,7 @@ struct FeedingCountCard: View {
           
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(16)
         .padding(.horizontal)
     }
@@ -186,10 +190,9 @@ struct FeedingTrendView: View {
     let countData: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             FeedingVolumeCard(data: volumeData)
             FeedingCountCard(data: countData)
         }
-        .padding(.bottom, 20)
     }
 }

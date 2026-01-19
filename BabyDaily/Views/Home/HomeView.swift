@@ -5,6 +5,7 @@ struct HomeView: View {
     let baby: Baby
     @Environment(\.modelContext) private var modelContext
     @Query private var records: [Record]
+    @Environment(\.colorScheme) private var colorScheme
 
     @StateObject private var unitManager = UnitManager.shared
     
@@ -13,8 +14,6 @@ struct HomeView: View {
         let babyId = baby.id
         _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
     }
-    
-
     
     // 进行中记录（仅显示吸奶或亲喂）
     /// 仍在进行的记录（仅保留未结束且为指定子类的记录）
@@ -104,7 +103,7 @@ struct HomeView: View {
                     }
                 }.padding(.bottom, 20)
             }
-            .background(Color(.systemGray6))
+            .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
             .toolbar(.hidden, for: .navigationBar)
         }
     }
@@ -114,6 +113,7 @@ struct HomeView: View {
 struct BabyInfoHeader: View {
     let baby: Baby
     let latestGrowthData: GrowthData
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -194,13 +194,51 @@ struct BabyInfoHeader: View {
             .padding(.horizontal, 20)
         }
         .padding(.top, 8)
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
     }
 }
 
 // 进行中记录卡片组件
 struct OngoingRecordCard: View {
     let record: Record
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
+    
+    // 计时器相关状态
+    @State private var timer: Timer?
+    @State private var elapsedTime: TimeInterval = 0
+    
+    // 计算已过时间并格式化
+    private var formattedElapsedTime: String {
+        let totalSeconds = Int(elapsedTime)
+        
+        let days = totalSeconds / (24 * 3600)
+        let hours = (totalSeconds % (24 * 3600)) / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        if days > 0 {
+            if hours > 0 {
+                return String(format: "已进行 %d 天 %d 时", days, hours)
+            } else {
+                return String(format: "已进行 %d 天", days)
+            }
+        } else if hours > 0 {
+            if minutes > 0 {
+                return String(format: "已进行 %d 时 %d 分", hours, minutes)
+            } else {
+                return String(format: "已进行 %d 时", hours)
+            }
+        } else if minutes > 0 {
+            if seconds > 0 {
+                return String(format: "已进行 %d 分 %d 秒", minutes, seconds)
+            } else {
+                return String(format: "已进行 %d 分", minutes)
+            }
+        } else {
+            return String(format: "已进行 %d 秒", seconds)
+        }
+    }
     
     var body: some View {
         HStack(spacing: 12) {
@@ -208,26 +246,54 @@ struct OngoingRecordCard: View {
                 .font(.title)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(record.subCategory.localized) · 进行中")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                HStack(alignment: .center) {
+                    Text("\(record.subCategory.localized) · ")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                // 计时器显示
+                Text(formattedElapsedTime)
                     .font(.caption)
                     .foregroundColor(.secondary)
+                
             }
             
             Spacer()
             
             Button("ending".localized) {
                 // 结束记录
+                record.endTimestamp = Date()
+                do {
+                    try modelContext.save()
+                } catch {
+                    print("Failed to save record: \(error)")
+                }
             }
             .font(.system(size: 14))
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(12)
         .padding(.horizontal, 20)
+        .onAppear {
+            // 初始化已过时间
+            elapsedTime = Date().timeIntervalSince(record.startTimestamp)
+            
+            // 启动定时器，每秒更新一次
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
+                _ in
+                elapsedTime = Date().timeIntervalSince(record.startTimestamp)
+            }
+        }
+        .onDisappear {
+            // 停止定时器
+            timer?.invalidate()
+            timer = nil
+        }
     }
 }
 
@@ -235,6 +301,7 @@ struct OngoingRecordCard: View {
 struct TodayStatistics: View {
     let todayStats: DailyStats
     let unitManager: UnitManager
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -260,7 +327,7 @@ struct TodayStatistics: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("时长".localized + ": \(todayStats.sleepDurationInHours.smartDecimal) 小时")
+                    Text("时长".localized + ": \(todayStats.sleepDurationInHours.smartDecimal) 时")
                         .font(.system(size: 14, weight: .medium))
                     Text("次数".localized + ": \(todayStats.sleepCount) 次")
                         .font(.system(size: 14, weight: .medium))       
@@ -294,7 +361,7 @@ struct TodayStatistics: View {
             }
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -305,6 +372,7 @@ struct TodayStatistics: View {
 struct QuickActionsSection: View {
     let quickActions: [(icon: String, category: String, name: String, color: Color)]
     let baby: Baby
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -326,7 +394,7 @@ struct QuickActionsSection: View {
             }
         }
         .padding()
-        .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -337,6 +405,7 @@ struct QuickActionsSection: View {
 struct AllActionsSection: View {
     let allActions: [(category: String, actions: [(icon: String, name: String, color: Color)])]
     let baby: Baby
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -370,7 +439,7 @@ struct AllActionsSection: View {
             }
         }
         .padding()
-        // .background(.background)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
