@@ -4,6 +4,7 @@ import SwiftData
 struct BabyCreationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var themeManager = ThemeManager.shared
     
     // 新增：编辑模式标识和现有宝宝数据
@@ -48,7 +49,7 @@ struct BabyCreationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#f2f2f2")
+                Color(colorScheme == .light ? .systemGray6 : .black)
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -66,9 +67,8 @@ struct BabyCreationView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
                     }
-                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 24)
-                    .padding(.top, 40)
+                    .padding(.top, 50)
                     .padding(.bottom, 32)
                 }
                 
@@ -77,9 +77,8 @@ struct BabyCreationView: View {
                     DatePickerOverlay(date: $birthday, onDismiss: { showingDatePicker = false })
                 }
             }
-            .navigationTitle(!isEditing ? "修改信息".localized : "")
+            .navigationTitle(isEditing ? "修改信息".localized : "")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle("record_detail".localized)
             .toolbar(.hidden, for: .tabBar)
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(
@@ -106,7 +105,7 @@ struct BabyCreationView: View {
             } else {
                 ZStack {
                     Circle()
-                        .fill(Color(.systemGray6))
+                        .fill(Color(.secondarySystemBackground))
                         .frame(width: 100, height: 100)
                     
                     Image(systemName: "camera.circle.fill")
@@ -147,10 +146,10 @@ struct BabyCreationView: View {
             }
         }
         .padding(36)
-        .background(.background)
-        .cornerRadius(12)
+        .frame(minWidth: 360, maxWidth: 600)
+        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .cornerRadius(Constants.cornerRadius)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-        .frame(maxWidth: 400)
     }
     
     // 宝宝名称字段

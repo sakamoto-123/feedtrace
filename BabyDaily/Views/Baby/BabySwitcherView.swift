@@ -69,7 +69,7 @@ struct BabySwitcherView: View {
                                     .font(.system(size: 18, weight: .medium))
                             }
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 0)
                         .padding(.horizontal, 24)
                     }
                     .buttonStyle(.plain)

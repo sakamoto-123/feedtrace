@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftData
 
 // 温度单位枚举
 enum TemperatureUnit: String, CaseIterable, Identifiable {
@@ -47,10 +48,53 @@ class UnitManager: ObservableObject {
     private let volumeUnitKey = "volumeUnit"
     
     // MARK: - 存储属性
-    @Published var temperatureUnit: TemperatureUnit
-    @Published var weightUnit: WeightUnit
-    @Published var lengthUnit: LengthUnit
-    @Published var volumeUnit: VolumeUnit
+    @Published var temperatureUnit: TemperatureUnit {
+        didSet {
+            // 更新UserDefaults和UserSetting
+            UserDefaults.standard.set(temperatureUnit.rawValue, forKey: temperatureUnitKey)
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.temperatureUnit = temperatureUnit.rawValue
+                }
+            }
+        }
+    }
+    
+    @Published var weightUnit: WeightUnit {
+        didSet {
+            // 更新UserDefaults和UserSetting
+            UserDefaults.standard.set(weightUnit.rawValue, forKey: weightUnitKey)
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.weightUnit = weightUnit.rawValue
+                }
+            }
+        }
+    }
+    
+    @Published var lengthUnit: LengthUnit {
+        didSet {
+            // 更新UserDefaults和UserSetting
+            UserDefaults.standard.set(lengthUnit.rawValue, forKey: lengthUnitKey)
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.lengthUnit = lengthUnit.rawValue
+                }
+            }
+        }
+    }
+    
+    @Published var volumeUnit: VolumeUnit {
+        didSet {
+            // 更新UserDefaults和UserSetting
+            UserDefaults.standard.set(volumeUnit.rawValue, forKey: volumeUnitKey)
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.volumeUnit = volumeUnit.rawValue
+                }
+            }
+        }
+    }
     
     // 初始化方法
     private init() {
@@ -59,36 +103,7 @@ class UnitManager: ObservableObject {
         self.weightUnit = Self.loadWeightUnit()
         self.lengthUnit = Self.loadLengthUnit()
         self.volumeUnit = Self.loadVolumeUnit()
-        
-        // 监听属性变化，保存到 UserDefaults
-        setupObservers()
     }
-    
-    // 设置观察者
-    private func setupObservers() {
-        $temperatureUnit.sink { [weak self] newValue in
-            UserDefaults.standard.set(newValue.rawValue, forKey: self?.temperatureUnitKey ?? "")
-        }
-        .store(in: &cancellables)
-        
-        $weightUnit.sink { [weak self] newValue in
-            UserDefaults.standard.set(newValue.rawValue, forKey: self?.weightUnitKey ?? "")
-        }
-        .store(in: &cancellables)
-        
-        $lengthUnit.sink { [weak self] newValue in
-            UserDefaults.standard.set(newValue.rawValue, forKey: self?.lengthUnitKey ?? "")
-        }
-        .store(in: &cancellables)
-        
-        $volumeUnit.sink { [weak self] newValue in
-            UserDefaults.standard.set(newValue.rawValue, forKey: self?.volumeUnitKey ?? "")
-        }
-        .store(in: &cancellables)
-    }
-    
-    // 存储取消令牌
-    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - 加载方法
     private static func loadTemperatureUnit() -> TemperatureUnit {
@@ -109,5 +124,18 @@ class UnitManager: ObservableObject {
     private static func loadVolumeUnit() -> VolumeUnit {
         let savedUnit = UserDefaults.standard.string(forKey: "volumeUnit") ?? VolumeUnit.ml.rawValue
         return VolumeUnit(rawValue: savedUnit) ?? .ml
+    }
+    
+    // 获取或创建UserSetting实例
+    private func getUserSetting() async -> UserSetting? {
+        // 这里需要访问ModelContext，暂时返回nil
+        // 实际实现会在App启动后初始化
+        return nil
+    }
+    
+    // 更新UserSetting实例
+    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
+        // 这里需要访问ModelContext，暂时不实现
+        // 实际实现会在App启动后初始化
     }
 }

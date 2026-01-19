@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 // iCloud状态枚举
 enum iCloudStatus {
@@ -16,6 +17,10 @@ struct SettingsView: View {
     @State private var showAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
+    // 同步管理器
+    @StateObject private var cloudSyncManager = CloudSyncManager.shared
+    // 获取ModelContext
+    @Environment(\.modelContext) private var modelContext
     
     // 检查iCloud状态
     private func checkiCloudStatus() async -> iCloudStatus {
@@ -152,6 +157,41 @@ struct SettingsView: View {
                             Text("")
                         }
                         .toggleStyle(SwitchToggleStyle(tint: Color.fromHex("#6cb09e")))
+                    }
+                    
+                    // 手动同步按钮和状态显示
+                    if isICloudSyncEnabled {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                    .foregroundColor(Color.fromHex("#6cb09e"))
+                                Text("手动同步".localized)
+                                Spacer()
+                                Button(action: {
+                                    Task {
+                                        await cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
+                                    }
+                                }) {
+                                    Text("立即同步".localized)
+                                        .font(.caption)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 4)
+                                        .background(Color.fromHex("#6cb09e"))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+                            }
+                            
+                            // 同步状态显示
+                            HStack {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(cloudSyncManager.getSyncStatusColor())
+                                Text(cloudSyncManager.getSyncStatusText())
+                                    .font(.caption)
+                                    .foregroundColor(cloudSyncManager.getSyncStatusColor())
+                                Spacer()
+                            }
+                        }
                     }
                 }
                 

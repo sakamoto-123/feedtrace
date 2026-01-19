@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import SwiftData
 
 // 主题模式枚举
 enum ThemeMode: String, CaseIterable {
@@ -126,15 +127,23 @@ class ThemeManager: ObservableObject {
     // 使用@Published属性来触发视图更新
     @Published var selectedThemeMode: ThemeMode {
         didSet {
-            // 当主题模式改变时，更新AppStorage的值
-            UserDefaults.standard.set(selectedThemeMode.rawValue, forKey: "selectedThemeMode")
+            // 当主题模式改变时，更新UserSetting模型
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.themeMode = selectedThemeMode.rawValue
+                }
+            }
         }
     }
     
     @Published var selectedThemeColor: ThemeColor {
         didSet {
-            // 当主题颜色改变时，更新AppStorage的值
-            UserDefaults.standard.set(selectedThemeColor.rawValue, forKey: "selectedThemeColor")
+            // 当主题颜色改变时，更新UserSetting模型
+            Task {
+                await updateUserSetting { [self] setting in
+                    setting.themeColor = selectedThemeColor.rawValue
+                }
+            }
         }
     }
     
@@ -142,12 +151,25 @@ class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     
     private init() {
-        // 从AppStorage中读取保存的值，如果没有则使用默认值
+        // 从UserDefaults中读取保存的值，如果没有则使用默认值
         let savedMode = UserDefaults.standard.string(forKey: "selectedThemeMode") ?? ThemeMode.system.rawValue
         self.selectedThemeMode = ThemeMode(rawValue: savedMode) ?? .system
         
         let savedColor = UserDefaults.standard.string(forKey: "selectedThemeColor") ?? ThemeColor.blue.rawValue
         self.selectedThemeColor = ThemeColor(rawValue: savedColor) ?? .blue
+    }
+    
+    // 获取或创建UserSetting实例
+    private func getUserSetting() async -> UserSetting? {
+        // 这里需要访问ModelContext，暂时返回nil
+        // 实际实现会在App启动后初始化
+        return nil
+    }
+    
+    // 更新UserSetting实例
+    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
+        // 这里需要访问ModelContext，暂时不实现
+        // 实际实现会在App启动后初始化
     }
     
     // 切换主题模式

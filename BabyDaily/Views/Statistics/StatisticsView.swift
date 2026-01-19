@@ -18,14 +18,6 @@ struct StatisticsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
     
-    // 图表交互 - 选中的数据点
-    @State private var selectedFeedingVolume: (date: Date, breastMilk: Int, formula: Int, water: Int)?
-    @State private var selectedFeedingCount: (date: Date, breastMilk: Int, formula: Int)?
-    @State private var selectedSleepDuration: (date: Date, duration: Double)?
-    @State private var selectedSleepCount: (date: Date, count: Int)?
-    @State private var selectedGrowth: (month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)?
-    @State private var selectedActivity: (day: Int, activity: String, hour: Int)?
-    
     // 成长统计维度选择
     @State private var selectedGrowthDimension: String = "weight"
     
@@ -276,10 +268,6 @@ struct StatisticsView: View {
         StatisticsDataGenerator.generateGrowthCurveData()
     }
     
-    // private var dailyActivityGridData: [(day: Int, weekday: String, activities: [String])] {
-    //     StatisticsDataGenerator.generateDailyActivityGridData()
-    // }
-    
     var body: some View {
         NavigationStack {
             VStack {
@@ -302,25 +290,15 @@ struct StatisticsView: View {
                         } else if selectedTab == "growth_statistics" {
                             GrowthStatisticsView(
                                 data: growthCurveData,
-                                selectedData: $selectedGrowth,
                                 selectedDimension: $selectedGrowthDimension,
-                                timeRange: timeRange
                             )
                         } 
-                        // else if selectedTab == "daily_activity" {
-                        //     DailyActivityView(
-                        //         gridData: dailyActivityGridData,
-                        //         selectedActivity: $selectedActivity,
-                        //         timeRange: timeRange
-                        //     )
-                        // }
                     }
                 }.padding(.top, 15)
             }
             .navigationTitle("statistics".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
-            .padding(.bottom, 32)
             .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
             // 监听timeRange变化，清理缓存
             .onChange(of: timeRange) {

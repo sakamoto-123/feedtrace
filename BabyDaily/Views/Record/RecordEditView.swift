@@ -608,6 +608,9 @@ struct RecordEditView: View {
     @State private var errorMessage: String? = nil
     @State private var showingErrorAlert = false
     
+    // 删除确认
+    @State private var showingDeleteConfirmation = false
+    
     // 当前选择的记录类型（用于支持选择和重新选择）
     @State private var selectedRecordType: (category: String, subCategory: String, icon: String)?
     
@@ -789,6 +792,13 @@ struct RecordEditView: View {
                 .alert(isPresented: $showingErrorAlert) {
                     errorAlert
                 }
+                .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
+                    Button("cancel".localized, role: .cancel) {}
+                    Button("delete".localized, role: .destructive) {
+                        // 删除记录
+                        deleteRecord()
+                    }
+                }
             }
     }
     
@@ -841,7 +851,7 @@ struct RecordEditView: View {
     // 删除按钮
     private var deleteButton: some View {
         Button(role: .destructive, action: {
-            deleteRecord()
+            showingDeleteConfirmation = true
         }) {
             Text("delete".localized)
         }

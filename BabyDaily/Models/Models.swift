@@ -19,8 +19,9 @@ final class Baby {
     var height: Double = 0.0
     var headCircumference: Double = 0.0
     var createdAt: Date = Date()
+    var updatedAt: Date = Date()
     
-    init(id: UUID = UUID(), name: String, photo: Data? = nil, birthday: Date, gender: String, weight: Double, height: Double, headCircumference: Double, createdAt: Date = Date()) {
+    init(id: UUID = UUID(), name: String, photo: Data? = nil, birthday: Date, gender: String, weight: Double, height: Double, headCircumference: Double, createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
         self.name = name
         self.photo = photo
@@ -30,6 +31,7 @@ final class Baby {
         self.height = height
         self.headCircumference = headCircumference
         self.createdAt = createdAt
+        self.updatedAt = updatedAt
     }
 }
 
@@ -51,8 +53,10 @@ public final class Record {
     public var dayOrNight: String? // DAY/NIGHT
     public var acceptance: String? // LIKE/NEUTRAL/DISLIKE/ALLERGY
     public var excrementStatus: String? // URINE/STOOL/MIXED
+    public var createdAt: Date = Date()
+    public var updatedAt: Date = Date()
     
-    public init(id: UUID = UUID(), babyId: UUID, icon: String, category: String, subCategory: String, startTimestamp: Date, endTimestamp: Date? = nil, name: String? = nil, value: Double? = nil, unit: String? = nil, remark: String? = nil, photos: [Data]? = nil, breastType: String? = nil, dayOrNight: String? = nil, acceptance: String? = nil, excrementStatus: String? = nil) {
+    public init(id: UUID = UUID(), babyId: UUID, icon: String, category: String, subCategory: String, startTimestamp: Date, endTimestamp: Date? = nil, name: String? = nil, value: Double? = nil, unit: String? = nil, remark: String? = nil, photos: [Data]? = nil, breastType: String? = nil, dayOrNight: String? = nil, acceptance: String? = nil, excrementStatus: String? = nil, createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
         self.babyId = babyId
         self.icon = icon
@@ -69,6 +73,49 @@ public final class Record {
         self.dayOrNight = dayOrNight
         self.acceptance = acceptance
         self.excrementStatus = excrementStatus
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+// 用户设置模型，用于iCloud同步
+@Model
+final class UserSetting {
+    var id: UUID = UUID()
+    
+    // 语言设置
+    var language: String = ""
+    
+    // 主题设置
+    var themeMode: String = "system"
+    var themeColor: String = "blue"
+    
+    // 单位设置
+    var temperatureUnit: String = "°C"
+    var weightUnit: String = "kg"
+    var lengthUnit: String = "cm"
+    var volumeUnit: String = "ml"
+    
+    // 新增：选中的宝宝ID
+    var selectedBabyId: UUID?
+    
+    // 创建时间
+    var createdAt: Date = Date()
+    // 更新时间
+    var updatedAt: Date = Date()
+    
+    init(id: UUID = UUID(), language: String = "", themeMode: String = "system", themeColor: String = "blue", temperatureUnit: String = "°C", weightUnit: String = "kg", lengthUnit: String = "cm", volumeUnit: String = "ml", selectedBabyId: UUID? = nil, createdAt: Date = Date(), updatedAt: Date = Date()) {
+        self.id = id
+        self.language = language
+        self.themeMode = themeMode
+        self.themeColor = themeColor
+        self.temperatureUnit = temperatureUnit
+        self.weightUnit = weightUnit
+        self.lengthUnit = lengthUnit
+        self.volumeUnit = volumeUnit
+        self.selectedBabyId = selectedBabyId
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
     }
 }
 

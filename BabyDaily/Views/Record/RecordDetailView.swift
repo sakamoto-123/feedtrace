@@ -232,7 +232,7 @@ struct RecordDetailView: View {
                     Text("photos".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], alignment: .leading, spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], alignment: .leading, spacing: 12) {
                         ForEach(photos.indices, id: \.self) { index in
                             if let uiImage = UIImage(data: photos[index]) {
                                 Image(uiImage: uiImage)

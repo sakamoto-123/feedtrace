@@ -100,8 +100,10 @@ struct HomeView: View {
 
                          // 所有操作区域
                         AllActionsSection(allActions: allActions, baby: baby)
+
+                        HStack{ Spacer() }.frame(height: 20)
                     }
-                }.padding(.bottom, 20)
+                }
             }
             .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
             .toolbar(.hidden, for: .navigationBar)
@@ -457,7 +459,7 @@ struct AllActionsSection: View {
 
                      if index != allActions.count - 1 {   // 最后一项不要 Divider
                         Divider()
-                            .background(Color(.systemGray4))
+                            .background(Color(.systemGray6))
                             .padding(.vertical, 8)
                     }                        
                 }

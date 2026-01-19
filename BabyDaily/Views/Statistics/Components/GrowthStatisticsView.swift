@@ -4,16 +4,15 @@ import Charts
 // 成长统计卡片
 struct GrowthStatisticsCard: View {
     let data: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)]
-    @Binding var selectedData: (month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)?
     @Binding var selectedDimension: String
-    let timeRange: String
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(spacing: 16) {
             // 标题和维度选择
             VStack(spacing: 12) {
-                ChartTitleView(title: "growth_statistics", timeRange: timeRange)
+                Text("growth_statistics".localized)
+                    .font(.system(size: 17, weight: .semibold))
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
@@ -66,21 +65,6 @@ struct GrowthStatisticsCard: View {
                         y: .value("head_cm", $0.headCircumference)
                     )
                     .foregroundStyle(Color.green.opacity(0.2))
-                } else if selectedDimension == "bmi" {
-                    LineMark(
-                        x: .value("month_age", $0.month),
-                        y: .value("bmi", $0.bmi)
-                    )
-                    .foregroundStyle(.orange)
-                    .symbol(.circle)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                    
-                    AreaMark(
-                        x: .value("month_age", $0.month),
-                        y: .value("bmi", $0.bmi)
-                    )
-                    .foregroundStyle(Color.orange.opacity(0.2))
                 }
             }
             .chartXAxis {
@@ -97,50 +81,8 @@ struct GrowthStatisticsCard: View {
                     AxisValueLabel()
                 }
             }
-            .chartOverlay {
-                proxy in
-                GeometryReader {
-                    geometry in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .onContinuousHover {
-                            hover in
-                            guard case .active(let location) = hover,
-                                  let month: Int = proxy.value(atX: location.x)
-                            else {
-                                selectedData = nil
-                                return
-                            }
-                            if let data = self.data.first(where: { $0.month == month }) {
-                                selectedData = (month: data.month, weight: data.weight, height: data.height, headCircumference: data.headCircumference, bmi: data.bmi)
-                            }
-                        }
-                }
-            }
             .frame(height: 250)
             .padding(.horizontal, 16)
-            
-            // 选中数据显示
-            if let selectedData = selectedData {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(String(format: "month_age_format".localized, selectedData.month))
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.black)
-                    HStack(spacing: 24) {
-                        Text(String(format: "weight_format".localized, selectedData.weight))
-                            .font(.system(size: 14))
-                            .foregroundColor(.red)
-                        Text(String(format: "height_format".localized, selectedData.height))
-                            .font(.system(size: 14))
-                            .foregroundColor(.blue)
-                        Text(String(format: "head_format".localized, selectedData.headCircumference))
-                            .font(.system(size: 14))
-                            .foregroundColor(.green)
-                    }
-                }
-                .padding(.horizontal, 20)
-            }
             
             // 数据指标
             HStack(spacing: 24) {
@@ -163,10 +105,6 @@ struct GrowthStatisticsCard: View {
                                 Text("\(latestData.headCircumference.smartDecimal) cm")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.black)
-                            } else if dimension == "bmi" {
-                                Text(latestData.bmi.smartDecimal(roundedTo: 1))
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.black)
                             }
                         }
                     }
@@ -184,13 +122,11 @@ struct GrowthStatisticsCard: View {
 // 成长统计组合视图
 struct GrowthStatisticsView: View {
     let data: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)]
-    @Binding var selectedData: (month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)?
     @Binding var selectedDimension: String
-    let timeRange: String
     
     var body: some View {
         VStack(spacing: 20) {
-            GrowthStatisticsCard(data: data, selectedData: $selectedData, selectedDimension: $selectedDimension, timeRange: timeRange)
+            GrowthStatisticsCard(data: data, selectedDimension: $selectedDimension)
         }
         .padding(.bottom, 20)
     }

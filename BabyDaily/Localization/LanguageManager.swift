@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import SwiftData
 
 // 语言枚举
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -72,6 +73,13 @@ class LanguageManager: ObservableObject {
         // 如果是系统语言，保存空字符串
         let languageToSave = selectedLanguage == .system ? "" : selectedLanguage.rawValue
         UserDefaults.standard.set(languageToSave, forKey: languageKey)
+        
+        // 更新UserSetting模型
+        Task {
+            await updateUserSetting { [self] setting in
+                setting.language = languageToSave
+            }
+        }
     }
     
     // 切换语言
@@ -105,6 +113,19 @@ class LanguageManager: ObservableObject {
     // 获取本地化日期格式字符串
     func localizedDateString(_ date: Date, dateStyle: DateFormatter.Style, timeStyle: DateFormatter.Style) -> String {
         return localizedDateFormatter(dateStyle: dateStyle, timeStyle: timeStyle).string(from: date)
+    }
+    
+    // 获取或创建UserSetting实例
+    private func getUserSetting() async -> UserSetting? {
+        // 这里需要访问ModelContext，暂时返回nil
+        // 实际实现会在App启动后初始化
+        return nil
+    }
+    
+    // 更新UserSetting实例
+    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
+        // 这里需要访问ModelContext，暂时不实现
+        // 实际实现会在App启动后初始化
     }
 }
 

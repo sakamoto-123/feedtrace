@@ -200,6 +200,10 @@ struct RecordListView: View {
     @State private var selectedRecord: Record?
     @State private var showConfetti = false
     
+    // 删除确认
+    @State private var showingDeleteConfirmation = false
+    @State private var recordToDelete: Record?
+    
     var body: some View {
         ZStack {
             NavigationStack {
@@ -267,6 +271,16 @@ struct RecordListView: View {
                 hapticFeedback: true
             )
         }
+        // 删除确认弹窗
+        .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
+            Button("cancel".localized, role: .cancel) {}
+            Button("delete".localized, role: .destructive) {
+                // 删除记录
+                if let record = recordToDelete {
+                    modelContext.delete(record)
+                }
+            }
+        }
         .onChange(of: showConfetti) {
             if $0 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -277,6 +291,7 @@ struct RecordListView: View {
     }
     
     private func deleteRecord(_ record: Record) {
-        modelContext.delete(record)
+        recordToDelete = record
+        showingDeleteConfirmation = true
     }
 }
