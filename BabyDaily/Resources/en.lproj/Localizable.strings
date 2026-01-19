@@ -34,7 +34,7 @@
 "lb" = "lb";
 "°C" = "°C";
 "°F" = "°F";
-"started_at" = "Started at: %@";
+"started_at" = "Started at %@";
 
 // Quick Actions
 "breast_milk" = "Breast Milk";

@@ -15,7 +15,7 @@
 "head" = "頭";
 "kg" = "kg";
 "cm" = "cm";
-"started_at" = "開始於: %@";
+"started_at" = "開始於 %@";
 
 // Quick Actions
 "breast_milk" = "母乳";

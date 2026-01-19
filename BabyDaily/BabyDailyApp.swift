@@ -14,21 +14,31 @@ struct BabyDailyApp: App {
     @StateObject var themeManager = ThemeManager.shared
     // 使用@StateObject包装LanguageManager实例，确保应用能够观察到语言变化
     @StateObject var languageManager = LanguageManager.shared
+    // 获取iCloud同步开关状态
+    @AppStorage("isICloudSyncEnabled") private var isICloudSyncEnabled = false
     
-    var sharedModelContainer: ModelContainer = {
+    // 使用静态方法创建ModelContainer，避免初始化顺序问题
+    private static func createModelContainer() -> ModelContainer {
         let schema = Schema([
             Baby.self,
             Record.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+        
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            // 基础配置
+            let baseConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            
+            return try ModelContainer(for: schema, configurations: [baseConfiguration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
+    }
+    
+    // 直接初始化ModelContainer
+    var sharedModelContainer: ModelContainer = {
+        return Self.createModelContainer()
     }()
-
+    
     var body: some Scene {
         WindowGroup {
             // 检查是否已有宝宝数据，如果没有则显示宝宝信息创建页面，否则显示首页

@@ -71,7 +71,7 @@ private struct SleepCountChart: View {
         .frame(height: 240)
         .padding(.horizontal, 8)
 //        .chartYScale(domain: .automatic(includesZero: true))
-        .chartYScale(domain: 0...16)
+        .chartYScale(domain: 0...15)
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
         .chartXAxis {

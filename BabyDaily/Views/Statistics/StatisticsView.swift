@@ -315,7 +315,7 @@ struct StatisticsView: View {
                         //     )
                         // }
                     }
-                }
+                }.padding(.top, 15)
             }
             .navigationTitle("statistics".localized)
             .navigationBarTitleDisplayMode(.inline)

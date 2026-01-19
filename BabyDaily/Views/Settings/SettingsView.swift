@@ -1,8 +1,43 @@
 import SwiftUI
 
+// iCloud状态枚举
+enum iCloudStatus {
+    case notLoggedIn      // 未登录iCloud
+    case insufficientSpace // 存储空间不足
+    case available         // 可用
+}
+
 struct SettingsView: View {
     let baby: Baby
     @State private var showShareSheet = false
+    // iCloud同步开关状态
+    @AppStorage("isICloudSyncEnabled") private var isICloudSyncEnabled = false
+    // 提示信息状态
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    
+    // 检查iCloud状态
+    private func checkiCloudStatus() async -> iCloudStatus {
+        // 检查是否登录iCloud
+        guard let ubiquityContainerURL = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+            return .notLoggedIn
+        }
+        
+        do {
+            // 检查可用存储空间
+            let resourceValues = try ubiquityContainerURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+            if let availableCapacity = resourceValues.volumeAvailableCapacityForImportantUsage {
+                // 检查可用空间是否大于100MB
+                let requiredSpace: Int64 = 100 * 1024 * 1024 // 100MB
+                return availableCapacity > requiredSpace ? .available : .insufficientSpace
+            }
+        } catch {
+            print("Error checking iCloud storage: \(error)")
+        }
+        
+        return .insufficientSpace
+    }
     
     private func shareApp() {
         let shareText = "推荐你使用 BabyDaily - 宝宝成长记录助手"
@@ -28,8 +63,7 @@ struct SettingsView: View {
     
     private func openAppStoreReview() {
         // 替换为你的App ID
-        let appID = "1234567890"
-        let urlString = "itms-apps://apps.apple.com/app/id\(appID)?action=write-review"
+        let urlString = "itms-apps://apps.apple.com/app/id6757728747?action=write-review"
         if let url = URL(string: urlString) {
             UIApplication.shared.open(url)
         }
@@ -39,7 +73,8 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 // 宝宝信息
-                Section {
+            Section {
+                NavigationLink(destination: BabyCreationView(isEditing: true, existingBaby: baby)) {
                     HStack {
                         if let photoData = baby.photo, let uiImage = UIImage(data: photoData) {
                             Image(uiImage: uiImage)
@@ -47,7 +82,6 @@ struct SettingsView: View {
                                 .scaledToFill()
                                 .frame(width: 60, height: 60)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(.secondary, lineWidth: 2))
                         } else {
                             Image(systemName: "person.crop.circle.fill")
                                 .resizable()
@@ -65,11 +99,59 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding(.leading, 12)
-                        
+                    }
+                }
+            }
+
+                // 会员特权
+                Section {
+                    NavigationLink(destination: MembershipPrivilegesView()) {
+                        HStack {
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(Color.fromHex("#ffb658"))
+                            Text("membership_privileges".localized)
+                            Spacer()
+                            Text("free".localized)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    HStack {
+                        Image(systemName: "icloud")
+                            .foregroundColor(Color.fromHex("#6cb09e"))
+                        Text("iCloud云同步/备份".localized)
                         Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
+                        Toggle(isOn: Binding(
+                            get: { isICloudSyncEnabled },
+                            set: { newValue in
+                                if newValue {
+                                    // 当尝试开启时，检查iCloud状态
+                                    Task {
+                                        let status = await checkiCloudStatus()
+                                        switch status {
+                                        case .available:
+                                            // iCloud可用，开启同步
+                                            isICloudSyncEnabled = true
+                                        case .notLoggedIn:
+                                            // 未登录iCloud，显示提示
+                                            alertTitle = "未登录iCloud"
+                                            alertMessage = "您尚未登录iCloud，请先登录iCloud后再开启同步功能。"
+                                            showAlert = true
+                                        case .insufficientSpace:
+                                            // 空间不足，显示提示
+                                            alertTitle = "iCloud空间不足"
+                                            alertMessage = "您的iCloud存储空间不足，无法开启同步功能。请清理iCloud空间后再尝试。"
+                                            showAlert = true
+                                        }
+                                    }
+                                } else {
+                                    // 关闭时直接执行
+                                    isICloudSyncEnabled = false
+                                }
+                            }
+                        )) {
+                            Text("")
+                        }
+                        .toggleStyle(SwitchToggleStyle(tint: Color.fromHex("#6cb09e")))
                     }
                 }
                 
@@ -112,27 +194,13 @@ struct SettingsView: View {
                     }
                 }
                 
-                // 会员特权
-                Section {
-                    NavigationLink(destination: MembershipPrivilegesView()) {
-                        HStack {
-                            Image(systemName: "crown.fill")
-                                .foregroundColor(.yellow)
-                            Text("membership_privileges".localized)
-                            Spacer()
-                            Text("free".localized)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                
                 // 关于
                 Section {
                     Button(action: shareApp) {
                         HStack {
                             Image(systemName: "square.and.arrow.up.circle.fill")
                                 .foregroundColor(Color.fromHex("#ffc76b"))
-                            Text("write_review".localized)
+                            Text("分享应用".localized)
                                 Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
@@ -173,6 +241,14 @@ struct SettingsView: View {
             }
             .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)
+            // 显示提示信息
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text(alertTitle),
+                    message: Text(alertMessage),
+                    dismissButton: .default(Text("确定"))
+                )
+            }
         }
     }
 }

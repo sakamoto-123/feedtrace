@@ -6,6 +6,11 @@ struct BabyCreationView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var themeManager = ThemeManager.shared
     
+    // 新增：编辑模式标识和现有宝宝数据
+    let isEditing: Bool
+    let existingBaby: Baby?
+    let isFirstCreation: Bool
+    
     @State private var name: String = ""
     @State private var photos: [Image] = []
     @State private var photoDatas: [Data] = []
@@ -16,6 +21,29 @@ struct BabyCreationView: View {
     
     @State private var showingImagePicker = false
     @State private var showingDatePicker = false
+    
+    // 初始化：如果是编辑模式，加载现有宝宝数据
+    init(isEditing: Bool = false, existingBaby: Baby? = nil, isFirstCreation: Bool = true) {
+        self.isEditing = isEditing
+        self.existingBaby = existingBaby
+        self.isFirstCreation = isFirstCreation
+        
+        if let baby = existingBaby {
+            _name = State(initialValue: baby.name)
+            _birthday = State(initialValue: baby.birthday)
+            _gender = State(initialValue: baby.gender)
+            _height = State(initialValue: String(baby.height))
+            _weight = State(initialValue: String(baby.weight))
+            
+            // 加载照片数据
+            if let photoData = baby.photo {
+                _photoDatas = State(initialValue: [photoData])
+                if let uiImage = UIImage(data: photoData) {
+                    _photos = State(initialValue: [Image(uiImage: uiImage)])
+                }
+            }
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -49,11 +77,10 @@ struct BabyCreationView: View {
                     DatePickerOverlay(date: $birthday, onDismiss: { showingDatePicker = false })
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(!isEditing ? "修改信息".localized : "")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // 移除了取消按钮
-            }
+            .navigationTitle("record_detail".localized)
+            .toolbar(.hidden, for: .tabBar)
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(
                     images: $photos,
@@ -109,11 +136,15 @@ struct BabyCreationView: View {
             // 性别选择
             genderField
                   
-            // 身高体重一行
-            bodyDataRow
+            // 身高体重一行 - 仅在非编辑模式显示
+            if !isEditing && isFirstCreation {
+                bodyDataRow
+            }
 
             // 主题颜色选择
-            themeColorPicker
+            if isFirstCreation && !isEditing {
+                themeColorPicker
+            }
         }
         .padding(36)
         .background(.background)
@@ -126,11 +157,13 @@ struct BabyCreationView: View {
     private var nameField: some View {
         VStack(alignment: .center, spacing: 8) {
             TextField("", text: $name, prompt: Text("enter_baby_name".localized).foregroundColor(.gray))
-
                 .font(.system(size: 16))
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 8)
                 .frame(width: 200)
+                .keyboardDoneButton()
+                .submitLabel(.done)
+                .autocorrectionDisabled()
                 .overlay(
                     Divider()
                         .background(themeManager.currentThemeColor)
@@ -239,21 +272,23 @@ struct BabyCreationView: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
-            HStack(spacing: 16) {
-                ForEach(ThemeColor.allCases) { themeColor in
-                    Button(action: {
-                        themeManager.switchThemeColor(to: themeColor)
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(themeColor.color)
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-                            
-                            if themeManager.selectedThemeColor == themeColor {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.white)
+            ScrollView(.horizontal, showsIndicators: false) {
+               HStack(spacing: 16) {
+                    ForEach(ThemeColor.allCases) { themeColor in
+                        Button(action: {
+                            themeManager.switchThemeColor(to: themeColor)
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(themeColor.color)
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                
+                                if themeManager.selectedThemeColor == themeColor {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
                     }
@@ -278,6 +313,9 @@ struct BabyCreationView: View {
                             .font(.system(size: 16))
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.center)
+                            .keyboardDoneButton()
+                            .submitLabel(.done)
+                            .autocorrectionDisabled()
                         
                         Text("cm".localized)
                             .font(.system(size: 16))
@@ -304,6 +342,9 @@ struct BabyCreationView: View {
                             .font(.system(size: 16))
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.center)
+                            .keyboardDoneButton()
+                            .submitLabel(.done)
+                            .autocorrectionDisabled()
                         
                         Text("kg".localized)
                             .font(.system(size: 16))
@@ -326,7 +367,7 @@ struct BabyCreationView: View {
         Button(action: {
             saveBaby()
         }) {
-            Text("add_baby".localized)
+            Text(!isEditing ? "add_baby".localized : "save".localized)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
                 .padding(.horizontal, 48)
@@ -343,17 +384,29 @@ struct BabyCreationView: View {
         let heightValue = Double(height) ?? 50
         let weightValue = Double(weight) ?? 3.5
         
-        let newBaby = Baby(
-            name: name,
-            photo: photoDatas.first,
-            birthday: birthday,
-            gender: gender,
-            weight: weightValue,
-            height: heightValue,
-            headCircumference: 34 // 默认值
-        )
+        if isEditing, let baby = existingBaby {
+            // 更新现有宝宝数据
+            baby.name = name
+            baby.photo = photoDatas.first
+            baby.birthday = birthday
+            baby.gender = gender
+            baby.weight = weightValue
+            baby.height = heightValue
+        } else {
+            // 创建新宝宝
+            let newBaby = Baby(
+                name: name,
+                photo: photoDatas.first,
+                birthday: birthday,
+                gender: gender,
+                weight: weightValue,
+                height: heightValue,
+                headCircumference: 34 // 默认值
+            )
+            
+            modelContext.insert(newBaby)
+        }
         
-        modelContext.insert(newBaby)
         dismiss()
     }
 }

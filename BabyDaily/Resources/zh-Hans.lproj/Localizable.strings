@@ -31,7 +31,7 @@
 "lb" = "lb";
 "°C" = "°C";
 "°F" = "°F";
-"started_at" = "开始于: %@";
+"started_at" = "开始于 %@";
 
 "feeding_category" = "喂养";
 "activity_category" = "活动";

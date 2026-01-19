@@ -15,7 +15,7 @@
 "head" = "머리";
 "kg" = "kg";
 "cm" = "cm";
-"started_at" = "시작: %@";
+"started_at" = "시작 %@";
 
 // Quick Actions
 "solid_food" = "이유식";

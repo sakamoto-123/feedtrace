@@ -143,7 +143,7 @@ struct RecordPhotosPreview: View {
     
     var body: some View {
         if !photos.isEmpty {
-            HStack(spacing: -26) {
+            HStack(alignment: .center, spacing: -26) {
                 ForEach(photos.prefix(3).indices, id: \.self) {
                     index in
                     let photoData = photos[index]
@@ -153,20 +153,13 @@ struct RecordPhotosPreview: View {
                             .scaledToFill()
                             .frame(width: 36, height: 36)
                             .cornerRadius(18)
-                            .overlay(
-                                Circle()
-                                    .stroke(.secondary, lineWidth: 2)
-                            )
                     }
                 }
                 
                 if photos.count > 3 {
                     Text("+\(photos.count - 3)")
-                        .font(.caption2)
-                        .frame(width: 36, height: 36)
-                        .background(Color(.systemGray3))
-                        .cornerRadius(6)
-                        .foregroundColor(.secondary)
+                        .font(.caption)
+                        .padding(.leading, 30)
                 }
             }
         }

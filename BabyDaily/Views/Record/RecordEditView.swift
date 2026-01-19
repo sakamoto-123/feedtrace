@@ -61,17 +61,17 @@ struct RecordTypeSelector: View {
         // 使用Group来组合多个ForEach
         Group {
             // 按分类生成按钮
-            ForEach(getSortedCategories(), id: \.key) { category, actions in
+            ForEach(getSortedCategories(), id: \.category) { item in
                 // 为每个分类生成按钮
-                categoryButtons(category: category, actions: actions)
+                categoryButtons(category: item.category, actions: item.actions)
             }
         }
     }
     
     // 获取原始顺序的分类
-    private func getSortedCategories() -> [(key: String, value: [(icon: String, name: String, color: Color)])] {
-        // 直接返回Dictionary的键值对数组，保持原始顺序
-        return Array(Constants.allCategorys)
+    private func getSortedCategories() -> [(category: String, actions: [(icon: String, name: String, color: Color)])] {
+        // 直接返回数组，保持原始顺序
+        return Constants.allCategorysByOrder
     }
     
     // 为单个分类生成按钮
@@ -376,6 +376,9 @@ struct RecordInfoSection: View {
     // 单位管理
     let unitManager: UnitManager
     
+    // 控制单位设置页面显示
+    @State private var showUnitSettingSheet = false
+    
     // 根据 subCategory 获取默认单位
     private var defaultUnit: String {
         guard let subCategory = subCategory else { return "" }
@@ -397,90 +400,103 @@ struct RecordInfoSection: View {
     }
     
     var body: some View {
-        
-        // 名称输入
-        if needsName {
-            TextField((subCategory?.localized ?? "") + "name".localized, text: $name)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(Constants.cornerRadius)
-                .keyboardDoneButton()
-                .submitLabel(.done)
-        }
-        
-        // 喂养侧选择
-        if needsBreastType {
-            Picker("breast_side".localized, selection: $breastType) {
-                Text("both_sides".localized).tag("BOTH")
-                Text("left_side".localized).tag("LEFT")
-                Text("right_side".localized).tag("RIGHT")
-            }
-            .font(.system(size: 16))
-            .pickerStyle(.segmented)
-            .controlSize(.large)
-            .tint(.accentColor)
-        }
-        
-        // 用量输入
-        if needsValue {
-            HStack(spacing: 4) {
-                TextField("数量".localized, text: $value)
-                    .keyboardType(.decimalPad)
+        VStack(spacing: 16) {
+            // 名称输入
+            if needsName {
+                TextField((subCategory?.localized ?? "") + "name".localized, text: $name)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(Constants.cornerRadius)
                     .keyboardDoneButton()
                     .submitLabel(.done)
-                     .autocorrectionDisabled()
-
-                Text(defaultUnit.localized ?? "")
-                    .foregroundStyle(.secondary)
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
-            // 确保单位正确设置
-            .onAppear {
-                if unit.isEmpty {
+            
+            // 喂养侧选择
+            if needsBreastType {
+                Picker("breast_side".localized, selection: $breastType) {
+                    Text("both_sides".localized).tag("BOTH")
+                    Text("left_side".localized).tag("LEFT")
+                    Text("right_side".localized).tag("RIGHT")
+                }
+                .font(.system(size: 16))
+                .pickerStyle(.segmented)
+                .controlSize(.large)
+                .tint(.accentColor)
+            }
+            
+            // 用量输入
+            if needsValue {
+                HStack(spacing: 4) {
+                    TextField("数量".localized, text: $value)
+                        .keyboardType(.decimalPad)
+                        .keyboardDoneButton()
+                        .submitLabel(.done)
+                        .autocorrectionDisabled()
+
+                    Button(action: {
+                        showUnitSettingSheet.toggle()
+                    }) {
+                        Text(defaultUnit.localized ?? "")
+                            .font(.body)
+                            .foregroundColor(.accentColor)
+                    }
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
+                // 确保单位正确设置
+                .onAppear {
+                    if unit.isEmpty {
+                        unit = defaultUnit
+                    }
+                }
+                .onChange(of: subCategory) {
                     unit = defaultUnit
                 }
             }
-            .onChange(of: subCategory) {
-                unit = defaultUnit
-            }
-        }
 
-        // 白天/黑夜选择
-        if needsDayOrNight {
-            Picker("day_night".localized, selection: $dayOrNight) {
-                Label("daytime".localized, systemImage: "sunrise").tag("DAY")
-                Label("night".localized, systemImage: "moon.stars").tag("NIGHT")
+            // 白天/黑夜选择
+            if needsDayOrNight {
+                Picker("day_night".localized, selection: $dayOrNight) {
+                    Label("daytime".localized, systemImage: "sunrise").tag("DAY")
+                    Label("night".localized, systemImage: "moon.stars").tag("NIGHT")
+                }
+                .pickerStyle(.segmented)
+                .controlSize(.large)
+                .tint(.accentColor)
             }
-            .pickerStyle(.segmented)
-            .controlSize(.large)
-            .tint(.accentColor)
+            
+            // 接受程度选择
+            if needsAcceptance {
+                Picker("acceptance_level".localized, selection: $acceptance) {
+                    Text("like".localized).tag("LIKE")
+                    Text("neutral".localized).tag("NEUTRAL")
+                    Text("dislike".localized).tag("DISLIKE")
+                    Text("allergy".localized).tag("ALLERGY")
+                }
+                .pickerStyle(.segmented)
+                .controlSize(.large)
+                .tint(.accentColor)
+            }
+            
+            // 排泄物类型选择
+            if needsExcrementStatus {
+                Picker("excrement_type".localized, selection: $excrementStatus) {
+                    Text("urine".localized).tag("URINE")
+                    Text("stool".localized).tag("STOOL")
+                    Text("mixed".localized).tag("MIXED")
+                }
+                .pickerStyle(.segmented)
+                .controlSize(.large)
+                .tint(.accentColor)
+            }
         }
-        
-        // 接受程度选择
-        if needsAcceptance {
-            Picker("acceptance_level".localized, selection: $acceptance) {
-                Text("like".localized).tag("LIKE")
-                Text("neutral".localized).tag("NEUTRAL")
-                Text("dislike".localized).tag("DISLIKE")
-                Text("allergy".localized).tag("ALLERGY")
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.large)
-            .tint(.accentColor)
-        }
-        
-        // 排泄物类型选择
-        if needsExcrementStatus {
-            Picker("excrement_type".localized, selection: $excrementStatus) {
-                Text("urine".localized).tag("URINE")
-                Text("stool".localized).tag("STOOL")
-                Text("mixed".localized).tag("MIXED")
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.large)
-            .tint(.accentColor)
+        // 单位设置页面
+        .sheet(isPresented: $showUnitSettingSheet, onDismiss: {
+            // 当单位设置页面关闭时，更新当前单位
+            unit = defaultUnit
+        }) {
+            UnitSettingView()
         }
     }
     
@@ -515,7 +531,7 @@ struct RecordAdditionalInfoSection: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             
-            LazyVGrid(columns:  [GridItem(.adaptive(minimum: 80), spacing: 12)], spacing: 12) {
+            LazyVGrid(columns:  [GridItem(.adaptive(minimum: 75), spacing: 12)], spacing: 12) {
                 ForEach(photos.indices, id: \.self) { index in
                     let photoData = photos[index]
                     if let uiImage = UIImage(data: photoData) {
@@ -523,7 +539,7 @@ struct RecordAdditionalInfoSection: View {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 80, height: 80)
+                                .frame(width: 75, height: 75)
                                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                             
                             Button(action: {

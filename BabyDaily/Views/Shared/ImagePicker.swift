@@ -12,7 +12,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration = PHPickerConfiguration()
         configuration.filter = .images
-        configuration.selectionLimit = allowsMultipleSelection ? 0 : 1
+        configuration.selectionLimit = allowsMultipleSelection ? 9 : 1
         configuration.preferredAssetRepresentationMode = .automatic
         
         let picker = PHPickerViewController(configuration: configuration)
@@ -52,18 +52,10 @@ struct ImagePicker: UIViewControllerRepresentable {
                     }
                     
                     if self.parent.allowsEditing {
-                        // 使用 UIImagePickerController 进行编辑
-                        let imagePicker = UIImagePickerController()
-                        imagePicker.sourceType = .photoLibrary
-                        imagePicker.allowsEditing = true
-                        imagePicker.delegate = self
-                        // 这里需要特殊处理，因为 PHPicker 和 UIImagePicker 不能同时使用
-                        // 简化处理：如果需要编辑，则只支持单选
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                           let rootViewController = windowScene.windows.first?.rootViewController {
-                            // 保存当前图片到临时变量
-                            let tempImage = uiImage
-                            // 稍后处理
+                        // 直接使用原始图片（编辑功能在BabyCreationView中通过UIImagePickerControllerWrapper实现）
+                        newImages.append(Image(uiImage: uiImage))
+                        if let data = uiImage.jpegData(compressionQuality: 0.8) {
+                            newImageDatas.append(data)
                         }
                     } else {
                         // 直接使用原始图片
@@ -77,8 +69,15 @@ struct ImagePicker: UIViewControllerRepresentable {
             
             dispatchGroup.notify(queue: .main) {
                 if !newImages.isEmpty {
-                    self.parent.images.append(contentsOf: newImages)
-                    self.parent.imageDatas.append(contentsOf: newImageDatas)
+                    if self.parent.allowsMultipleSelection {
+                        // 多选模式：追加图片
+                        self.parent.images.append(contentsOf: newImages)
+                        self.parent.imageDatas.append(contentsOf: newImageDatas)
+                    } else {
+                        // 单选模式：替换图片
+                        self.parent.images = newImages
+                        self.parent.imageDatas = newImageDatas
+                    }
                 }
             }
         }
@@ -95,9 +94,17 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
             
             if let image = uiImage {
-                parent.images.append(Image(uiImage: image))
+                let newImage = Image(uiImage: image)
                 if let data = image.jpegData(compressionQuality: 0.8) {
-                    parent.imageDatas.append(data)
+                    if parent.allowsMultipleSelection {
+                        // 多选模式：追加图片
+                        parent.images.append(newImage)
+                        parent.imageDatas.append(data)
+                    } else {
+                        // 单选模式：替换图片
+                        parent.images = [newImage]
+                        parent.imageDatas = [data]
+                    }
                 }
             }
         }
@@ -207,9 +214,11 @@ struct ImagePickerWrapper: UIViewControllerRepresentable {
             }
             
             if let image = uiImage {
-                parent.images.append(Image(uiImage: image))
+                let newImage = Image(uiImage: image)
                 if let data = image.jpegData(compressionQuality: 0.8) {
-                    parent.imageDatas.append(data)
+                    // ImagePickerWrapper 总是用于单选（相机或单张图片选择），所以直接替换
+                    parent.images = [newImage]
+                    parent.imageDatas = [data]
                 }
             }
             parent.dismiss()

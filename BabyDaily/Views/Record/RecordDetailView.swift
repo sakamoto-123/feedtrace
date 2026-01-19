@@ -232,13 +232,13 @@ struct RecordDetailView: View {
                     Text("photos".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 12)], alignment: .leading, spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], alignment: .leading, spacing: 16) {
                         ForEach(photos.indices, id: \.self) { index in
                             if let uiImage = UIImage(data: photos[index]) {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 80, height: 80)
+                                    .frame(width: 75, height: 75)
                                     .clipped()
                                     .cornerRadius(Constants.cornerRadius)
                                     .onTapGesture {

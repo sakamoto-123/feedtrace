@@ -1,31 +1,31 @@
 import SwiftUI
 
 struct MainTabView: View {
-    let selectedBaby: Baby
+    @Binding var baby: Baby
     @EnvironmentObject var languageManager: LanguageManager
     
     var body: some View {
         TabView {
             // 首页
-            HomeView(baby: selectedBaby)
+            HomeView(baby: $baby)
                 .tabItem {
                     Label("home".localized, systemImage: "house.fill")
                 }
             
             // 记录
-            RecordListView(baby: selectedBaby)
+            RecordListView(baby: baby)
                 .tabItem {
                     Label("records".localized, systemImage: "list.bullet")
                 }
             
             // 统计
-            StatisticsView(baby: selectedBaby)
+            StatisticsView(baby: baby)
                 .tabItem {
                     Label("statistics".localized, systemImage: "chart.bar.fill")
                 }
             
             // 设置
-            SettingsView(baby: selectedBaby)
+            SettingsView(baby: baby)
                 .tabItem {
                     Label("settings".localized, systemImage: "gearshape.fill")
                 }

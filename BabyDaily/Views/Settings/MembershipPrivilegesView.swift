@@ -23,7 +23,7 @@ struct MembershipPrivilegesView: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 40)
                             .padding(.vertical, 12)
-                            .background(.accentColor)
+                            .background(Color.accentColor)
                             .cornerRadius(24)
                     }
                     .padding(.top, 8)

@@ -15,7 +15,7 @@
 "head" = "Cabeza";
 "kg" = "kg";
 "cm" = "cm";
-"started_at" = "Iniciado a las: %@";
+"started_at" = "Iniciado a las %@";
 
 // Quick Actions
 "breast_milk" = "Leche Materna";

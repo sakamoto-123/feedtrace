@@ -10,15 +10,15 @@ import SwiftData
 
 @Model
 final class Baby {
-    var id: UUID
-    var name: String
+    var id: UUID = UUID()
+    var name: String = ""
     var photo: Data?
-    var birthday: Date
-    var gender: String // 男/女
-    var weight: Double
-    var height: Double
-    var headCircumference: Double
-    var createdAt: Date
+    var birthday: Date = Date()
+    var gender: String = "" // 男/女
+    var weight: Double = 0.0
+    var height: Double = 0.0
+    var headCircumference: Double = 0.0
+    var createdAt: Date = Date()
     
     init(id: UUID = UUID(), name: String, photo: Data? = nil, birthday: Date, gender: String, weight: Double, height: Double, headCircumference: Double, createdAt: Date = Date()) {
         self.id = id
@@ -35,12 +35,12 @@ final class Baby {
 
 @Model
 public final class Record {
-    public var id: UUID
-    public var babyId: UUID
-    public var icon: String
-    public var category: String
-    public var subCategory: String
-    public var startTimestamp: Date
+    public var id: UUID = UUID()
+    public var babyId: UUID = UUID()
+    public var icon: String = ""
+    public var category: String = ""
+    public var subCategory: String = ""
+    public var startTimestamp: Date = Date()
     public var endTimestamp: Date?
     public var name: String?
     public var value: Double?

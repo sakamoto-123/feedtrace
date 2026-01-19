@@ -2,16 +2,18 @@ import SwiftUI
 import SwiftData
 
 struct HomeView: View {
-    let baby: Baby
+    @Binding var baby: Baby
     @Environment(\.modelContext) private var modelContext
     @Query private var records: [Record]
     @Environment(\.colorScheme) private var colorScheme
 
     @StateObject private var unitManager = UnitManager.shared
+    @State private var showingBabySwitcher = false
+    @State private var showingBabyCreation = false
     
-    init(baby: Baby) {
-        self.baby = baby
-        let babyId = baby.id
+    init(baby: Binding<Baby>) {
+        self._baby = baby
+        let babyId = baby.wrappedValue.id
         _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
     }
     
@@ -75,9 +77,7 @@ struct HomeView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // 固定在顶部的宝宝基本信息模块
-                BabyInfoHeader(baby: baby, latestGrowthData: latestGrowthData)
-                
-                Divider()
+                BabyInfoHeader(baby: baby, latestGrowthData: latestGrowthData, showingBabySwitcher: $showingBabySwitcher)
                 
                 // 可滚动的内容区域
                 ScrollView {
@@ -105,6 +105,22 @@ struct HomeView: View {
             }
             .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
             .toolbar(.hidden, for: .navigationBar)
+            // 宝宝切换视图
+            .sheet(isPresented: $showingBabySwitcher) {
+                BabySwitcherView(
+                    currentBaby: baby,
+                    onSelectBaby: { selectedBaby in
+                        self.baby = selectedBaby
+                    },
+                    onAddBaby: {
+                        showingBabyCreation = true
+                    }
+                )
+            }
+            // 新增宝宝视图
+            .sheet(isPresented: $showingBabyCreation) {
+                BabyCreationView(isEditing: false, isFirstCreation: false)
+            }
         }
     }
 }
@@ -113,6 +129,7 @@ struct HomeView: View {
 struct BabyInfoHeader: View {
     let baby: Baby
     let latestGrowthData: GrowthData
+    @Binding var showingBabySwitcher: Bool
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
@@ -143,6 +160,14 @@ struct BabyInfoHeader: View {
                     Text(calculateBabyAge(baby))
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
+                }
+
+                Button(action: {
+                    showingBabySwitcher = true
+                }) {
+                    Image(systemName: "arrow.left.arrow.right.circle")
+                        .font(.system(size: 16))
+                        .foregroundColor(.accentColor)
                 }
                 
                 Spacer()
@@ -247,7 +272,7 @@ struct OngoingRecordCard: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .center) {
-                    Text("\(record.subCategory.localized) · ")
+                    Text("\(record.subCategory.localized)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                     Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))

@@ -6,5 +6,22 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<!-- iCloud配置 -->
+	<key>CKContainerIdentifiers</key>
+	<array>
+		<string>iCloud.cn.iizhi.BabyDaily</string>
+	</array>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.cn.iizhi.BabyDaily</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<false/>
+			<key>NSUbiquitousContainerName</key>
+			<string>BabyDaily</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
 </dict>
 </plist>

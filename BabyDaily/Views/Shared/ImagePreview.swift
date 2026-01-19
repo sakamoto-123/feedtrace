@@ -38,28 +38,34 @@ struct ImagePreview: View {
                         .padding(.vertical, 8)
                     
                     // 缩略图滚动视图
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(images.indices, id: \.self) { index in
-                                if let uiImage = UIImage(data: images[index]) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(.background, lineWidth: index == currentIndex ? 2 : 0)
-                                        )
-                                        .opacity(index == currentIndex ? 1.0 : 0.6)
-                                        .onTapGesture {
-                                            currentIndex = index
-                                        }
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(images.indices, id: \.self) { index in
+                                    if let uiImage = UIImage(data: images[index]) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 60, height: 60)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(.background, lineWidth: index == currentIndex ? 2 : 0)
+                                            )
+                                            .opacity(index == currentIndex ? 1.0 : 0.6)
+                                            .onTapGesture {
+                                                currentIndex = index
+                                            }
+                                            .id(index)
+                                    }
                                 }
                             }
+                            .padding(.horizontal)
+                            .padding(.bottom, 20)
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+                        .onChange(of: currentIndex) {
+                            proxy.scrollTo(currentIndex, anchor: .center)
+                        }
                     }
                 }
                 .background(Color.black.opacity(0.8))
