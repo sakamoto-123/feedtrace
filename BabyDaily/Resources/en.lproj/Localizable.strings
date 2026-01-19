@@ -1,4 +1,16 @@
 // English localization resource file
+
+// Unit Setting
+"unit_setting" = "Unit Setting";
+"unit_settings" = "Unit Settings";
+"temperature_unit" = "Temperature Unit";
+"select_temperature_unit" = "Select temperature measurement unit";
+"weight_unit" = "Weight Unit";
+"select_weight_unit" = "Select weight measurement unit";
+"length_unit" = "Length Unit";
+"select_length_unit" = "For height and head circumference measurement";
+"volume_unit" = "Volume Unit";
+"select_volume_unit" = "Select volume measurement unit";
 // HomeView
 "baby_diary" = "Baby Diary";
 "today_statistics" = "Today's Statistics";
@@ -15,6 +27,13 @@
 "head" = "Head";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "Started at: %@";
 
 // Quick Actions

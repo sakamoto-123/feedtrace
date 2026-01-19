@@ -24,7 +24,7 @@ struct OverviewCard: View {
             }
         }
         .padding(16)
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .frame(width: 180)

@@ -14,7 +14,7 @@ struct DatePickerSheet: View {
     let displayedComponents: DatePickerComponents
     
     // 初始化方法 - 用于非可选日期
-    init(title: String, date: Binding<Date>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
+    init(title: String = "", date: Binding<Date>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
         self.title = title
         self._date = date
         self._optionalDate = .constant(nil)
@@ -24,7 +24,7 @@ struct DatePickerSheet: View {
     }
     
     // 初始化方法 - 用于可选日期
-    init(title: String, optionalDate: Binding<Date?>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
+    init(title: String = "", optionalDate: Binding<Date?>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
         self.title = title
         self._date = Binding(get: { optionalDate.wrappedValue ?? Date() }, 
                             set: { optionalDate.wrappedValue = $0 })
@@ -35,40 +35,64 @@ struct DatePickerSheet: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
-            HStack(spacing: 20) {
-                Button("取消") {
-                    isPresented = false
-                }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
+        VStack(spacing: 0) {
+            // 标题栏
+            HStack {
+                Spacer()
                 
                 Text(title)
                     .font(.headline)
                     .padding(.top, 20)
                 
-                Button("确定") {
+                Spacer()
+                
+                Button("完成") {
                     // 如果是可选日期，确保更新可选日期的值
                     if isOptional {
                         optionalDate = date
                     }
                     isPresented = false
                 }
-                .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.blue)
+                .padding(.trailing, 20)
+                .padding(.top, 20)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
             
-            DatePicker(
-                "",
-                selection: $date,
-                displayedComponents: displayedComponents
-            )
-            .datePickerStyle(.graphical)
-            .padding(.horizontal, 20)
-            
-       
+            // 根据显示组件选择不同的日期选择器样式
+            if displayedComponents == [.date] {
+                // 日期选择器 - 使用图形化样式
+                DatePicker(
+                    "",
+                    selection: $date,
+                    displayedComponents: displayedComponents
+                )
+                .datePickerStyle(.graphical)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            } else if displayedComponents == [.hourAndMinute] {
+                // 时间选择器 - 使用滚轮样式
+                DatePicker(
+                    "",
+                    selection: $date,
+                    displayedComponents: displayedComponents
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            } else {
+                // 同时显示日期和时间 - 使用默认样式
+                DatePicker(
+                    "",
+                    selection: $date,
+                    displayedComponents: displayedComponents
+                )
+                .datePickerStyle(.graphical)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            }
         }
     }
 }

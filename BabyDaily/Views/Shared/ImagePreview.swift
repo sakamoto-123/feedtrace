@@ -49,7 +49,7 @@ struct ImagePreview: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white, lineWidth: index == currentIndex ? 2 : 0)
+                                                .stroke(.background, lineWidth: index == currentIndex ? 2 : 0)
                                         )
                                         .opacity(index == currentIndex ? 1.0 : 0.6)
                                         .onTapGesture {

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UIKit
+import Combine
 
 // MARK: - 记录类型选择器组件
 struct RecordTypeSelector: View {
@@ -26,11 +27,11 @@ struct RecordTypeSelector: View {
                 VStack(spacing: 8) {
                     ZStack {
                         Circle()
-                            .fill(isSelected ? action.color.opacity(0.8) : Color.gray.opacity(0.1))
+                            .fill(isSelected ? action.color.opacity(0.8) : .secondary.opacity(0.1))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()
-                                    .stroke(isSelected ? action.color : Color.gray.opacity(0.2), lineWidth: 2)
+                                    .stroke(isSelected ? action.color : .secondary.opacity(0.2), lineWidth: 2)
                             )
                         
                         Text(action.icon)
@@ -46,43 +47,79 @@ struct RecordTypeSelector: View {
         }
     }
     
-    var body: some View {
-        
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    // 将所有分类下的记录类型合并到一个列表
-                    ForEach(Constants.allCategorys.sorted(by: { $0.key < $1.key }), id: \.key) { category, actions in
-                        ForEach(actions, id: \.name) { action in
-                            ActionButton(
-                                category: category,
-                                action: action,
-                                isSelected: currentSelectedType?.subCategory == action.name,
-                                onTap: {
-                                    // 选择或重新选择记录类型
-                                    selectedRecordType = (category: category, subCategory: action.name, icon: action.icon)
-                                }
-                            )
-                        }
-                    }
+    // 生成所有记录类型按钮
+    private var recordTypeButtons: some View {
+        HStack(spacing: 16) {
+            // 将所有分类下的记录类型合并到一个列表
+            recordTypeButtonsContent
+        }
+        .padding(.vertical, 8)
+    }
+    
+    // 分解ForEach循环为单独的计算属性
+    private var recordTypeButtonsContent: some View {
+        // 使用Group来组合多个ForEach
+        Group {
+            // 按分类生成按钮
+            ForEach(getSortedCategories(), id: \.key) { category, actions in
+                // 为每个分类生成按钮
+                categoryButtons(category: category, actions: actions)
+            }
+        }
+    }
+    
+    // 获取原始顺序的分类
+    private func getSortedCategories() -> [(key: String, value: [(icon: String, name: String, color: Color)])] {
+        // 直接返回Dictionary的键值对数组，保持原始顺序
+        return Array(Constants.allCategorys)
+    }
+    
+    // 为单个分类生成按钮
+    private func categoryButtons(category: String, actions: [(icon: String, name: String, color: Color)]) -> some View {
+        ForEach(actions, id: \.name) { action in
+            ActionButton(
+                category: category,
+                action: action,
+                isSelected: isActionSelected(action: action),
+                onTap: {
+                    selectAction(category: category, action: action)
                 }
-                .padding(.vertical, 8)
-                .onAppear {
-                    // 当视图出现时，滚动到初始记录类型位置
-                    if let scrollType = selectedRecordType ?? initialRecordType {
-                        let scrollId = "\(scrollType.category)\(scrollType.subCategory)"
-                        // 延迟0.1秒执行滚动，确保视图完全布局完成
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                proxy.scrollTo(scrollId, anchor: .center)
-                            }
-                        }
-                    }
+            )
+        }
+    }
+    
+    // 检查动作是否被选中
+    private func isActionSelected(action: (icon: String, name: String, color: Color)) -> Bool {
+        return currentSelectedType?.subCategory == action.name
+    }
+    
+    // 选择动作
+    private func selectAction(category: String, action: (icon: String, name: String, color: Color)) {
+        selectedRecordType = (category: category, subCategory: action.name, icon: action.icon)
+    }
+    
+    // 滚动到初始记录类型位置
+    private func scrollToInitialType(proxy: ScrollViewProxy) {
+        if let scrollType = selectedRecordType ?? initialRecordType {
+            let scrollId = "\(scrollType.category)\(scrollType.subCategory)"
+            // 延迟0.1秒执行滚动，确保视图完全布局完成
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation {
+                    proxy.scrollTo(scrollId, anchor: .center)
                 }
             }
         }
-        
-        
+    }
+    
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                recordTypeButtons
+            }
+            .onAppear {
+                scrollToInitialType(proxy: proxy)
+            }
+        }
     }
 }
 
@@ -92,75 +129,211 @@ struct RecordTimeSelector: View {
     @Binding var endTimestamp: Date?
     @Binding var showEndTimePicker: Bool
     
-    // 控制日期选择sheet的显示状态
+    // 控制日期和时间选择sheet的显示状态
+    @State private var showStartDateSheet = false
     @State private var showStartTimeSheet = false
+    @State private var showEndDateSheet = false
     @State private var showEndTimeSheet = false
     
+    // 辅助函数：获取日期相对时间描述（今天、昨天、几天前）
+    private func getRelativeDateDescription(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        if calendar.isDateInToday(date) {
+            return "今天"
+        } else if calendar.isDateInYesterday(date) {
+            return "昨天"
+        } else {
+            let components = calendar.dateComponents([.day], from: date, to: now)
+            let days = components.day ?? 0
+            if days < 0 {
+                return "\(days)天后"
+            } else {
+                return "\(days)天前" 
+            }
+        }
+    }
+    
+    // 辅助函数：获取时间段标签（早上、中午、下午、晚上、凌晨）
+    private func getTimePeriod(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        
+        if hour >= 6 && hour < 12 {
+            return "早上"
+        } else if hour >= 12 && hour < 14 {
+            return "中午"
+        } else if hour >= 14 && hour < 18 {
+            return "下午"
+        } else if hour >= 18 && hour < 22 {
+            return "晚上"
+        } else {
+            return "凌晨"
+        }
+    }
     
     var body: some View {
-        Section {
+        VStack(alignment: .leading) {
             // 开始时间
             VStack(alignment: .leading, spacing: 12) {
-                Text("start_time".localized)
-                    .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                // 日期部分
+                HStack(spacing: 8) {
+                    Text("start_time".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    // 相对时间标签
+                    if !getRelativeDateDescription(startTimestamp).isEmpty {
+                        Text(getRelativeDateDescription(startTimestamp))
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(6)
+                    }
+                    
+                    // 具体日期
+                    Button(action: {
+                        showStartDateSheet.toggle()
+                    }) {
+                        Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .omitted))
+                            .font(.system(size: 14))
+                            .foregroundColor(.blue)
+                    }
+                }
                 
+                // 时间部分
+                HStack(alignment: .center, spacing: 8) {
+                    Button(action: {
+                        showStartTimeSheet.toggle()
+                    }) {
+                        Text(formatDateTime(startTimestamp, dateStyle: .omitted, timeStyle: .shortened))
+                            .font(.system(size: 36))
+                            .foregroundColor(.primary)
+                    }
+                                    
+                    Text(getTimePeriod(startTimestamp))
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(6)
+
+                    Spacer()
+                }
                 
-                Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .shortened))
-                    .font(.title)
-                    .foregroundColor(.primary)
             }
             .padding(.vertical, 8)
             
             // 结束时间
-            if showEndTimePicker {
+            if showEndTimePicker && endTimestamp != nil {
+                Divider()
+
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
+                    // 日期部分
+                    HStack(spacing: 8) {
                         Text("end_time".localized)
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
+
+                        Spacer()
+                            
+                        // 相对时间标签
+                        if let endDate = endTimestamp, !getRelativeDateDescription(endDate).isEmpty {
+                            Text(getRelativeDateDescription(endDate))
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(4)
+                        }
+                        // 具体日期
+                        Button(action: {
+                            showEndDateSheet.toggle()
+                        }) {
+                            Text(formatDateTime(endTimestamp!, dateStyle: .long, timeStyle: .omitted))
+                                .font(.system(size: 14))
+                                .foregroundColor(.blue)
+                        }
                     }
-                    
-                    Button {
-                        showEndTimeSheet.toggle()
-                    } label: {
-                        Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .shortened))
-                            .font(.title)
-                            .foregroundColor(.primary)
+
+                    // 时间部分
+                    HStack(alignment: .center, spacing: 8) {
+                         Button(action: {
+                            showEndTimeSheet.toggle()
+                        }) {
+                            Text(formatDateTime(endTimestamp!, dateStyle: .omitted, timeStyle: .shortened))
+                                .font(.system(size: 36))
+                                .foregroundColor(.primary)
+                        }
+                      
+                        Text(getTimePeriod(endTimestamp!))
+                            .font(.system(size: 2))
+                            .foregroundColor(.gray)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(4)
                     }
-                    
-                    
                 }
                 .padding(.vertical, 8)
             }
             
             // 添加/移除结束时间按钮
-            Button {
-                if showEndTimePicker {
-                    showEndTimePicker = false
-                    endTimestamp = nil
-                } else {
-                    showEndTimePicker = true
-                    endTimestamp = Date()
-                }
-            } label: {
-                HStack {
-                    Spacer()
+            HStack {
+                Spacer()
+                Button {
+                    if showEndTimePicker {
+                        showEndTimePicker = false
+                        endTimestamp = nil
+                    } else {
+                        endTimestamp = Date()
+                        showEndTimePicker = true
+                    }
+                } label: {
                     Image(systemName: showEndTimePicker ? "minus.circle.fill" : "plus.circle.fill")
-                        .foregroundColor(.blue)
+                            .foregroundColor(.blue)
                     Text(showEndTimePicker ? "移除结束时间" : "添加结束时间")
-                        .foregroundColor(.blue)
-                    Spacer()
+                            .foregroundColor(.blue)
                 }
-                .padding(.vertical, 8)
+                    
+                Spacer()
             }
+            .font(.system(size: 14))
+            .padding(.vertical, 8)
+           
+        }
+        // 开始日期选择 - 使用 sheet + presentation detents 控制高度
+        .sheet(isPresented: $showStartDateSheet) {
+            DatePickerSheet(
+                date: $startTimestamp,
+                isPresented: $showStartDateSheet,
+                displayedComponents: [.date]
+            )
+            .presentationDetents([.height(460)])
+            .presentationDragIndicator(.visible)
         }
         // 开始时间选择 - 使用 sheet + presentation detents 控制高度
         .sheet(isPresented: $showStartTimeSheet) {
             DatePickerSheet(
-                title: "选择开始时间",
                 date: $startTimestamp,
                 isPresented: $showStartTimeSheet,
+                displayedComponents: [.hourAndMinute]
+            )
+            .presentationDetents([.height(300)])
+            .presentationDragIndicator(.visible)
+        }
+        // 结束日期选择 - 使用 sheet + presentation detents 控制高度
+        .sheet(isPresented: $showEndDateSheet) {
+            DatePickerSheet(
+                optionalDate: $endTimestamp,
+                isPresented: $showEndDateSheet,
                 displayedComponents: [.date]
             )
             .presentationDetents([.height(460)])
@@ -169,12 +342,11 @@ struct RecordTimeSelector: View {
         // 结束时间选择 - 使用 sheet + presentation detents 控制高度
         .sheet(isPresented: $showEndTimeSheet) {
             DatePickerSheet(
-                title: "选择结束时间",
                 optionalDate: $endTimestamp,
                 isPresented: $showEndTimeSheet,
                 displayedComponents: [.hourAndMinute]
             )
-            .presentationDetents([.height(400)])
+            .presentationDetents([.height(300)])
             .presentationDragIndicator(.visible)
         }
         
@@ -184,6 +356,7 @@ struct RecordTimeSelector: View {
 // MARK: - 信息模块组件
 struct RecordInfoSection: View {
     // 绑定参数
+    let subCategory: String?
     @Binding var name: String
     @Binding var breastType: String
     @Binding var value: String
@@ -200,14 +373,39 @@ struct RecordInfoSection: View {
     let needsAcceptance: Bool
     let needsExcrementStatus: Bool
     
-    // 单位选项
-    private let unitOptions: [String] = ["ml", "g", "kg", "cm", "degree", "tablet", "piece"]
+    // 单位管理
+    let unitManager: UnitManager
+    
+    // 根据 subCategory 获取默认单位
+    private var defaultUnit: String {
+        guard let subCategory = subCategory else { return "" }
+        
+        switch subCategory {
+        case "breast_bottle", "formula", "water_intake", "nursing", "pumping":
+            return unitManager.volumeUnit.rawValue
+        case "height", "head":
+            return unitManager.lengthUnit.rawValue
+        case "temperature":
+            return unitManager.temperatureUnit.rawValue
+        case "weight":
+            return unitManager.weightUnit.rawValue
+        case "jaundice":
+            return "mg/dL"
+        default:
+            return ""
+        }
+    }
     
     var body: some View {
         
         // 名称输入
         if needsName {
-            TextField("name".localized, text: $name)
+            TextField((subCategory?.localized ?? "") + "name".localized, text: $name)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(Constants.cornerRadius)
+                .keyboardDoneButton()
+                .submitLabel(.done)
         }
         
         // 喂养侧选择
@@ -217,32 +415,47 @@ struct RecordInfoSection: View {
                 Text("left_side".localized).tag("LEFT")
                 Text("right_side".localized).tag("RIGHT")
             }
+            .font(.system(size: 16))
             .pickerStyle(.segmented)
+            .controlSize(.large)
+            .tint(.accentColor)
         }
         
         // 用量输入
         if needsValue {
-            HStack {
-                TextField("amount".localized, text: $value)
+            HStack(spacing: 4) {
+                TextField("数量".localized, text: $value)
                     .keyboardType(.decimalPad)
-                
-                Picker("", selection: $unit) {
-                    ForEach(unitOptions, id: \.self) {
-                        Text($0.localized)
-                    }
+                    .keyboardDoneButton()
+                    .submitLabel(.done)
+                     .autocorrectionDisabled()
+
+                Text(defaultUnit.localized ?? "")
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
+            // 确保单位正确设置
+            .onAppear {
+                if unit.isEmpty {
+                    unit = defaultUnit
                 }
-                .pickerStyle(.menu)
-                .frame(width: 80)
+            }
+            .onChange(of: subCategory) {
+                unit = defaultUnit
             }
         }
+
         // 白天/黑夜选择
-        
         if needsDayOrNight {
             Picker("day_night".localized, selection: $dayOrNight) {
-                Text("daytime".localized).tag("DAY")
-                Text("night".localized).tag("NIGHT")
+                Label("daytime".localized, systemImage: "sunrise").tag("DAY")
+                Label("night".localized, systemImage: "moon.stars").tag("NIGHT")
             }
             .pickerStyle(.segmented)
+            .controlSize(.large)
+            .tint(.accentColor)
         }
         
         // 接受程度选择
@@ -254,6 +467,8 @@ struct RecordInfoSection: View {
                 Text("allergy".localized).tag("ALLERGY")
             }
             .pickerStyle(.segmented)
+            .controlSize(.large)
+            .tint(.accentColor)
         }
         
         // 排泄物类型选择
@@ -264,6 +479,8 @@ struct RecordInfoSection: View {
                 Text("mixed".localized).tag("MIXED")
             }
             .pickerStyle(.segmented)
+            .controlSize(.large)
+            .tint(.accentColor)
         }
     }
     
@@ -278,26 +495,35 @@ struct RecordAdditionalInfoSection: View {
     @Binding var tempImageDatas: [Data]
     
     var body: some View {
-        
         // 备注
         TextField("remark".localized, text: $remark, axis: .vertical)
-            .lineLimit(3, reservesSpace: true)
+            .padding()
+            .frame(minHeight: 120) // 确保至少显示4行，根据字体大小调整高度
+            .background(Color(.systemGray6))
+            .cornerRadius(Constants.cornerRadius)
+            .lineLimit(10) // 设置最大10行的限制
+            .keyboardDoneButton()
+            .submitLabel(.done)
         
+        Divider()
+            .padding(.bottom, 8)
+
         // 照片
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("photos".localized)
-                .font(.headline)
+                .font(.caption)
+                .foregroundColor(.secondary)
             
-            LazyVGrid(columns: [GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80)), GridItem(.fixed(80))], spacing: 12) {
+            LazyVGrid(columns:  [GridItem(.adaptive(minimum: 80), spacing: 12)], spacing: 12) {
                 ForEach(photos.indices, id: \.self) { index in
                     let photoData = photos[index]
                     if let uiImage = UIImage(data: photoData) {
-                        ZStack(alignment: .topLeading) {
+                        ZStack(alignment: .topTrailing) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 80, height: 80)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                             
                             Button(action: {
                                 // 删除照片
@@ -305,10 +531,10 @@ struct RecordAdditionalInfoSection: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.red)
-                                    .background(Color.white)
+                                    .background(.background)
                                     .clipShape(Circle())
                             }
-                            .offset(x: -4, y: -4)
+                            .offset(x: 4, y: -4)
                             .zIndex(1)
                         }
                     }
@@ -321,10 +547,9 @@ struct RecordAdditionalInfoSection: View {
                     allowsMultipleSelection: true,
                     allowsEditing: false
                 )
-            }
+            }.padding(.leading, 0)
         }
     }
-    
 }
 
 // MARK: - 主编辑视图
@@ -335,6 +560,9 @@ struct RecordEditView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    
+    // 单位管理
+    @StateObject private var unitManager = UnitManager.shared
     
     // 基本信息
     @State private var startTimestamp: Date = Date()
@@ -369,102 +597,45 @@ struct RecordEditView: View {
         return selectedRecordType ?? recordType
     }
     
-    // 是否需要结束时间
-    private var needsEndTime: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
-        return subCategory == "nursing" || subCategory == "sleep"
+    // 获取当前有效的子分类
+    private var currentSubCategory: String? {
+        return currentRecordType?.subCategory ?? existingRecord?.subCategory
     }
     
     // 是否需要名称
     private var needsName: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
-        return subCategory == "medical_visit" || subCategory == "medication" || subCategory == "supplement" || subCategory == "vaccination"
+        let subCategory = currentSubCategory
+        return subCategory == "medical_visit" || subCategory == "medication" || subCategory == "supplement" || subCategory == "vaccination"  || subCategory == "solid_food" 
     }
     
     // 是否需要喂养侧
     private var needsBreastType: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
-        return subCategory == "nursing"
+        let subCategory = currentSubCategory
+        return subCategory == "nursing" || subCategory == "pumping"
     }
     
     // 是否需要用量
     private var needsValue: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
-        return ["formula", "water_intake", "breast_milk", "solid_food", "height", "weight", "head", "jaundice", "medication", "supplement"].contains(subCategory)
+        let subCategory = currentSubCategory
+        return ["formula", "water_intake", "breast_bottle", "breast_milk", "height", "weight", "head", "jaundice", "pumping", "temperature"].contains(subCategory)
     }
     
     // 是否需要白天/黑夜
     private var needsDayOrNight: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
+        let subCategory = currentSubCategory
         return subCategory == "sleep"
     }
     
     // 是否需要接受程度
     private var needsAcceptance: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
+        let subCategory = currentSubCategory
         return subCategory == "solid_food"
     }
     
     // 是否需要排泄物类型
     private var needsExcrementStatus: Bool {
-        guard let subCategory = currentRecordType?.subCategory ?? existingRecord?.subCategory else {
-            return false
-        }
+        let subCategory = currentSubCategory
         return subCategory == "diaper"
-    }
-    
-    // 单位选项
-    private let unitOptions: [String] = ["ml", "g", "kg", "cm", "degree", "tablet", "piece"]
-    
-    // 获取时间段标签
-    private func getTimePeriod(date: Date) -> String {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: date)
-        
-        if hour >= 6 && hour < 12 {
-            return "早上"
-        } else if hour >= 12 && hour < 14 {
-            return "中午"
-        } else if hour >= 14 && hour < 18 {
-            return "下午"
-        } else if hour >= 18 && hour < 22 {
-            return "晚上"
-        } else {
-            return "凌晨"
-        }
-    }
-    
-    // 格式化日期显示
-    private func formatDate(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
-        
-        // 检查是否为今天
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "今天 " + formatter.string(from: date)
-        } else {
-            return formatter.string(from: date)
-        }
-    }
-    
-    // 格式化时间显示
-    private func formatTime(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: date)
     }
     
     // 初始化现有记录数据
@@ -492,40 +663,82 @@ struct RecordEditView: View {
         }
     }
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                // 记录类型选择（横向滚动）
-                RecordTypeSelector(
-                    selectedRecordType: $selectedRecordType,
-                    initialRecordType: recordType
-                )
-                
-                // 时间选择模块
+    // 分解body为更小的计算属性
+    private var recordTypeSection: some View {
+        VStack(spacing: 16) {
+            RecordTypeSelector(
+                selectedRecordType: $selectedRecordType,
+                initialRecordType: recordType
+            )
+        }
+        .padding()
+        .background(.background)
+    }
+    
+    private var timeSection: some View {
+        VStack (alignment: .leading, spacing: 8) {
+            Text("时间信息".localized)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 16) {
                 RecordTimeSelector(
                     startTimestamp: $startTimestamp,
                     endTimestamp: $endTimestamp,
                     showEndTimePicker: $showEndTimePicker
                 )
-                
-                // 信息模块
-                RecordInfoSection(
-                    name: $name,
-                    breastType: $breastType,
-                    value: $value,
-                    unit: $unit,
-                    dayOrNight: $dayOrNight,
-                    acceptance: $acceptance,
-                    excrementStatus: $excrementStatus,
-                    needsName: needsName,
-                    needsBreastType: needsBreastType,
-                    needsValue: needsValue,
-                    needsDayOrNight: needsDayOrNight,
-                    needsAcceptance: needsAcceptance,
-                    needsExcrementStatus: needsExcrementStatus
-                )
-                
-                // 补充信息模块
+            } 
+            .padding()
+            .background(.background)
+            .cornerRadius(Constants.cornerRadius)
+        }
+    }
+    
+    private var infoSection: some View {
+        let shouldShowInfoSection = needsName || needsBreastType || needsValue || needsDayOrNight || needsAcceptance || needsExcrementStatus
+        
+        if shouldShowInfoSection {
+            return AnyView(
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("基础信息".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    VStack(spacing: 16) {
+                        RecordInfoSection(
+                            subCategory: currentSubCategory,
+                            name: $name,
+                            breastType: $breastType,
+                            value: $value,
+                            unit: $unit,
+                            dayOrNight: $dayOrNight,
+                            acceptance: $acceptance,
+                            excrementStatus: $excrementStatus,
+                            needsName: needsName,
+                            needsBreastType: needsBreastType,
+                            needsValue: needsValue,
+                            needsDayOrNight: needsDayOrNight,
+                            needsAcceptance: needsAcceptance,
+                            needsExcrementStatus: needsExcrementStatus,
+                            unitManager: unitManager
+                        )
+                    }
+                    .padding()
+                    .background(.background)
+                    .cornerRadius(Constants.cornerRadius)
+            })
+        } else {
+            return AnyView(EmptyView())
+        }
+    }
+    
+    private var additionalInfoSection: some View {
+        VStack (alignment: .leading, spacing: 8) {
+            Text("补充信息".localized)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 16) {
                 RecordAdditionalInfoSection(
                     remark: $remark,
                     photos: $photos,
@@ -533,48 +746,118 @@ struct RecordEditView: View {
                     tempImageDatas: $tempImageDatas
                 )
             }
-            .navigationTitle(existingRecord != nil ? "edit_record".localized : "create_record".localized)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // 保存按钮
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("save".localized) {
-                        saveRecord()
-                    }
-                    .disabled(existingRecord == nil && currentRecordType == nil)
+            .padding()
+            .background(.background)
+            .cornerRadius(Constants.cornerRadius)
+        }
+    }
+    
+    var body: some View {
+            NavigationStack {
+                VStack(spacing: 8) {
+                    recordTypeSection
+                    mainScrollView
                 }
-                
-                // 删除按钮（仅编辑模式）
-                if existingRecord != nil {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(role: .destructive, action: {
-                            deleteRecord()
-                        }) {
-                            Text("delete".localized)
-                        }
-                    }
+                .background(Color(.systemGray6))
+                .navigationTitle(getNavigationTitle())
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { toolbarContent() }
+                .toolbar(.hidden, for: .tabBar)
+                .onChange(of: tempImageDatas) { oldValue, newValue in
+                    handleImageDataChange(oldValue: oldValue, newValue: newValue)
                 }
-            }
-            .toolbar(.hidden, for: .tabBar)
-            
-            .onChange(of: tempImageDatas) { oldValue, newValue in
-                if !newValue.isEmpty {
-                    photos.append(contentsOf: newValue)
-                    tempImageDatas.removeAll()
+                .alert(isPresented: $showingErrorAlert) {
+                    errorAlert
                 }
             }
+    }
+    
+    // 主滚动视图
+    private var mainScrollView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                timeSection
+                infoSection
+                additionalInfoSection
+                Spacer()
+            }
+            .padding()
+            .padding(.top, 0)
+            .padding(.bottom, 24)
+        }
+        // 添加点击手势，点击外部关闭键盘
+        .gesture(
+            TapGesture()
+                .onEnded {
+                    // 关闭所有键盘
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+        )
+    }
+    
+    // 获取导航标题
+    private func getNavigationTitle() -> String {
+        return existingRecord != nil ? "edit_record".localized : "create_record".localized
+    }
+    
+    // 工具栏内容
+    private func toolbarContent() -> some ToolbarContent {
+        // 使用Group来组合多个ToolbarItem
+        Group {
+            // 删除按钮（仅编辑模式）
+            if existingRecord != nil {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    deleteButton
+                }
+            }
             
-            // 错误提示
-            .alert(isPresented: $showingErrorAlert) {
-                Alert(
-                    title: Text("save_failed".localized),
-                    message: Text(errorMessage ?? "unknown_error".localized),
-                    dismissButton: .default(Text("ok".localized))
-                )
+            // 保存按钮
+            ToolbarItem(placement: .navigationBarTrailing) {
+                saveButton
             }
         }
     }
     
+    // 删除按钮
+    private var deleteButton: some View {
+        Button(role: .destructive, action: {
+            deleteRecord()
+        }) {
+            Text("delete".localized)
+        }
+    }
+    
+    // 保存按钮
+    private var saveButton: some View {
+        Button("save".localized) {
+            saveRecord()
+        }
+        .disabled(isSaveButtonDisabled())
+    }
+    
+    // 检查保存按钮是否应该禁用
+    private func isSaveButtonDisabled() -> Bool {
+        return existingRecord == nil && currentRecordType == nil
+    }
+    
+    // 处理图片数据变化
+    private func handleImageDataChange(oldValue: [Data], newValue: [Data]) {
+        if !newValue.isEmpty {
+            photos.append(contentsOf: newValue)
+            tempImageDatas.removeAll()
+        }
+    }
+    
+    // 错误提示
+    private var errorAlert: Alert {
+        Alert(
+            title: Text("save_failed".localized),
+            message: Text(errorMessage ?? "unknown_error".localized),
+            dismissButton: .default(Text("ok".localized))
+        )
+    }
+    
+    // 保存记录
     private func saveRecord() {
         // 重置错误信息
         errorMessage = nil
@@ -662,6 +945,7 @@ struct RecordEditView: View {
         }
     }
     
+    // 删除记录
     private func deleteRecord() {
         if let existing = existingRecord {
             modelContext.delete(existing)

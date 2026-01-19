@@ -82,7 +82,7 @@ struct SleepDurationCard: View {
                 .padding(.horizontal, 20)
             }
         }
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)
@@ -162,7 +162,7 @@ struct SleepCountCard: View {
                 .padding(.horizontal, 20)
             }
         }
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)

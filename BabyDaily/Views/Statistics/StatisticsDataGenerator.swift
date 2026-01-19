@@ -2,8 +2,8 @@ import SwiftUI
 
 // 统计数据生成器
 struct StatisticsDataGenerator {
-    static func generateFeedingVolumeData(days: Int) -> [(date: Date, breastMilk: Int, formula: Int)] {
-        var data: [(date: Date, breastMilk: Int, formula: Int)] = []
+    static func generateFeedingVolumeData(days: Int) -> [(date: Date, breastMilk: Int, formula: Int, water: Int)] {
+        var data: [(date: Date, breastMilk: Int, formula: Int, water: Int)] = []
         let calendar = Calendar.current
         let now = Date()
         
@@ -12,7 +12,8 @@ struct StatisticsDataGenerator {
                 data.append((
                     date: date,
                     breastMilk: Int.random(in: 150...300),
-                    formula: Int.random(in: 100...250)
+                    formula: Int.random(in: 100...250),
+                    water: Int.random(in: 50...150)
                 ))
             }
         }

@@ -15,14 +15,14 @@ struct SettingsView: View {
                                 .scaledToFill()
                                 .frame(width: 60, height: 60)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+                                .overlay(Circle().stroke(.secondary, lineWidth: 2))
                         } else {
                             Image(systemName: "person.crop.circle.fill")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 60, height: 60)
                                 .foregroundColor(.gray)
-                                .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+                                .overlay(Circle().stroke(.secondary, lineWidth: 2))
                         }
                         
                         VStack(alignment: .leading, spacing: 4) {
@@ -66,6 +66,15 @@ struct SettingsView: View {
                             Image(systemName: "moon.fill")
                                 .foregroundColor(.accentColor)
                             Text("mode_setting".localized)
+                            Spacer()
+                        }
+                    }
+                    
+                    NavigationLink(destination: UnitSettingView()) {
+                        HStack {
+                            Image(systemName: "ruler.fill")
+                                .foregroundColor(.accentColor)
+                            Text("unit_setting".localized)
                             Spacer()
                         }
                     }

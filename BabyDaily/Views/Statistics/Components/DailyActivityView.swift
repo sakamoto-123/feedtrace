@@ -40,7 +40,7 @@ struct ActivityCell: View {
         case "bath":
             activityColor = Color.purple.opacity(0.3)
         default:
-            activityColor = Color.gray.opacity(0.3)
+            activityColor = .secondary.opacity(0.3)
         }
         
         return Button(action: {
@@ -117,7 +117,7 @@ struct ActivityGrid: View {
             }
         }
         .padding(.horizontal, 16)
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)
@@ -128,7 +128,7 @@ struct ActivityGrid: View {
 struct ActivityLegend: View {
     var body: some View {
         HStack(spacing: 16) {
-            ForEach([("feeding", Color.red), ("sleep", Color.blue), ("play", Color.green), ("change_diaper", Color.yellow), ("bath", Color.purple), ("other", Color.gray)], id: \.0) { (activity, color) in
+            ForEach([("feeding", Color.red), ("sleep", Color.blue), ("play", Color.green), ("change_diaper", Color.yellow), ("bath", Color.purple), ("other", .secondary)], id: \.0) { (activity, color) in
                 HStack(spacing: 4) {
                     Circle()
                         .frame(width: 12, height: 12)

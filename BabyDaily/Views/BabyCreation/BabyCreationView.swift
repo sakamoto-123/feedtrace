@@ -116,7 +116,7 @@ struct BabyCreationView: View {
             themeColorPicker
         }
         .padding(36)
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         .frame(maxWidth: 400)
@@ -429,7 +429,7 @@ struct DatePickerOverlay: View {
                 .datePickerStyle(.graphical)
                 .padding()
             }
-            .background(Color.white)
+            .background(.background)
             .cornerRadius(16)
             .padding(.horizontal, 24)
             .shadow(radius: 20)

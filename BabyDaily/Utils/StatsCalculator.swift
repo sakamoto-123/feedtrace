@@ -10,6 +10,8 @@ public struct DailyStats {
     public var formulaCount: Int
     public var breastMilkAmount: Double
     public var breastMilkCount: Int
+    public var waterAmount: Double
+    public var waterCount: Int
     
     // 睡觉统计
     public var sleepCount: Int
@@ -36,6 +38,8 @@ public class StatsCalculator {
         var formulaCount = 0
         var breastMilkAmount = 0.0
         var breastMilkCount = 0
+        var waterAmount = 0.0
+        var waterCount = 0
         
         var sleepCount = 0
         var totalSleepDurationInMinutes = 0.0
@@ -61,6 +65,12 @@ public class StatsCalculator {
                     // 奶粉记录
                     formulaAmount += value
                     formulaCount += 1
+                    totalFeedingAmount += value
+                    totalFeedingCount += 1
+                case "water_intake":
+                    // 水记录
+                    waterAmount += value
+                    waterCount += 1
                     totalFeedingAmount += value
                     totalFeedingCount += 1
                 case "solid_food":
@@ -100,6 +110,8 @@ public class StatsCalculator {
             formulaCount: formulaCount,
             breastMilkAmount: breastMilkAmount,
             breastMilkCount: breastMilkCount,
+            waterAmount: waterAmount,
+            waterCount: waterCount,
             sleepCount: sleepCount,
             sleepDurationInHours: sleepDurationInHours,
             solidFoodRecords: solidFoodRecords,

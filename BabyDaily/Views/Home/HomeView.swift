@@ -5,6 +5,8 @@ struct HomeView: View {
     let baby: Baby
     @Environment(\.modelContext) private var modelContext
     @Query private var records: [Record]
+
+    @StateObject private var unitManager = UnitManager.shared
     
     init(baby: Baby) {
         self.baby = baby
@@ -62,13 +64,7 @@ struct HomeView: View {
     
     // 所有操作分类 - 保持原始顺序
     private var allActions: [(category: String, actions: [(icon: String, name: String, color: Color)])] {
-        return [
-            (category: "feeding_category", actions: Constants.allCategorys["feeding_category"] ?? []),
-            (category: "activity_category", actions: Constants.allCategorys["activity_category"] ?? []),
-            (category: "growth_category", actions: Constants.allCategorys["growth_category"] ?? []),
-            (category: "health_category", actions: Constants.allCategorys["health_category"] ?? []),
-            (category: "milestone_category", actions: Constants.allCategorys["milestone_category"] ?? [])
-        ]
+        return Constants.allCategorysByOrder
     }
     
     // 最新生长数据
@@ -98,15 +94,15 @@ struct HomeView: View {
                         }
 
                         // 今天的记录统计
-                        TodayStatistics(todayStats: todayStats)
+                        TodayStatistics(todayStats: todayStats, unitManager: unitManager)
                         
                         // 快速操作区域
-                        QuickActionsSection(quickActions: quickActions, baby: baby)
+                        // QuickActionsSection(quickActions: quickActions, baby: baby)
 
                          // 所有操作区域
                         AllActionsSection(allActions: allActions, baby: baby)
                     }
-                }
+                }.padding(.bottom, 20)
             }
             .background(Color(.systemGray6))
             .toolbar(.hidden, for: .navigationBar)
@@ -198,7 +194,7 @@ struct BabyInfoHeader: View {
             .padding(.horizontal, 20)
         }
         .padding(.top, 8)
-        .background(Color.white)
+        .background(.background)
     }
 }
 
@@ -229,7 +225,7 @@ struct OngoingRecordCard: View {
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(12)
         .padding(.horizontal, 20)
     }
@@ -238,6 +234,7 @@ struct OngoingRecordCard: View {
 // 今日统计信息组件
 struct TodayStatistics: View {
     let todayStats: DailyStats
+    let unitManager: UnitManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -251,9 +248,9 @@ struct TodayStatistics: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("formula".localized + ": \(todayStats.formulaAmount.smartDecimal) ml")
+                    Text("formula".localized + ": \(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))
-                    Text("breast_milk".localized + ": \(todayStats.breastMilkAmount.smartDecimal) ml")
+                    Text("breast_milk".localized + ": \(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))       
                 }
 
@@ -276,7 +273,7 @@ struct TodayStatistics: View {
                         .foregroundColor(.secondary)
                     
                     ForEach(todayStats.supplementRecords, id: \.self) { record in
-                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) ml" : ""
+                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
                         Text("\(record.name)\(valueText)")
                             .font(.system(size: 14, weight: .medium))
                     }
@@ -289,7 +286,7 @@ struct TodayStatistics: View {
                         .foregroundColor(.secondary)
                     
                     ForEach(todayStats.solidFoodRecords, id: \.self) { record in
-                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) ml" : ""
+                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
                         Text("\(record.name)\(valueText)")
                             .font(.system(size: 14, weight: .medium))
                     }
@@ -297,7 +294,7 @@ struct TodayStatistics: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -316,20 +313,20 @@ struct QuickActionsSection: View {
                 .foregroundColor(.primary)
             
             // 自适应四列网格布局
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 12)], spacing: 20) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 12)], spacing: 20) {
                 ForEach(quickActions, id: \.name) { action in
                     CategoryActionButton(
                         icon: action.icon,
                         name: action.name,
                         color: action.color,
                         category: action.category,
-                        baby: baby
+                        baby: baby,
                     )
                 }
             }
         }
         .padding()
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -346,13 +343,13 @@ struct AllActionsSection: View {
             Text("all_actions".localized)
                 .font(.headline)
             
-            ForEach(allActions, id: \.category) { categoryItem in
+            ForEach(Array(allActions.enumerated()), id: \.element.category) { index, categoryItem in
                 VStack(alignment: .leading, spacing: 16) {
                     Text(categoryItem.category.localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                     
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 12)], spacing: 20) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], spacing: 20) {
                         ForEach(categoryItem.actions, id: \.name) { action in
                             CategoryActionButton(
                                 icon: action.icon,
@@ -363,11 +360,17 @@ struct AllActionsSection: View {
                             )
                         }
                     }
+
+                     if index != allActions.count - 1 {   // 最后一项不要 Divider
+                        Divider()
+                            .background(Color(.systemGray4))
+                            .padding(.vertical, 8)
+                    }                        
                 }
             }
         }
         .padding()
-        .background(Color.white)
+        // .background(.background)
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -388,17 +391,15 @@ struct CategoryActionButton: View {
             NavigationLink(destination: RecordEditView(baby: baby, recordType: (category: category, subCategory: name, icon: icon))) {
                 ZStack {
                     Circle()
-                        .fill(color)
+                        .fill(color.opacity(0.5))
                         .frame(width: size, height: size)
+                        .overlay(
+                            Circle()
+                                .stroke(color, lineWidth: 2)
+                        )
                     
                     Text(icon)
                         .font(.system(size: 32))
-                    
-                    // 右下角的红色加号
-                    // Image(systemName: "plus.circle.fill")
-                    //     .font(.system(size: 18))
-                    //     .foregroundColor(.red)
-                    //     .offset(x: 25, y: 25)
                 }
             }
             .buttonStyle(PlainButtonStyle())

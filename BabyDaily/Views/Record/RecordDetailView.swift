@@ -37,7 +37,7 @@ struct RecordDetailView: View {
                     .font(.title2)
                     .fontWeight(.bold)
                     
-                Text("\(record.category) · \(formatRelativeTime(record.startTimestamp))")
+                Text("\(record.category.localized) · \(formatRelativeTime(record.startTimestamp))")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -46,7 +46,7 @@ struct RecordDetailView: View {
             milestoneInfoView
         }
         .padding()
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(Constants.cornerRadius)
     }
     
@@ -108,7 +108,7 @@ struct RecordDetailView: View {
                 }
             }
             .padding()
-            .background(Color.white)
+            .background(.background)
             .cornerRadius(Constants.cornerRadius)
         }
     }
@@ -193,7 +193,7 @@ struct RecordDetailView: View {
                 } 
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.white)
+                .background(.background)
                 .cornerRadius(Constants.cornerRadius)
             } else {
                 // 对于不需要详细信息的分类，返回一个空视图
@@ -217,7 +217,7 @@ struct RecordDetailView: View {
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(.background)
                 .cornerRadius(Constants.cornerRadius)
             }
         }
@@ -232,7 +232,7 @@ struct RecordDetailView: View {
                     Text("photos".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 12)], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 12)], alignment: .leading, spacing: 16) {
                         ForEach(photos.indices, id: \.self) { index in
                             if let uiImage = UIImage(data: photos[index]) {
                                 Image(uiImage: uiImage)
@@ -250,7 +250,7 @@ struct RecordDetailView: View {
                     }
                 }  
                 .padding()
-                .background(Color.white)
+                .background(.background)
                 .cornerRadius(Constants.cornerRadius)
             }
         }
@@ -322,6 +322,7 @@ struct RecordDetailView: View {
         .sheet(isPresented: $isNavigatingToEdit) {
             RecordEditView(baby: baby!, recordType: nil, existingRecord: record)
         }
+        .background(Color(.systemGray6))
         // 删除确认弹窗
         .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
             Button("cancel".localized, role: .cancel) {}

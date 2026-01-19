@@ -13,24 +13,6 @@ struct GrowthStatisticsCard: View {
             // 标题和维度选择
             VStack(spacing: 12) {
                 ChartTitleView(title: "growth_statistics", timeRange: timeRange)
-                
-                // 维度选择器
-                HStack(spacing: 12) {
-                    ForEach(["weight", "height", "head", "bmi"], id: \.self) {
-                        dimension in
-                        Button(action: {
-                            selectedDimension = dimension
-                        }) {
-                            Text(dimension.localized)
-                                .font(.system(size: 14))
-                                .foregroundColor(selectedDimension == dimension ? .white : .black)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(selectedDimension == dimension ? Color.blue : Color(.systemGray5))
-                                .cornerRadius(16)
-                        }
-                    }
-                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
@@ -191,7 +173,7 @@ struct GrowthStatisticsCard: View {
             }
             .padding(.horizontal, 20)
         }
-        .background(Color.white)
+        .background(.background)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)

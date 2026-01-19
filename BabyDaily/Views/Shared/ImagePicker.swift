@@ -143,9 +143,8 @@ struct ImagePickerMenu: View {
                     .frame(width: 80, height: 80)
                     .cornerRadius(8)
                 
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "photo.fill")
                     .font(.title)
-                    .foregroundColor(.accentColor)
             }
         }
         .sheet(isPresented: $showImagePicker) {

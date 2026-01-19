@@ -1,4 +1,16 @@
 // 简体中文本地化资源文件
+
+// Unit Setting
+"unit_setting" = "单位设置";
+"unit_settings" = "单位设置";
+"temperature_unit" = "温度单位";
+"select_temperature_unit" = "选择温度测量的单位";
+"weight_unit" = "重量单位";
+"select_weight_unit" = "选择重量测量的单位";
+"length_unit" = "长度单位";
+"select_length_unit" = "用于身高和头围测量";
+"volume_unit" = "体积单位";
+"select_volume_unit" = "选择体积测量的单位";
 // HomeView
 "baby_diary" = "宝宝日记";
 "today_statistics" = "今日统计";
@@ -12,6 +24,13 @@
 "all_actions" = "所有操作";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "开始于: %@";
 
 "feeding_category" = "喂养";
@@ -20,7 +39,6 @@
 "health_category" = "健康";
 "milestone_category" = "重要节点";
 
-"breast_milk" = "母乳";
 "solid_food" = "辅食";
 "water" = "水";
 "sleep" = "睡觉";
@@ -31,7 +49,7 @@
 "height" = "身高";
 "head" = "头";
 "nursing" = "亲喂";
-"breast_bottle" = "母乳瓶喂";
+"breast_bottle" = "母乳";
 "formula" = "奶粉";
 "water_intake" = "水";
 "walking" = "走路";
@@ -50,6 +68,7 @@
 "first_crawl" = "第一次爬";
 "first_roll" = "第一次翻身";
 "first_word" = "说第一句话";
+"first_walk" = "第一次走路";
 
 // Language Setting
 "select_language" = "选择语言";

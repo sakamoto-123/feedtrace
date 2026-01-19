@@ -1,248 +1,194 @@
 import SwiftUI
 import Charts
 
-// 奶量趋势卡片
-struct FeedingVolumeCard: View {
-    let data: [(date: Date, breastMilk: Int, formula: Int)]
-    @Binding var selectedData: (date: Date, breastMilk: Int, formula: Int)?
-    let timeRange: String
+enum FeedingType: String, CaseIterable {
+    case breastMilk, formula, water
+
+    var color: Color {
+        switch self {
+        case .breastMilk:
+            return Color(.systemBlue).opacity(0.65)
+        case .formula:
+            return Color(.systemOrange).opacity(0.65)
+        case .water:
+            return Color(.green).opacity(0.6)
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .breastMilk: return "母乳"
+        case .formula: return "formula".localized
+        case .water: return "water_intake".localized
+        }
+    }
+}
+
+struct FeedingStackItem: Identifiable {
+    let id = UUID()
+    let date: Date
+    let type: FeedingType
+    let value: Int
+}
+
+private struct ChartLegend: View {
+    var body: some View {
+        // 图例
+        HStack(spacing: 12) {
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(FeedingType.breastMilk.color)
+                    .frame(width: 8, height: 8)
+                Text(FeedingType.breastMilk.title)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(FeedingType.formula.color)
+                    .frame(width: 8, height: 8)
+                Text(FeedingType.formula.title)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(FeedingType.water.color)
+                    .frame(width: 8, height: 8)
+                Text(FeedingType.water.title)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+}
+
+// 奶量趋势图表子组件
+private struct FeedingBaseChart: View {
+    let stackedData: [FeedingStackItem]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // 标题
-            ChartTitleView(title: "feeding_trend_title", timeRange: timeRange)
-                .padding(.horizontal, 20)
-            
-            // 图表区域
-            Chart {
-                ForEach(data, id: \.date) {
-                    // 母乳曲线
-                    LineMark(
-                        x: .value("date", $0.date),
-                        y: .value("milk_volume_unit", $0.breastMilk)
-                    )
-                    .foregroundStyle(.red)
-                    .symbol(.circle)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                    
-                    // 奶粉曲线
-                    LineMark(
-                        x: .value("date", $0.date),
-                        y: .value("milk_volume_unit", $0.formula)
-                    )
-                    .foregroundStyle(.blue)
-                    .symbol(.circle)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                    
-                    // 曲线填充
-                    AreaMark(
-                        x: .value("date", $0.date),
-                        y: .value("milk_volume_unit", $0.breastMilk)
-                    )
-                    .foregroundStyle(Color.red.opacity(0.2))
-                    
-                    AreaMark(
-                        x: .value("date", $0.date),
-                        y: .value("milk_volume_unit", $0.formula)
-                    )
-                    .foregroundStyle(Color.blue.opacity(0.2))
-                }
-            }
-            .chartForegroundStyleScale(
-                domain: ["breast_milk", "formula_milk"],
-                range: [.red, .blue]
+        Chart(stackedData) { item in
+            BarMark(
+                x: .value("date", item.date),
+                y: .value("volume", item.value),
+                width: 30,
             )
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: .dateTime.month().day())
+            .foregroundStyle(item.type.color)
+            .annotation(position: .overlay, alignment: .center) {
+                if item.value > 0 {
+                    Text("\(item.value)")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white)
                 }
             }
-            .chartYAxis {
-                AxisMarks() {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel()
-                }
-            }
-            .chartOverlay {
-                proxy in
-                GeometryReader {
-                    geometry in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .onContinuousHover {
-                            hover in
-                            guard case .active(let location) = hover,
-                                  let date: Date = proxy.value(atX: location.x)
-                            else {
-                                selectedData = nil
-                                return
-                            }
-                            if let data = self.data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                                selectedData = (date: data.date, breastMilk: data.breastMilk, formula: data.formula)
-                            }
-                        }
-                }
-            }
-            .frame(height: 220)
-            .padding(.horizontal, 16)
-            
-            // 选中数据显示
-            if let selectedData = selectedData {
-                HStack(spacing: 24) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("breast_milk".localized + ": \(selectedData.breastMilk) ml")
-                            .font(.system(size: 14))
-                            .foregroundColor(.red)
-                        Text("formula_milk".localized + ": \(selectedData.formula) ml")
-                            .font(.system(size: 14))
-                            .foregroundColor(.blue)
-                    }
-                    Spacer()
-                    Text(selectedData.date, format: .dateTime.month().day())
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 20)
-            }
-            
-            // 图例
-            HStack(spacing: 24) {
-                LegendItem(title: "breast_milk", color: .red)
-                LegendItem(title: "formula_milk", color: .blue)
-            }
-            .padding(.horizontal, 20)
         }
-        .background(Color.white)
+        .frame(height: 250)
+        .padding(.horizontal, 8)
+        .chartScrollableAxes(.horizontal)
+        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .day)) { value in
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.secondary)
+                    .offset(x: -4) 
+            }
+        }
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 5)) {
+                AxisGridLine()
+                    .foregroundStyle(Color.gray.opacity(0.12))
+                AxisValueLabel()
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.secondary)
+            }
+        }
+    }
+}
+
+// 奶量趋势卡片
+struct FeedingVolumeCard: View {
+    let data: [(date: Date, breastMilk: Int, formula: Int, water: Int)]
+    // 添加明确的类型注解
+    private var stackedData: [FeedingStackItem] {
+        data.flatMap {
+            [
+                FeedingStackItem(date: $0.date, type: .breastMilk, value: $0.breastMilk),
+                FeedingStackItem(date: $0.date, type: .formula, value: $0.formula),
+                FeedingStackItem(date: $0.date, type: .water, value: $0.water)
+            ]
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // 标题
+            HStack{
+                Text("喂养数量")
+                    .font(.system(size: 17, weight: .semibold))
+                Spacer()
+                ChartLegend()
+            }
+            
+            // 使用提取的子组件
+            FeedingBaseChart(stackedData: stackedData)
+        }
+        .padding()
+        .background(.background)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 16)
+        .padding(.horizontal)
     }
 }
 
 // 喂养次数卡片
 struct FeedingCountCard: View {
-    let data: [(date: Date, breastMilk: Int, formula: Int)]
-    @Binding var selectedData: (date: Date, breastMilk: Int, formula: Int)?
-    let timeRange: String
+      let data: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
+    // 添加明确的类型注解
+    private var stackedData: [FeedingStackItem] {
+        data.flatMap {
+            [
+                FeedingStackItem(date: $0.date, type: .breastMilk, value: $0.breastMilkCount),
+                FeedingStackItem(date: $0.date, type: .formula, value: $0.formulaCount),
+                FeedingStackItem(date: $0.date, type: .water, value: $0.waterCount)
+            ]
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 标题
-            ChartTitleView(title: "feeding_count_title", timeRange: timeRange)
-                .padding(.horizontal, 20)
-            
-            // 图表区域
-            Chart {
-                ForEach(data, id: \.date) {
-                    data in
-                    // 母乳柱状图
-                    BarMark(
-                        x: .value("date", data.date),
-                        y: .value("times_unit", data.breastMilk)
-                    )
-                    .foregroundStyle(.red.opacity(0.8))
-                    
-                    // 奶粉柱状图
-                    BarMark(
-                        x: .value("date", data.date),
-                        y: .value("times_unit", data.formula)
-                    )
-                    .foregroundStyle(.blue.opacity(0.8))
-                }
-            }
-            .chartForegroundStyleScale(
-                domain: ["breast_milk", "formula_milk"],
-                range: [.red.opacity(0.8), .blue.opacity(0.8)]
-            )
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: .dateTime.month().day())
-                }
-            }
-            .chartYAxis {
-                AxisMarks() {
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel()
-                }
-            }
-            .chartOverlay {
-                proxy in
-                GeometryReader {
-                    geometry in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .onContinuousHover {
-                            hover in
-                            guard case .active(let location) = hover,
-                                  let date: Date = proxy.value(atX: location.x)
-                            else {
-                                selectedData = nil
-                                return
-                            }
-                            if let data = self.data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                                selectedData = (date: data.date, breastMilk: data.breastMilk, formula: data.formula)
-                            }
-                        }
-                }
-            }
-            .frame(height: 220)
-            .padding(.horizontal, 16)
-            
-            // 选中数据显示
-            if let selectedData = selectedData {
-                HStack(spacing: 24) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("breast_milk".localized + ": \(selectedData.breastMilk) " + "times".localized)
-                            .font(.system(size: 14))
-                            .foregroundColor(.red)
-                        Text("formula_milk".localized + ": \(selectedData.formula) " + "times".localized)
-                            .font(.system(size: 14))
-                            .foregroundColor(.blue)
-                    }
-                    Spacer()
-                    Text(selectedData.date, format: .dateTime.month().day())
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 20)
+               // 标题
+            HStack{
+                Text("喂养次数")
+                    .font(.system(size: 17, weight: .semibold))
+                Spacer()
+                ChartLegend()
             }
             
-            // 图例
-            HStack(spacing: 24) {
-                LegendItem(title: "breast_milk", color: .red)
-                LegendItem(title: "formula_milk", color: .blue)
-            }
-            .padding(.horizontal, 20)
+            // 使用提取的子组件
+            FeedingBaseChart(stackedData: stackedData)
+            
+          
         }
-        .background(Color.white)
+        .padding()
+        .background(.background)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 16)
+        .padding(.horizontal)
     }
 }
 
 // 喂养趋势组合视图
 struct FeedingTrendView: View {
-    let volumeData: [(date: Date, breastMilk: Int, formula: Int)]
-    let countData: [(date: Date, breastMilk: Int, formula: Int)]
-    @Binding var selectedVolumeData: (date: Date, breastMilk: Int, formula: Int)?
-    @Binding var selectedCountData: (date: Date, breastMilk: Int, formula: Int)?
-    let timeRange: String
+    let volumeData: [(date: Date, breastMilk: Int, formula: Int, water: Int)]
+    let countData: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
     
     var body: some View {
         VStack(spacing: 20) {
-            FeedingVolumeCard(data: volumeData, selectedData: $selectedVolumeData, timeRange: timeRange)
-            FeedingCountCard(data: countData, selectedData: $selectedCountData, timeRange: timeRange)
+            FeedingVolumeCard(data: volumeData)
+            FeedingCountCard(data: countData)
         }
         .padding(.bottom, 20)
     }
