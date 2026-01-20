@@ -147,7 +147,7 @@ struct BabyCreationView: View {
         }
         .padding(36)
         .frame(minWidth: 360, maxWidth: 600)
-        .background(Color.themeBackground(for: colorScheme))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }

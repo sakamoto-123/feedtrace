@@ -13,6 +13,8 @@ struct DatePickerSheet: View {
     // 可选的日期显示组件，默认为日期和时间
     let displayedComponents: DatePickerComponents
     
+    @EnvironmentObject var appSettings: AppSettings
+    
     // 初始化方法 - 用于非可选日期
     init(title: String = "", date: Binding<Date>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
         self.title = title
@@ -54,7 +56,7 @@ struct DatePickerSheet: View {
                     isPresented = false
                 }
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.blue)
+                .foregroundColor(appSettings.currentThemeColor)
                 .padding(.trailing, 20)
                 .padding(.top, 20)
             }
@@ -94,5 +96,6 @@ struct DatePickerSheet: View {
                 .padding(.bottom, 20)
             }
         }
+        .accentColor(appSettings.currentThemeColor)
     }
 }

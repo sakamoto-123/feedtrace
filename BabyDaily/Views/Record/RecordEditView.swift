@@ -202,7 +202,7 @@ struct RecordTimeSelector: View {
                     }) {
                         Text(formatDateTime(startTimestamp, dateStyle: .long, timeStyle: .omitted))
                             .font(.system(size: 14))
-                            .foregroundColor(.blue)
+                            .foregroundColor(.accentColor)
                     }
                 }
                 
@@ -259,7 +259,7 @@ struct RecordTimeSelector: View {
                         }) {
                             Text(formatDateTime(endTimestamp!, dateStyle: .long, timeStyle: .omitted))
                                 .font(.system(size: 14))
-                                .foregroundColor(.blue)
+                                .foregroundColor(.accentColor)
                         }
                     }
 
@@ -298,9 +298,9 @@ struct RecordTimeSelector: View {
                     }
                 } label: {
                     Image(systemName: showEndTimePicker ? "minus.circle.fill" : "plus.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.accentColor)
                     Text(showEndTimePicker ? "移除结束时间" : "添加结束时间")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.accentColor)
                 }
                     
                 Spacer()
@@ -579,6 +579,7 @@ struct RecordEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var appSettings: AppSettings
     
     // 单位管理
     @StateObject private var unitManager = UnitManager.shared
@@ -800,6 +801,7 @@ struct RecordEditView: View {
                     }
                 }
             }
+            .accentColor(appSettings.currentThemeColor)
     }
     
     // 主滚动视图

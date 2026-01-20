@@ -57,29 +57,67 @@ class DataMigrationManager {
         let targetFetchDescriptor = FetchDescriptor<T>()
         let targetItems = try targetContext.fetch(targetFetchDescriptor)
         log("从目标容器获取到 \(targetItems.count) 条已存在的 \(typeName) 数据", level: .info)
+
+        // 输出所有的 targetItems 和 sourceItems 的id
+        log("目标容器中的 \(typeName) 数据ID: \(targetItems.map { $0.id })", level: .info)
+        log("源容器中的 \(typeName) 数据ID: \(sourceItems.map { $0.id })", level: .info)
         
-        var existingItemMap = Dictionary(uniqueKeysWithValues: targetItems.map { item -> (UUID, T) in
-            // 使用反射获取id属性
-            let mirror = Mirror(reflecting: item)
-            let id = mirror.children.first { $0.label == "id" }?.value as? UUID ?? UUID()
-            return (id, item)
-        })
+        // 构建现有项目ID映射，直接访问id属性
+        var existingItemMap = [UUID: T]()
+        for item in targetItems {
+            // 根据模型类型直接获取id
+            var itemId: UUID
+            if let baby = item as? Baby {
+                itemId = baby.id
+            } else if let record = item as? Record {
+                itemId = record.id
+            } else if let setting = item as? UserSetting {
+                itemId = setting.id
+            } else {
+                log("未知模型类型: \(typeName)", level: .error)
+                continue
+            }
+            existingItemMap[itemId] = item
+        }
         
         var addedCount = 0
         var updatedCount = 0
         var skippedCount = 0
         
         for sourceItem in sourceItems {
-            // 使用反射获取id和updatedAt属性
-            let sourceMirror = Mirror(reflecting: sourceItem)
-            let sourceId = sourceMirror.children.first { $0.label == "id" }?.value as? UUID ?? UUID()
-            let sourceUpdatedAt = sourceMirror.children.first { $0.label == "updatedAt" }?.value as? Date ?? Date.distantPast
+            // 直接访问id和updatedAt属性
+            var sourceId: UUID
+            var sourceUpdatedAt: Date
+            
+            if let baby = sourceItem as? Baby {
+                sourceId = baby.id
+                sourceUpdatedAt = baby.updatedAt
+            } else if let record = sourceItem as? Record {
+                sourceId = record.id
+                sourceUpdatedAt = record.updatedAt
+            } else if let setting = sourceItem as? UserSetting {
+                sourceId = setting.id
+                sourceUpdatedAt = setting.updatedAt
+            } else {
+                log("未知模型类型: \(typeName)", level: .error)
+                continue
+            }
             
             // 检查目标容器中是否已存在该ID的数据
             if let existingItem = existingItemMap[sourceId] {
                 // 目标容器中已存在，比较updatedAt字段，保留最新版本
-                let existingMirror = Mirror(reflecting: existingItem)
-                let existingUpdatedAt = existingMirror.children.first { $0.label == "updatedAt" }?.value as? Date ?? Date.distantPast
+                var existingUpdatedAt: Date
+                
+                if let existingBaby = existingItem as? Baby {
+                    existingUpdatedAt = existingBaby.updatedAt
+                } else if let existingRecord = existingItem as? Record {
+                    existingUpdatedAt = existingRecord.updatedAt
+                } else if let existingSetting = existingItem as? UserSetting {
+                    existingUpdatedAt = existingSetting.updatedAt
+                } else {
+                    log("未知模型类型: \(typeName)", level: .error)
+                    continue
+                }
                 
                 if sourceUpdatedAt > existingUpdatedAt {
                     // 源数据更新，替换目标数据
@@ -227,15 +265,38 @@ class DataMigrationManager {
         var deletedCount = 0
         
         for item in items {
-            // 使用反射获取id和updatedAt属性
-            let mirror = Mirror(reflecting: item)
-            let id = mirror.children.first { $0.label == "id" }?.value as? UUID ?? UUID()
-            let updatedAt = mirror.children.first { $0.label == "updatedAt" }?.value as? Date ?? Date.distantPast
+            // 直接访问id和updatedAt属性
+            var id: UUID
+            var updatedAt: Date
+            
+            if let baby = item as? Baby {
+                id = baby.id
+                updatedAt = baby.updatedAt
+            } else if let record = item as? Record {
+                id = record.id
+                updatedAt = record.updatedAt
+            } else if let setting = item as? UserSetting {
+                id = setting.id
+                updatedAt = setting.updatedAt
+            } else {
+                log("未知模型类型: \(typeName)，跳过记录", level: .error)
+                continue
+            }
             
             if let existing = uniqueItems[id] {
                 // 如果已存在该ID，比较updatedAt，保留最新的
-                let existingMirror = Mirror(reflecting: existing)
-                let existingUpdatedAt = existingMirror.children.first { $0.label == "updatedAt" }?.value as? Date ?? Date.distantPast
+                var existingUpdatedAt: Date
+                
+                if let existingBaby = existing as? Baby {
+                    existingUpdatedAt = existingBaby.updatedAt
+                } else if let existingRecord = existing as? Record {
+                    existingUpdatedAt = existingRecord.updatedAt
+                } else if let existingSetting = existing as? UserSetting {
+                    existingUpdatedAt = existingSetting.updatedAt
+                } else {
+                    log("未知模型类型: \(typeName)，跳过记录", level: .error)
+                    continue
+                }
                 
                 if updatedAt > existingUpdatedAt {
                     // 新记录更新，删除旧记录

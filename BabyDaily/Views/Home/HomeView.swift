@@ -152,9 +152,21 @@ struct BabyInfoHeader: View {
             modelContext.delete(record)
         }
         
+        // 删除所有UserSetting数据
+        do {
+            let fetchDescriptor = FetchDescriptor<UserSetting>()
+            let userSettings = try modelContext.fetch(fetchDescriptor)
+            for setting in userSettings {
+                modelContext.delete(setting)
+            }
+        } catch {
+            print("Failed to fetch UserSetting: \(error)")
+        }
+        
         do {
             try modelContext.save()
             print("Successfully deleted all records for baby: \(baby.name)")
+            print("Successfully deleted all UserSetting data")
         } catch {
             print("Failed to delete all records: \(error)")
         }

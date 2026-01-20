@@ -47,7 +47,7 @@ struct ContentView: View {
                     if let currentSelectedBaby = selectedBaby,
                        !$0.contains(where: { $0.id == currentSelectedBaby.id }) {
                         // 优先从本地缓存获取宝宝
-                        if let cachedBabyId = userSettingManager. (),
+                        if let cachedBabyId = userSettingManager.getSelectedBabyIdFromDefaults(),
                            let cachedBaby = $0.first(where: { $0.id == cachedBabyId }) {
                             selectedBaby = cachedBaby
                         } else {
