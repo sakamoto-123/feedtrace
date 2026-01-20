@@ -301,7 +301,7 @@ struct StatisticsView: View {
             .navigationTitle("statistics".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
-            .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
+            .background(Color.themeListBackground(for: colorScheme))
             // 监听timeRange变化，清理缓存
             .onChange(of: timeRange) {
                 feedingDataCache = nil

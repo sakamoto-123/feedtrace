@@ -85,6 +85,9 @@
 "theme_color" = "テーマカラー";
 "language_setting" = "言語設定";
 "mode_setting" = "モード設定";
+"system_theme" = "システムに従う";
+"light_theme" = "ライトモード";
+"dark_theme" = "ダークモード";
 "membership_privileges" = "会員特典";
 "free" = "無料";
 "about" = "について";

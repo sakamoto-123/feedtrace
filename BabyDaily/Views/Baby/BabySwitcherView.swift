@@ -51,8 +51,9 @@ struct BabySwitcherView: View {
                             } else {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()
-                                    .scaledToFill()                                    .frame(width: 40, height: 40)
-                                    .foregroundColor(ThemeManager.shared.selectedThemeColor.color)
+                                    .scaledToFill()                                    
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(AppSettings.shared.currentThemeColor)
                             }
                             
                             // 宝宝名称
@@ -65,7 +66,7 @@ struct BabySwitcherView: View {
                             // 选中标记
                             if currentBaby?.id == baby.id {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(ThemeManager.shared.selectedThemeColor.color)
+                                    .foregroundColor(AppSettings.shared.currentThemeColor)
                                     .font(.system(size: 18, weight: .medium))
                             }
                         }
@@ -89,7 +90,7 @@ struct BabySwitcherView: View {
                     Text("添加新的宝宝".localized)
                         .font(.system(size: 16, weight: .medium))
                 }
-                .foregroundColor(ThemeManager.shared.selectedThemeColor.color)
+                .foregroundColor(AppSettings.shared.currentThemeColor)
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 16)
                 .padding(.top, 24)

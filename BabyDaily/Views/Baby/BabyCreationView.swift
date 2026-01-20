@@ -5,7 +5,7 @@ struct BabyCreationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject var appSettings: AppSettings
     
     // 新增：编辑模式标识和现有宝宝数据
     let isEditing: Bool
@@ -49,7 +49,7 @@ struct BabyCreationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(colorScheme == .dark ? .black : .systemBackground)
+                Color.themeBackground(for: colorScheme)
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -112,7 +112,7 @@ struct BabyCreationView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 70, height: 70)
-                        .foregroundColor(themeManager.currentThemeColor)
+                        .foregroundColor(appSettings.currentThemeColor)
                 }
             }
         }
@@ -147,7 +147,7 @@ struct BabyCreationView: View {
         }
         .padding(36)
         .frame(minWidth: 360, maxWidth: 600)
-        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color(.systemBackground))
+        .background(Color.themeBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -165,7 +165,7 @@ struct BabyCreationView: View {
                 .autocorrectionDisabled()
                 .overlay(
                     Divider()
-                        .background(themeManager.currentThemeColor)
+                        .background(appSettings.currentThemeColor)
                         .offset(y: 16)
                 )
         }
@@ -197,7 +197,7 @@ struct BabyCreationView: View {
             .frame(width: 200)
            .overlay(
                Divider()
-                   .background(themeManager.currentThemeColor)
+                   .background(appSettings.currentThemeColor)
                    .offset(y: 16)
            )
         }
@@ -222,7 +222,7 @@ struct BabyCreationView: View {
                         .minimumScaleFactor(0.8)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(gender == "male" ? themeManager.currentThemeColor : Color(.systemGray5))
+                        .background(gender == "male" ? appSettings.currentThemeColor : Color(.systemGray5))
                         .cornerRadius(20)
                 }
                 .fixedSize(horizontal: true, vertical: false)
@@ -238,7 +238,7 @@ struct BabyCreationView: View {
                         .minimumScaleFactor(0.8)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(gender == "female" ? themeManager.currentThemeColor : Color(.systemGray5))
+                        .background(gender == "female" ? appSettings.currentThemeColor : Color(.systemGray5))
                         .cornerRadius(20)
                 }
                 .fixedSize(horizontal: true, vertical: false)
@@ -254,7 +254,7 @@ struct BabyCreationView: View {
                         .minimumScaleFactor(0.75)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
-                        .background(gender == "prefer_not_to_say" ? themeManager.currentThemeColor : Color(.systemGray5))
+                        .background(gender == "prefer_not_to_say" ? appSettings.currentThemeColor : Color(.systemGray5))
                         .cornerRadius(20)
                 }
                 .fixedSize(horizontal: true, vertical: false)
@@ -275,7 +275,7 @@ struct BabyCreationView: View {
                HStack(spacing: 16) {
                     ForEach(ThemeColor.allCases) { themeColor in
                         Button(action: {
-                            themeManager.switchThemeColor(to: themeColor)
+                            appSettings.setThemeColor(themeColor)
                         }) {
                             ZStack {
                                 Circle()
@@ -283,7 +283,7 @@ struct BabyCreationView: View {
                                     .frame(width: 40, height: 40)
                                     .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                                 
-                                if themeManager.selectedThemeColor == themeColor {
+                                if appSettings.themeColor == themeColor {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundColor(.white)
@@ -323,7 +323,7 @@ struct BabyCreationView: View {
                     .padding(.vertical, 8)
                     .overlay(
                         Divider()
-                            .background(themeManager.currentThemeColor)
+                            .background(appSettings.currentThemeColor)
                             .offset(y: 16)
                     )
                 }
@@ -352,7 +352,7 @@ struct BabyCreationView: View {
                     .padding(.vertical, 8)
                     .overlay(
                         Divider()
-                            .background(themeManager.currentThemeColor)
+                            .background(appSettings.currentThemeColor)
                             .offset(y: 16)
                     )
                 }
@@ -371,7 +371,7 @@ struct BabyCreationView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 48)
                 .padding(.vertical, 14)
-                .background(themeManager.currentThemeColor)
+                .background(appSettings.currentThemeColor)
                 .cornerRadius(24)
         }
         .disabled(name.isEmpty)
@@ -448,7 +448,7 @@ extension Color {
 struct DatePickerOverlay: View {
     @Binding var date: Date
     var onDismiss: () -> Void
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject var appSettings: AppSettings
     
     var body: some View {
         ZStack {
@@ -468,7 +468,7 @@ struct DatePickerOverlay: View {
                     onDismiss()
                 }
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(themeManager.currentThemeColor)
+                    .foregroundColor(appSettings.currentThemeColor)
                 }
                 .padding(16)
                 

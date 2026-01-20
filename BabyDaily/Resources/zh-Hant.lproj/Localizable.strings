@@ -85,6 +85,9 @@
 "theme_color" = "主題顏色";
 "language_setting" = "語言設置";
 "mode_setting" = "模式設置";
+"system_theme" = "跟隨系統";
+"light_theme" = "淺色模式";
+"dark_theme" = "深色模式";
 "membership_privileges" = "會員特權";
 "free" = "免費";
 "about" = "關於";

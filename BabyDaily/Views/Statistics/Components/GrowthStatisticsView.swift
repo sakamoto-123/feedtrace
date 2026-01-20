@@ -126,7 +126,7 @@ struct GrowthStatisticsCard: View {
             // 图例
             makeLegend()
         }
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal, 16)
     }

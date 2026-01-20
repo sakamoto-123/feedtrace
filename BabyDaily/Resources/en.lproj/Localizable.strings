@@ -104,6 +104,9 @@
 "theme_color" = "Theme Color";
 "language_setting" = "Language Setting";
 "mode_setting" = "Mode Setting";
+"system_theme" = "Follow System";
+"light_theme" = "Light Mode";
+"dark_theme" = "Dark Mode";
 "membership_privileges" = "Membership Privileges";
 "free" = "Free";
 "about" = "About";

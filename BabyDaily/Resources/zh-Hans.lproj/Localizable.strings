@@ -93,6 +93,9 @@
 "theme_color" = "主题颜色";
 "language_setting" = "语言设置";
 "mode_setting" = "模式设置";
+"system_theme" = "跟随系统";
+"light_theme" = "浅色模式";
+"dark_theme" = "深色模式";
 "membership_privileges" = "会员特权";
 "free" = "免费";
 "about" = "关于";

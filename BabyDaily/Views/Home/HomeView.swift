@@ -105,7 +105,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
+            .background(Color.themeListBackground(for: colorScheme))
             .toolbar(.hidden, for: .navigationBar)
             // 宝宝切换视图
             .sheet(isPresented: $showingBabySwitcher) {
@@ -221,7 +221,7 @@ struct BabyInfoHeader: View {
             .padding(.horizontal, 20)
         }
         .padding(.top, 8)
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
     }
 }
 
@@ -303,7 +303,7 @@ struct OngoingRecordCard: View {
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .onAppear {
@@ -388,7 +388,7 @@ struct TodayStatistics: View {
             }
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -421,7 +421,7 @@ struct QuickActionsSection: View {
             }
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -466,7 +466,7 @@ struct AllActionsSection: View {
             }
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)

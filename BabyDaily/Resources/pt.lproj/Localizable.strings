@@ -85,6 +85,9 @@
 "theme_color" = "Cor do tema";
 "language_setting" = "Configuração de idioma";
 "mode_setting" = "Configuração de modo";
+"system_theme" = "Seguir sistema";
+"light_theme" = "Modo claro";
+"dark_theme" = "Modo escuro";
 "membership_privileges" = "Privilégios de assinante";
 "free" = "Gratuito";
 "about" = "Sobre";

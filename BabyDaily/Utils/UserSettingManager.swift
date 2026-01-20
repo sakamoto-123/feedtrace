@@ -82,12 +82,10 @@ class UserSettingManager: ObservableObject {
     
     // 从UserDefaults创建UserSetting
     private func createUserSettingFromDefaults() -> UserSetting {
-        // 语言设置
-        let language = UserDefaults.standard.string(forKey: "appLanguage") ?? ""
-        
-        // 主题设置
-        let themeMode = UserDefaults.standard.string(forKey: "selectedThemeMode") ?? "system"
-        let themeColor = UserDefaults.standard.string(forKey: "selectedThemeColor") ?? "blue"
+        // 从AppSettings获取设置（统一管理）
+        let language = AppSettings.shared.language == .system ? "" : AppSettings.shared.language.rawValue
+        let themeMode = AppSettings.shared.themeMode.rawValue
+        let themeColor = AppSettings.shared.themeColor.rawValue
         
         // 单位设置
         let temperatureUnit = UserDefaults.standard.string(forKey: "temperatureUnit") ?? "°C"
@@ -110,18 +108,8 @@ class UserSettingManager: ObservableObject {
     
     // 同步UserSetting到各个管理类
     private func syncToManagers(_ setting: UserSetting) {
-        // 同步到LanguageManager
-        if let language = AppLanguage(rawValue: setting.language) {
-            LanguageManager.shared.selectedLanguage = language
-        }
-        
-        // 同步到ThemeManager
-        if let themeMode = ThemeMode(rawValue: setting.themeMode) {
-            ThemeManager.shared.selectedThemeMode = themeMode
-        }
-        if let themeColor = ThemeColor(rawValue: setting.themeColor) {
-            ThemeManager.shared.selectedThemeColor = themeColor
-        }
+        // 同步到AppSettings（统一管理主题和语言）
+        AppSettings.shared.syncFromUserSetting(setting)
         
         // 同步到UnitManager
         if let temperatureUnit = TemperatureUnit(rawValue: setting.temperatureUnit) {
@@ -207,21 +195,7 @@ class UserSettingManager: ObservableObject {
     }
 }
 
-// 扩展ThemeManager，使用UserSettingManager
-fileprivate extension ThemeManager {
-    // 更新UserSetting实例
-    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
-        await UserSettingManager.shared.updateUserSetting(updateBlock)
-    }
-}
-
-// 扩展LanguageManager，使用UserSettingManager
-fileprivate extension LanguageManager {
-    // 更新UserSetting实例
-    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
-        await UserSettingManager.shared.updateUserSetting(updateBlock)
-    }
-}
+// AppSettings已经在内部使用UserSettingManager，无需额外扩展
 
 // 扩展UnitManager，使用UserSettingManager
 fileprivate extension UnitManager {

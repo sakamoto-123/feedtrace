@@ -98,6 +98,6 @@ struct ChartHeaderView: View {
         }
         .padding()
         .padding(.top, 0)
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
     }
 }

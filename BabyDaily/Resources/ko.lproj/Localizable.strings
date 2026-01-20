@@ -83,6 +83,9 @@
 "theme_color" = "테마 색상";
 "language_setting" = "언어 설정";
 "mode_setting" = "모드 설정";
+"system_theme" = "시스템 따르기";
+"light_theme" = "라이트 모드";
+"dark_theme" = "다크 모드";
 "membership_privileges" = "회원 특권";
 "free" = "무료";
 "about" = "소개";

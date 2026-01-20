@@ -118,7 +118,7 @@ struct ActivityGrid: View {
             }
         }
         .padding(.horizontal, 16)
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .padding(.horizontal, 16)

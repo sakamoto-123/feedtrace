@@ -18,7 +18,7 @@ extension NumberFormatter {
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 1
         formatter.usesGroupingSeparator = false
-        formatter.locale = LanguageManager.shared.currentLocale
+        formatter.locale = AppSettings.shared.currentLocale
         return formatter
     }()
 }
@@ -61,7 +61,7 @@ func formatDate(_ date: Date) -> String {
     } else if components.day == 1 {
         return "yesterday".localized
     } else {
-        return date.formatted(Date.FormatStyle(date: .long).locale(LanguageManager.shared.currentLocale))
+        return date.formatted(Date.FormatStyle(date: .long).locale(AppSettings.shared.currentLocale))
     }
 }
 
@@ -98,7 +98,7 @@ func calculateBabyAge(_ baby: Baby, _ date: Date = Date()) -> String {
 /// - Returns: 格式化后的相对时间字符串（如：32秒前、3分钟前、1小时前、3个月前、1年前等）
 func formatRelativeTime(_ timestamp: Date) -> String {
     let formatter = RelativeDateTimeFormatter()
-    formatter.locale = LanguageManager.shared.currentLocale
+    formatter.locale = AppSettings.shared.currentLocale
     formatter.dateTimeStyle = .numeric
     formatter.unitsStyle = .full
     return formatter.localizedString(for: timestamp, relativeTo: Date())
@@ -112,7 +112,7 @@ func formatRelativeTime(_ timestamp: Date) -> String {
 /// - Returns: 格式化后的日期时间字符串，使用app内选择的语言
 func formatDateTime(_ date: Date, dateStyle: Date.FormatStyle.DateStyle = .long, timeStyle: Date.FormatStyle.TimeStyle = .shortened) -> String {
     let formatStyle = Date.FormatStyle(date: dateStyle, time: timeStyle)
-        .locale(LanguageManager.shared.currentLocale)
+        .locale(AppSettings.shared.currentLocale)
     return date.formatted(formatStyle)
 }
 
@@ -131,7 +131,7 @@ func localizedDuration(from start: Date, to end: Date) -> String {
     
     // 设置日历和本地化
     var calendar = Calendar.current
-    calendar.locale = LanguageManager.shared.currentLocale
+    calendar.locale = AppSettings.shared.currentLocale
     formatter.calendar = calendar
     
     return formatter.string(from: interval) ?? ""

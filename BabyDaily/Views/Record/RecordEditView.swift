@@ -548,7 +548,7 @@ struct RecordAdditionalInfoSection: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.red)
-                                    .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+                                    .background(Color.themeCardBackground(for: colorScheme))
                                     .clipShape(Circle())
                             }
                             .offset(x: 4, y: -4)
@@ -695,7 +695,7 @@ struct RecordEditView: View {
             )
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
     }
     
     private var timeSection: some View {
@@ -712,7 +712,7 @@ struct RecordEditView: View {
                 )
             } 
             .padding()
-            .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+            .background(Color.themeCardBackground(for: colorScheme))
             .cornerRadius(Constants.cornerRadius)
         }
     }
@@ -747,7 +747,7 @@ struct RecordEditView: View {
                         )
                     }
                     .padding()
-                    .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+                    .background(Color.themeCardBackground(for: colorScheme))
                     .cornerRadius(Constants.cornerRadius)
             })
         } else {
@@ -770,7 +770,7 @@ struct RecordEditView: View {
                 )
             }
             .padding()
-            .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+            .background(Color.themeCardBackground(for: colorScheme))
             .cornerRadius(Constants.cornerRadius)
         }
     }
@@ -781,7 +781,7 @@ struct RecordEditView: View {
                     recordTypeSection
                     mainScrollView
                 }
-                .background(colorScheme == .light ? Color(.systemGray6) : Color.black)
+                .background(Color.themeListBackground(for: colorScheme))
                 .navigationTitle(getNavigationTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbarContent() }

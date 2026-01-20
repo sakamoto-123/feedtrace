@@ -2,7 +2,6 @@ import SwiftUI
 
 struct MainTabView: View {
     @Binding var baby: Baby
-    @EnvironmentObject var languageManager: LanguageManager
     
     var body: some View {
         TabView {

@@ -168,7 +168,7 @@ struct FeedingVolumeCard: View {
             FeedingBaseChart(stackedData: stackedData, timeRange: timeRange, type: type)
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(16)
         .padding(.horizontal)
     }
@@ -207,7 +207,7 @@ struct FeedingCountCard: View {
           
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(16)
         .padding(.horizontal)
     }

@@ -117,7 +117,7 @@ struct SleepDurationCard: View {
             SleepDurationChart(data: data, timeRange: timeRange)
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal)
     }
@@ -142,7 +142,7 @@ struct SleepCountCard: View {
             SleepCountChart(data: data, timeRange: timeRange)
         }
         .padding()
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         .padding(.horizontal)
     }
