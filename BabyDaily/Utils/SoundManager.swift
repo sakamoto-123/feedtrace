@@ -59,7 +59,7 @@ class SoundManager: ObservableObject {
     
     // 播放庆祝音效
     func playCelebrationSound() {
-        print("Play celebration sound called, isSoundEnabled: \(isSoundEnabled), celeSoundPlayer: \(celeSoundPlayer != nil)")
+        Logger.debug("Play celebration sound called, isSoundEnabled: \(isSoundEnabled), celeSoundPlayer: \(celeSoundPlayer != nil)")
         guard isSoundEnabled, let player = celeSoundPlayer else { return }
         player.stop()
         player.currentTime = 0

@@ -94,7 +94,7 @@ class CloudSyncManager: ObservableObject {
                     cloudKitDatabase: .private(CloudKitConfig.containerIdentifier)
                 )
                 let container = try ModelContainer(for: schema, configurations: [cloudConfiguration])
-                print("[CloudSync] Created CloudKit ModelContainer")
+                Logger.info("Created CloudKit ModelContainer")
                 return container
             } else {
                 // 本地存储配置 - 明确指定不使用CloudKit，使用独立的文件URL
@@ -107,7 +107,7 @@ class CloudSyncManager: ObservableObject {
                     url: localStoreURL
                 )
                 let container = try ModelContainer(for: schema, configurations: [localConfiguration])
-                print("[CloudSync] Created Local ModelContainer at URL: \(localStoreURL)")
+                Logger.info("Created Local ModelContainer at URL: \(localStoreURL)")
                 return container
             }
         } catch {
@@ -121,7 +121,7 @@ class CloudSyncManager: ObservableObject {
     func checkiCloudStatus() -> iCloudStatus {
         // 调试信息：打印当前设备类型
         #if targetEnvironment(simulator)
-        print("[CloudSync] Running on simulator - using mock iCloud status")
+        Logger.debug("Running on simulator - using mock iCloud status")
         // 模拟器上，直接返回可用状态，因为模拟器的iCloud容器访问可能不可靠
         let mockStatus = iCloudStatus.available
         updateICloudStatus(mockStatus)
@@ -130,28 +130,28 @@ class CloudSyncManager: ObservableObject {
         // 真机上，使用真实的iCloud状态检查
         // 检查是否登录iCloud
         guard let ubiquityContainerURL = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
-            print("[CloudSync] iCloud not logged in")
+            Logger.warning("iCloud not logged in")
             let status = iCloudStatus.notLoggedIn
             updateICloudStatus(status)
             return status
         }
         
-        print("[CloudSync] iCloud logged in, checking storage")
+        Logger.debug("iCloud logged in, checking storage")
         
         do {
             // 检查可用存储空间
             let resourceValues = try ubiquityContainerURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
             if let availableCapacity = resourceValues.volumeAvailableCapacityForImportantUsage {
-                print("[CloudSync] iCloud available capacity: \(availableCapacity)")
+                Logger.debug("iCloud available capacity: \(availableCapacity)")
                 let status = availableCapacity > CloudKitConfig.minRequiredSpace ? iCloudStatus.available : iCloudStatus.insufficientSpace
                 updateICloudStatus(status)
                 return status
             }
         } catch {
-            print("[CloudSync] Error checking iCloud storage: \(error)")
+            Logger.error("Error checking iCloud storage: \(error)")
         }
         
-        print("[CloudSync] iCloud storage check failed, defaulting to available")
+        Logger.warning("iCloud storage check failed, defaulting to available")
         // 如果存储检查失败，默认返回可用状态
         let defaultStatus = iCloudStatus.available
         updateICloudStatus(defaultStatus)
@@ -181,7 +181,7 @@ class CloudSyncManager: ObservableObject {
             
             updateSyncStatus(.completed)
         } catch {
-            print("[CloudSync] Sync error: \(error)")
+            Logger.error("Sync error: \(error)")
             updateSyncStatus(.error(error))
         }
     }

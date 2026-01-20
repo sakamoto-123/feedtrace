@@ -11,11 +11,17 @@ struct BabySwitcherView: View {
     let onSelectBaby: (Baby) -> Void
     let onAddBaby: () -> Void
     
-    // 删除相关状态
+    // 删除相关状态 - 只存储要删除的宝宝ID，不存储实例
     @State private var showingDeleteConfirm = false
-    @State private var babyToDelete: Baby?
+    @State private var babyToDeleteId: UUID?
     @State private var showingDeleteError = false
     @State private var deleteErrorMessage = ""
+    
+    // 计算属性：从当前有效的 babies 数组中获取要删除的宝宝实例
+    private var babyToDelete: Baby? {
+        guard let id = babyToDeleteId else { return nil }
+        return babies.first(where: { $0.id == id })
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -115,7 +121,9 @@ struct BabySwitcherView: View {
                     deleteBaby(baby)
                 }
             }
-            Button("取消", role: .cancel) {}
+            Button("取消", role: .cancel) {
+                babyToDeleteId = nil
+            }
         } message: {
             if let baby = babyToDelete {
                 Text("确定要删除宝宝 \(baby.name) 吗？此操作不可恢复，所有相关记录也将被删除。")
@@ -135,15 +143,20 @@ struct BabySwitcherView: View {
     /// 确认删除宝宝
     private func confirmDelete(at offsets: IndexSet) {
         guard let index = offsets.first, index < babies.count else { return }
-        babyToDelete = babies[index]
+        // 只存储ID，不存储实例
+        babyToDeleteId = babies[index].id
         showingDeleteConfirm = true
     }
     
     /// 删除宝宝及相关记录
     private func deleteBaby(_ baby: Baby) {
         do {
+            // 从当前有效的 babies 数组中查找要删除的宝宝
+            // baby 参数来自计算属性，总是有效的实例
+            let babyId = baby.id
+            
             // 1. 删除与该宝宝关联的所有记录
-            let babyRecords = allRecords.filter { $0.babyId == baby.id }
+            let babyRecords = allRecords.filter { $0.babyId == babyId }
             for record in babyRecords {
                 modelContext.delete(record)
             }
@@ -155,7 +168,7 @@ struct BabySwitcherView: View {
             try modelContext.save()
             
             // 4. 如果删除的是当前选中的宝宝，关闭视图
-            if baby.id == currentBaby?.id {
+            if babyId == currentBaby?.id {
                 dismiss()
             }
         } catch {
@@ -165,7 +178,7 @@ struct BabySwitcherView: View {
         }
         
         // 重置状态
-        babyToDelete = nil
+        babyToDeleteId = nil
         showingDeleteConfirm = false
     }
 }

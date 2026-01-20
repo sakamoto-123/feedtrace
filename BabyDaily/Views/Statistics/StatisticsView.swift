@@ -58,7 +58,7 @@ struct StatisticsView: View {
         
         // 计算查询开始日期：daysCount天前的00:00:00
         guard let startDate = calendar.date(byAdding: .day, value: -daysCount + 1, to: today) else {
-            print("Failed to calculate start date")
+            Logger.error("Failed to calculate start date")
             return []
         }
         
@@ -103,7 +103,7 @@ struct StatisticsView: View {
                     dateFormatter.timeZone = TimeZone.current
                     let localDateStr = dateFormatter.string(from: startOfDay)
                 } else {
-                    print("FeedingData: Failed to calculate date for index \(i)")
+                    Logger.warning("FeedingData: Failed to calculate date for index \(i)")
                 }
             }
             
@@ -129,7 +129,7 @@ struct StatisticsView: View {
                     groupedData[startOfDay]?.water += value
                     groupedData[startOfDay]?.waterCount += 1
                 } else {
-                    print("FeedingData: Unknown subCategory \(record.subCategory) for record ID \(record.id)")
+                    Logger.warning("FeedingData: Unknown subCategory \(record.subCategory) for record ID \(record.id)")
                 }
             }
             
@@ -152,7 +152,7 @@ struct StatisticsView: View {
             
             return result
         } catch {
-            print("Error fetching feeding data: \(error)")
+            Logger.error("Error fetching feeding data: \(error)")
             return []
         }
     }
@@ -165,7 +165,7 @@ struct StatisticsView: View {
         
         // 计算查询开始日期：daysCount天前的00:00:00
         guard let startDate = calendar.date(byAdding: .day, value: -daysCount + 1, to: today) else {
-            print("Failed to calculate start date")
+            Logger.error("Failed to calculate start date")
             return []
         }
         
@@ -178,7 +178,7 @@ struct StatisticsView: View {
         dateFormatter.timeZone = TimeZone.current
         let localStartDateStr = dateFormatter.string(from: startDate)
         let localEndDateStr = dateFormatter.string(from: endDate)
-        print("SleepData: Querying from \(localStartDateStr) to \(localEndDateStr) for baby ID: \(baby.id)")
+        Logger.debug("SleepData: Querying from \(localStartDateStr) to \(localEndDateStr) for baby ID: \(baby.id)")
         
         // 将外部变量提取为常量
         let babyId = baby.id
@@ -199,7 +199,7 @@ struct StatisticsView: View {
             let records: [Record] = try modelContext.fetch(fetchDescriptor)
             
             // 记录查询到的记录数量
-            print("SleepData: Found \(records.count) sleep records")
+            Logger.debug("SleepData: Found \(records.count) sleep records")
             
             // 按日期分组计算数据
             var groupedData: [Date: (duration: Int, count: Int)] = [:]
@@ -214,9 +214,9 @@ struct StatisticsView: View {
                     dateFormatter.dateFormat = "yyyy-MM-dd"
                     dateFormatter.timeZone = TimeZone.current
                     let localDateStr = dateFormatter.string(from: startOfDay)
-                    print("SleepData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
+                    Logger.debug("SleepData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
                 } else {
-                    print("SleepData: Failed to calculate date for index \(i)")
+                    Logger.warning("SleepData: Failed to calculate date for index \(i)")
                 }
             }
             
@@ -242,19 +242,19 @@ struct StatisticsView: View {
                 .sorted { $0.date < $1.date }
             
             // 记录最终返回数据
-            print("SleepData: Returning \(result.count) days of data:")
+            Logger.debug("SleepData: Returning \(result.count) days of data:")
             for item in result {
                 // 使用本地时间格式输出日志
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 dateFormatter.timeZone = TimeZone.current
                 let localDateStr = dateFormatter.string(from: item.date)
-                print("SleepData: \(localDateStr): duration=\(item.duration) hours, count=\(item.count)")
+                Logger.debug("SleepData: \(localDateStr): duration=\(item.duration) hours, count=\(item.count)")
             }
             
             return result
         } catch {
-            print("Error fetching sleep data: \(error)")
+            Logger.error("Error fetching sleep data: \(error)")
             return []
         }
     }
@@ -305,7 +305,7 @@ struct StatisticsView: View {
             .onChange(of: timeRange) {
                 feedingDataCache = nil
                 lastTimeRange = nil
-                print("FeedingData: Cleared cache due to timeRange change to \($0)")
+                Logger.debug("FeedingData: Cleared cache due to timeRange change to \($0)")
             }
         }
     } // 结束body

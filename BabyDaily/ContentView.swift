@@ -14,10 +14,22 @@ struct ContentView: View {
     @Query(sort: [SortDescriptor(\Baby.createdAt)]) private var babies: [Baby]
     @StateObject private var userSettingManager = UserSettingManager.shared
     
-    // 新增：当前选中的宝宝状态
-    @State private var selectedBaby: Baby?
+    // 只存储选中的宝宝ID，不存储实例，避免持有失效的模型引用
+    @State private var selectedBabyId: UUID?
     // 新增：标记是否已经初始化，避免重复调用setup
     @State private var hasInitialized = false
+    
+    // 计算属性：从当前有效的 babies 数组中获取选中的宝宝实例
+    private var selectedBaby: Baby? {
+        guard let selectedBabyId = selectedBabyId else {
+            // 如果没有选中的ID，尝试从缓存加载
+            if let cachedId = userSettingManager.getSelectedBabyIdFromDefaults() {
+                return babies.first(where: { $0.id == cachedId })
+            }
+            return babies.first
+        }
+        return babies.first(where: { $0.id == selectedBabyId })
+    }
     
     var body: some View {
         if babies.isEmpty {
@@ -42,71 +54,68 @@ struct ContentView: View {
                         loadSelectedBaby()
                     }
                 }
-                .onChange(of: babies) {
-                    // 当宝宝列表变化时，确保selectedBaby仍然有效
-                    if let currentSelectedBaby = selectedBaby,
-                       !$0.contains(where: { $0.id == currentSelectedBaby.id }) {
-                        // 优先从本地缓存获取宝宝
-                        if let cachedBabyId = userSettingManager.getSelectedBabyIdFromDefaults(),
-                           let cachedBaby = $0.first(where: { $0.id == cachedBabyId }) {
-                            selectedBaby = cachedBaby
-                        } else {
-                            // 只有在没有本地缓存时才使用firstBaby
-                            selectedBaby = $0.first
+                .onChange(of: babies) { newBabies in
+                    // 当宝宝列表变化时（包括容器切换），确保选中的宝宝ID仍然有效
+                    // 如果当前选中的ID对应的宝宝不在新数组中，重新选择
+                    if let currentId = selectedBabyId {
+                        if !newBabies.contains(where: { $0.id == currentId }) {
+                            // 当前选中的宝宝不在新数组中，重新选择
+                            selectBabyFromList(newBabies)
                         }
-                        // 更新本地缓存
-                        if let selectedBaby = selectedBaby {
-                            userSettingManager.setSelectedBabyId(selectedBaby.id)
-                        }
+                    } else {
+                        // 如果没有选中的ID，尝试加载
+                        selectBabyFromList(newBabies)
                     }
                 }
         }
     }
     
     // 优化：将babyBinding提取为计算属性，避免在body中重复创建
+    // 使用计算属性 selectedBaby 来获取当前有效的实例
     private var babyBinding: Binding<Baby> {
         Binding(get: {
-            if let selectedBaby = selectedBaby {
-                return selectedBaby
-            } else {
-                if let cachedBabyId = userSettingManager.getSelectedBabyIdFromDefaults(),
-                   let cachedBaby = babies.first(where: { $0.id == cachedBabyId }) {
-                    return cachedBaby
-                }
-                // 只有在没有本地缓存时才使用firstBaby
-                return babies.first!
+            // selectedBaby 是计算属性，总是从当前有效的 babies 数组中获取
+            guard let baby = selectedBaby else {
+                // 如果计算属性返回 nil，说明 babies 为空，这不应该发生
+                // 但为了安全，返回第一个（如果存在）
+                return babies.first ?? Baby(
+                    id: UUID(),
+                    name: "",
+                    birthday: Date(),
+                    gender: "",
+                    weight: 0,
+                    height: 0,
+                    headCircumference: 0
+                )
             }
+            return baby
         }, set: {
-            let baby = $0
-            selectedBaby = baby
-            // 保存选中的宝宝ID到本地缓存
-            userSettingManager.setSelectedBabyId(baby.id)
+            // 当设置新的宝宝时，只保存ID
+            selectedBabyId = $0.id
+            userSettingManager.setSelectedBabyId($0.id)
         })
     }
     
-    // 从本地缓存加载选中的宝宝
-    private func loadSelectedBaby() {
-        // 只有在babies非空时才执行，避免空数组操作
+    // 从宝宝列表中选择一个宝宝（优先使用缓存的ID，否则使用第一个）
+    private func selectBabyFromList(_ babies: [Baby]) {
         guard !babies.isEmpty else { return }
         
-        // 如果已经有选中的宝宝，直接返回，避免重复加载
-        if selectedBaby != nil {
-            return
-        }
-        
-        // 从本地缓存获取选中的宝宝ID
-        if let cachedBabyId = userSettingManager.getSelectedBabyIdFromDefaults() {
-            if let baby = babies.first(where: { $0.id == cachedBabyId }) {
-                selectedBaby = baby
-                return
+        // 优先从缓存获取
+        if let cachedId = userSettingManager.getSelectedBabyIdFromDefaults(),
+           babies.contains(where: { $0.id == cachedId }) {
+            selectedBabyId = cachedId
+        } else {
+            // 使用第一个宝宝
+            selectedBabyId = babies.first?.id
+            if let id = selectedBabyId {
+                userSettingManager.setSelectedBabyId(id)
             }
         }
-        
-        // 如果本地缓存中没有对应的宝宝，使用第一个宝宝
-        selectedBaby = babies.first
-        // 更新本地缓存
-        if let selectedBaby = selectedBaby {
-            userSettingManager.setSelectedBabyId(selectedBaby.id)
-        }
+    }
+    
+    // 从本地缓存加载选中的宝宝ID
+    private func loadSelectedBaby() {
+        guard !babies.isEmpty else { return }
+        selectBabyFromList(babies)
     }
 }

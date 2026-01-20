@@ -21,7 +21,7 @@ struct RecordDetailView: View {
             let babies = try modelContext.fetch(fetchDescriptor)
             return babies.first(where: { $0.id == record.babyId })
         } catch {
-            print("Failed to fetch baby: \(error)")
+            Logger.error("Failed to fetch baby: \(error)")
             return nil
         }
     }

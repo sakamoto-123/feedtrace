@@ -51,7 +51,7 @@ class UserSettingManager: ObservableObject {
                 userSetting = newSetting
             }
         } catch {
-            print("Failed to load or create UserSetting: \(error)")
+            Logger.error("Failed to load or create UserSetting: \(error)")
             // 从UserDefaults获取最新设置，而不是使用默认值
             let newSetting = createUserSettingFromDefaults()
             modelContext.insert(newSetting)
@@ -59,7 +59,7 @@ class UserSettingManager: ObservableObject {
                 try modelContext.save()
                 userSetting = newSetting
             } catch {
-                print("Failed to save UserSetting from defaults: \(error)")
+                Logger.error("Failed to save UserSetting from defaults: \(error)")
             }
         }
     }
@@ -109,7 +109,7 @@ class UserSettingManager: ObservableObject {
             try modelContext.save()
             self.userSetting = userSetting
         } catch {
-            print("Failed to update UserSetting: \(error)")
+            Logger.error("Failed to update UserSetting: \(error)")
         }
     }
     

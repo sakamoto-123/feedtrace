@@ -22,45 +22,25 @@ enum DataMigrationError: Error {
 class DataMigrationManager {
     static let shared = DataMigrationManager()
     
-    // 日志记录级别
-    private enum LogLevel {
-        case info, warning, error
-    }
-    
     private init() {}
-    
-    // 日志记录方法
-    private func log(_ message: String, level: LogLevel = .info) {
-        let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .medium)
-        let levelString: String
-        switch level {
-        case .info:
-            levelString = "[INFO]"
-        case .warning:
-            levelString = "[WARNING]"
-        case .error:
-            levelString = "[ERROR]"
-        }
-        print("\(timestamp) \(levelString) \(message)")
-    }
     
     // 泛型迁移单个模型数据
     private func migrateModel<T: PersistentModel>(_ type: T.Type, from sourceContext: ModelContext, to targetContext: ModelContext) throws {
         let typeName = String(describing: type)
-        log("开始迁移模型: \(typeName)", level: .info)
+        Logger.info("开始迁移模型: \(typeName)")
         
         let fetchDescriptor = FetchDescriptor<T>()
         let sourceItems = try sourceContext.fetch(fetchDescriptor)
-        log("从源容器获取到 \(sourceItems.count) 条 \(typeName) 数据", level: .info)
+        Logger.info("从源容器获取到 \(sourceItems.count) 条 \(typeName) 数据")
         
         // 获取目标容器中已存在的所有项目，构建ID映射
         let targetFetchDescriptor = FetchDescriptor<T>()
         let targetItems = try targetContext.fetch(targetFetchDescriptor)
-        log("从目标容器获取到 \(targetItems.count) 条已存在的 \(typeName) 数据", level: .info)
+        Logger.info("从目标容器获取到 \(targetItems.count) 条已存在的 \(typeName) 数据")
 
         // 输出所有的 targetItems 和 sourceItems 的id
-        log("目标容器中的 \(typeName) 数据ID: \(targetItems.map { $0.id })", level: .info)
-        log("源容器中的 \(typeName) 数据ID: \(sourceItems.map { $0.id })", level: .info)
+        Logger.debug("目标容器中的 \(typeName) 数据ID: \(targetItems.map { $0.id })")
+        Logger.debug("源容器中的 \(typeName) 数据ID: \(sourceItems.map { $0.id })")
         
         // 构建现有项目ID映射，直接访问id属性
         var existingItemMap = [UUID: T]()
@@ -74,7 +54,7 @@ class DataMigrationManager {
             } else if let setting = item as? UserSetting {
                 itemId = setting.id
             } else {
-                log("未知模型类型: \(typeName)", level: .error)
+                Logger.error("未知模型类型: \(typeName)")
                 continue
             }
             existingItemMap[itemId] = item
@@ -99,7 +79,7 @@ class DataMigrationManager {
                 sourceId = setting.id
                 sourceUpdatedAt = setting.updatedAt
             } else {
-                log("未知模型类型: \(typeName)", level: .error)
+                Logger.error("未知模型类型: \(typeName)")
                 continue
             }
             
@@ -218,12 +198,12 @@ class DataMigrationManager {
             }
         }
         
-        log("\(typeName) 迁移完成: 新增 \(addedCount) 条, 更新 \(updatedCount) 条, 跳过 \(skippedCount) 条", level: .info)
+        Logger.info("\(typeName) 迁移完成: 新增 \(addedCount) 条, 更新 \(updatedCount) 条, 跳过 \(skippedCount) 条")
     }
     
     // 迁移数据从一个容器到另一个容器
     func migrateData(from sourceContainer: ModelContainer, to targetContainer: ModelContainer) -> Result<Bool, Error> {
-        log("开始数据迁移操作", level: .info)
+        Logger.info("开始数据迁移操作")
         let startTime = Date()
         
         do {
@@ -240,13 +220,13 @@ class DataMigrationManager {
             do {
                 try targetContext.save()
                 let duration = Date().timeIntervalSince(startTime)
-                log("数据迁移成功，耗时: \(String(format: "%.2f", duration)) 秒", level: .info)
+                Logger.info("数据迁移成功，耗时: \(String(format: "%.2f", duration)) 秒")
                 return .success(true)
             } catch {
                 throw DataMigrationError.contextSaveFailed(reason: error.localizedDescription)
             }
         } catch {
-            log("数据迁移失败: \(error.localizedDescription)", level: .error)
+            Logger.error("数据迁移失败: \(error.localizedDescription)")
             return .failure(error)
         }
     }
@@ -254,11 +234,11 @@ class DataMigrationManager {
     // 泛型去重单个模型数据
     private func deduplicateModel<T: PersistentModel>(_ type: T.Type, in context: ModelContext) throws {
         let typeName = String(describing: type)
-        log("开始去重模型: \(typeName)", level: .info)
+        Logger.info("开始去重模型: \(typeName)")
         
         let fetchDescriptor = FetchDescriptor<T>()
         let items = try context.fetch(fetchDescriptor)
-        log("获取到 \(items.count) 条 \(typeName) 数据进行去重", level: .info)
+        Logger.info("获取到 \(items.count) 条 \(typeName) 数据进行去重")
         
         // 按ID分组，保留每个ID最新的记录
         var uniqueItems = [UUID: T]()
@@ -294,7 +274,7 @@ class DataMigrationManager {
                 } else if let existingSetting = existing as? UserSetting {
                     existingUpdatedAt = existingSetting.updatedAt
                 } else {
-                    log("未知模型类型: \(typeName)，跳过记录", level: .error)
+                    Logger.error("未知模型类型: \(typeName)，跳过记录")
                     continue
                 }
                 
@@ -314,12 +294,12 @@ class DataMigrationManager {
             }
         }
         
-        log("\(typeName) 去重完成: 删除 \(deletedCount) 条重复数据，保留 \(uniqueItems.count) 条唯一数据", level: .info)
+        Logger.info("\(typeName) 去重完成: 删除 \(deletedCount) 条重复数据，保留 \(uniqueItems.count) 条唯一数据")
     }
     
     // 全局去重方法，确保每个ID只有一条记录，保留最新版本
     func removeDuplicates(in container: ModelContainer) -> Result<Bool, Error> {
-        log("开始全局去重操作", level: .info)
+        Logger.info("开始全局去重操作")
         let startTime = Date()
         
         do {
@@ -334,13 +314,13 @@ class DataMigrationManager {
             do {
                 try context.save()
                 let duration = Date().timeIntervalSince(startTime)
-                log("全局去重成功，耗时: \(String(format: "%.2f", duration)) 秒", level: .info)
+                Logger.info("全局去重成功，耗时: \(String(format: "%.2f", duration)) 秒")
                 return .success(true)
             } catch {
                 throw DataMigrationError.contextSaveFailed(reason: error.localizedDescription)
             }
         } catch {
-            log("全局去重失败: \(error.localizedDescription)", level: .error)
+            Logger.error("全局去重失败: \(error.localizedDescription)")
             return .failure(error)
         }
     }

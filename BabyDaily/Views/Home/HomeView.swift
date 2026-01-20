@@ -160,15 +160,15 @@ struct BabyInfoHeader: View {
                 modelContext.delete(setting)
             }
         } catch {
-            print("Failed to fetch UserSetting: \(error)")
+            Logger.error("Failed to fetch UserSetting: \(error)")
         }
         
         do {
             try modelContext.save()
-            print("Successfully deleted all records for baby: \(baby.name)")
-            print("Successfully deleted all UserSetting data")
+            Logger.debug("Successfully deleted all records for baby: \(baby.name)")
+            Logger.debug("Successfully deleted all UserSetting data")
         } catch {
-            print("Failed to delete all records: \(error)")
+            Logger.error("Failed to delete all records: \(error)")
         }
     }
     #endif
@@ -352,10 +352,10 @@ struct OngoingRecordCard: View {
                 // 结束记录
                 record.endTimestamp = Date()
                 do {
-                    try modelContext.save()
-                } catch {
-                    print("Failed to save record: \(error)")
-                }
+                try modelContext.save()
+            } catch {
+                Logger.error("Failed to save record: \(error)")
+            }
             }
             .font(.system(size: 14))
             .buttonStyle(.borderedProminent)

@@ -197,8 +197,15 @@ struct RecordListView: View {
     // 导航状态
     @State private var isNavigatingToEdit = false
     @State private var isNavigatingToCreate = false
-    @State private var selectedRecord: Record?
+    // 只存储选中的记录ID，不存储实例，避免持有失效的模型引用
+    @State private var selectedRecordId: UUID?
     @State private var showConfetti = false
+    
+    // 计算属性：从当前有效的 records 数组中获取选中的记录实例
+    private var selectedRecord: Record? {
+        guard let selectedRecordId = selectedRecordId else { return nil }
+        return records.first(where: { $0.id == selectedRecordId })
+    }
     
     // 删除确认
     // @State private var showingDeleteConfirmation = false
@@ -214,7 +221,8 @@ struct RecordListView: View {
                                 RecordItem(
                                     record: record,
                                     onEdit: {
-                                        selectedRecord = record
+                                        // 只存储ID，不存储实例
+                                        selectedRecordId = record.id
                                         isNavigatingToEdit = true
                                     },
                                     onDelete: {
