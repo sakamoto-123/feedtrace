@@ -17,7 +17,6 @@ struct HomeView: View {
         _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
     }
     
-    // 进行中记录（仅显示吸奶或亲喂）
     /// 仍在进行的记录（仅保留未结束且为指定子类的记录）
     private var ongoingRecords: [Record] {
         // 需要展示的子类白名单
@@ -133,6 +132,34 @@ struct BabyInfoHeader: View {
     let latestGrowthData: GrowthData
     @Binding var showingBabySwitcher: Bool
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
+    @State private var showingDeleteConfirm = false
+    @Query private var records: [Record]
+    
+    init(baby: Baby, latestGrowthData: GrowthData, showingBabySwitcher: Binding<Bool>) {
+        self.baby = baby
+        self.latestGrowthData = latestGrowthData
+        self._showingBabySwitcher = showingBabySwitcher
+        let babyId = baby.id
+        _records = Query(filter: #Predicate { $0.babyId == babyId })
+    }
+    
+    #if DEBUG
+    // 删除当前宝宝的所有记录 - 仅在debug模式下可用
+    private func deleteAllRecords() {
+        // 删除所有记录
+        for record in records {
+            modelContext.delete(record)
+        }
+        
+        do {
+            try modelContext.save()
+            print("Successfully deleted all records for baby: \(baby.name)")
+        } catch {
+            print("Failed to delete all records: \(error)")
+        }
+    }
+    #endif
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -173,6 +200,25 @@ struct BabyInfoHeader: View {
                 }
                 
                 Spacer()
+                
+                // 一键删除所有记录按钮 - 仅在debug模式下显示
+                #if DEBUG
+                Button(action: {
+                    showingDeleteConfirm = true
+                }) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 16))
+                        .foregroundColor(.red)
+                }
+                .confirmationDialog("delete_all_records_confirm".localized, isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+                    Button("delete".localized, role: .destructive) {
+                        deleteAllRecords()
+                    }
+                    Button("cancel".localized, role: .cancel) {}
+                } message: {
+                    Text("delete_all_records_message".localized)
+                }
+                #endif
             }
             .padding(.leading, 20)
             .padding(.bottom, 12)
@@ -362,27 +408,31 @@ struct TodayStatistics: View {
 
                 // 补剂信息
                if !todayStats.supplementRecords.isEmpty {
-                    Text("supplement".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    ForEach(todayStats.supplementRecords, id: \.self) { record in
-                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
-                        Text("\(record.name)\(valueText)")
-                            .font(.system(size: 14, weight: .medium))
+                   VStack(alignment: .leading, spacing: 8) {
+                        Text("supplement".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        ForEach(todayStats.supplementRecords, id: \.self) { record in
+                            let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
+                            Text("\(record.name!)\(valueText)")
+                                .font(.system(size: 14, weight: .medium))
+                        }   
                     }
                }
 
                 // 辅食信息
                if !todayStats.solidFoodRecords.isEmpty {
-                    Text("solid_food".localized)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("solid_food".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    ForEach(todayStats.solidFoodRecords, id: \.self) { record in
-                        let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
-                        Text("\(record.name)\(valueText)")
-                            .font(.system(size: 14, weight: .medium))
+                        ForEach(todayStats.solidFoodRecords, id: \.self) { record in
+                            let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
+                            Text("\(record.name!)\(valueText)")
+                                .font(.system(size: 14, weight: .medium))
+                        } 
                     }
                }
             }

@@ -91,18 +91,18 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
-                    HStack {
-                        Image(systemName: "icloud")
-                            .foregroundColor(Color.fromHex("#6cb09e"))
-                        Text("iCloud云同步/备份".localized)
-                        Spacer()
-                        Toggle(isOn: Binding(
-                            get: { isICloudSyncEnabled },
-                            set: { newValue in
-                                if newValue {
-                                    // 当尝试开启时，检查iCloud状态
-                                    Task {
-                                        let status = await cloudSyncManager.checkiCloudStatus()
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "icloud")
+                                .foregroundColor(Color.fromHex("#6cb09e"))
+                            Text("iCloud云同步/备份".localized)
+                            Spacer()
+                            Toggle(isOn: Binding(
+                                get: { isICloudSyncEnabled },
+                                set: { newValue in
+                                    if newValue {
+                                        // 当尝试开启时，检查iCloud状态
+                                        let status = cloudSyncManager.checkiCloudStatus()
                                         switch status {
                                         case .available:
                                             // iCloud可用，开启同步
@@ -118,16 +118,28 @@ struct SettingsView: View {
                                             alertMessage = "您的iCloud存储空间不足，无法开启同步功能。请清理iCloud空间后再尝试。"
                                             showAlert = true
                                         }
+                                    } else {
+                                        // 关闭时直接执行
+                                        isICloudSyncEnabled = false
                                     }
-                                } else {
-                                    // 关闭时直接执行
-                                    isICloudSyncEnabled = false
                                 }
+                            )) {
+                                Text("")
                             }
-                        )) {
-                            Text("")
+                            .toggleStyle(SwitchToggleStyle(tint: Color.fromHex("#6cb09e")))
                         }
-                        .toggleStyle(SwitchToggleStyle(tint: Color.fromHex("#6cb09e")))
+                        
+                        // 显示iCloud状态信息
+                        if isICloudSyncEnabled {
+                            HStack {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(.secondary)
+                                Text(cloudSyncManager.icloudStatus.description)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                        }
                     }
                     
                     // 手动同步按钮和状态显示
@@ -139,10 +151,8 @@ struct SettingsView: View {
                                 Text("手动同步".localized)
                                 Spacer()
                                 Button(action: {
-                                    Task {
-                                        await cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
-                                    }
-                                }) {
+                                        cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
+                                    }) {
                                     Text("立即同步".localized)
                                         .font(.caption)
                                         .padding(.horizontal, 12)
@@ -155,11 +165,11 @@ struct SettingsView: View {
                             
                             // 同步状态显示
                             HStack {
-                                Image(systemName: "info.circle")
-                                    .foregroundColor(cloudSyncManager.getSyncStatusColor())
-                                Text(cloudSyncManager.getSyncStatusText())
+                                Image(systemName: "cloud")
+                                    .foregroundColor(cloudSyncManager.syncStatus.color)
+                                Text(cloudSyncManager.syncStatus.description)
                                     .font(.caption)
-                                    .foregroundColor(cloudSyncManager.getSyncStatusColor())
+                                    .foregroundColor(cloudSyncManager.syncStatus.color)
                                 Spacer()
                             }
                         }
@@ -249,6 +259,7 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     Spacer()
                 }.listRowBackground(Color.clear)
+                .padding(.top, -44)
             }
             .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)

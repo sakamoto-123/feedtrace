@@ -20,23 +20,17 @@ class UserSettingManager: ObservableObject {
     // UserSetting实例
     @Published var userSetting: UserSetting?
     
-    // 新增：指示UserSetting是否已经加载完成
-    @Published var isLoaded = false
-    
     // 初始化
     private init() {}
     
     // 设置ModelContext
     func setup(modelContext: ModelContext) {
         self.modelContext = modelContext
-        Task {
-            await loadOrCreateUserSetting()
-        }
+        loadOrCreateUserSetting()
     }
     
     // 加载或创建UserSetting实例
-    @MainActor
-    private func loadOrCreateUserSetting() async {
+    private func loadOrCreateUserSetting() {
         guard let modelContext = modelContext else { return }
         
         do {
@@ -58,35 +52,20 @@ class UserSettingManager: ObservableObject {
             }
         } catch {
             print("Failed to load or create UserSetting: \(error)")
-            // 创建默认设置
-            let defaultSetting = UserSetting()
-            modelContext.insert(defaultSetting)
+            // 从UserDefaults获取最新设置，而不是使用默认值
+            let newSetting = createUserSettingFromDefaults()
+            modelContext.insert(newSetting)
             do {
                 try modelContext.save()
-                userSetting = defaultSetting
+                userSetting = newSetting
             } catch {
-                print("Failed to save default UserSetting: \(error)")
+                print("Failed to save UserSetting from defaults: \(error)")
             }
-        }
-        
-        // 设置isLoaded为true，表示加载完成
-        isLoaded = true
-        
-        // 将selectedBabyId同步到UserDefaults，确保下次启动时能快速加载
-        if let selectedBabyId = userSetting?.selectedBabyId {
-            UserDefaults.standard.set(selectedBabyId.uuidString, forKey: "selectedBabyId")
-        } else {
-            UserDefaults.standard.removeObject(forKey: "selectedBabyId")
         }
     }
     
     // 从UserDefaults创建UserSetting
     private func createUserSettingFromDefaults() -> UserSetting {
-        // 从AppSettings获取设置（统一管理）
-        let language = AppSettings.shared.language == .system ? "" : AppSettings.shared.language.rawValue
-        let themeMode = AppSettings.shared.themeMode.rawValue
-        let themeColor = AppSettings.shared.themeColor.rawValue
-        
         // 单位设置
         let temperatureUnit = UserDefaults.standard.string(forKey: "temperatureUnit") ?? "°C"
         let weightUnit = UserDefaults.standard.string(forKey: "weightUnit") ?? "kg"
@@ -95,23 +74,16 @@ class UserSettingManager: ObservableObject {
         
         // 创建并返回UserSetting
         return UserSetting(
-            language: language,
-            themeMode: themeMode,
-            themeColor: themeColor,
             temperatureUnit: temperatureUnit,
             weightUnit: weightUnit,
             lengthUnit: lengthUnit,
-            volumeUnit: volumeUnit,
-            selectedBabyId: nil
+            volumeUnit: volumeUnit
         )
     }
     
     // 同步UserSetting到各个管理类
     private func syncToManagers(_ setting: UserSetting) {
-        // 同步到AppSettings（统一管理主题和语言）
-        AppSettings.shared.syncFromUserSetting(setting)
-        
-        // 同步到UnitManager
+        // 只同步单位设置到UnitManager
         if let temperatureUnit = TemperatureUnit(rawValue: setting.temperatureUnit) {
             UnitManager.shared.temperatureUnit = temperatureUnit
         }
@@ -127,13 +99,13 @@ class UserSettingManager: ObservableObject {
     }
     
     // 更新UserSetting
-    @MainActor
-    func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
+    func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) {
         guard let modelContext = modelContext, var userSetting = userSetting else { return }
         
         do {
             updateBlock(userSetting)
             userSetting.updatedAt = Date()
+            
             try modelContext.save()
             self.userSetting = userSetting
         } catch {
@@ -146,30 +118,6 @@ class UserSettingManager: ObservableObject {
         return userSetting
     }
     
-    // 获取选中的宝宝ID
-    func getSelectedBabyId() -> UUID? {
-        // 安全访问，避免访问已销毁的实例
-        do {
-            // 尝试访问属性，如果实例已销毁，会抛出错误
-            guard let setting = userSetting else { return nil }
-            // 这里使用try?来捕获可能的销毁错误
-            let result = try? setting.selectedBabyId
-            if result == nil {
-                // 如果访问失败，说明实例已销毁，重新加载
-                Task {
-                    await loadOrCreateUserSetting()
-                }
-            }
-            return result
-        } catch {
-            // 如果发生错误，重新加载
-            Task {
-                await loadOrCreateUserSetting()
-            }
-            return nil
-        }
-    }
-    
     // 从UserDefaults同步获取选中的宝宝ID，用于快速加载
     func getSelectedBabyIdFromDefaults() -> UUID? {
         if let babyIdString = UserDefaults.standard.string(forKey: "selectedBabyId"), let babyId = UUID(uuidString: babyIdString) {
@@ -179,14 +127,8 @@ class UserSettingManager: ObservableObject {
     }
     
     // 设置选中的宝宝ID
-    @MainActor
-    func setSelectedBabyId(_ babyId: UUID?) async {
-        // 更新SwiftData中的UserSetting
-        await updateUserSetting { setting in
-            setting.selectedBabyId = babyId
-        }
-        
-        // 同时更新UserDefaults，用于快速加载
+    func setSelectedBabyId(_ babyId: UUID?) {
+        // 只更新UserDefaults，用于快速加载
         if let babyId = babyId {
             UserDefaults.standard.set(babyId.uuidString, forKey: "selectedBabyId")
         } else {
@@ -194,8 +136,6 @@ class UserSettingManager: ObservableObject {
         }
     }
 }
-
-// AppSettings已经在内部使用UserSettingManager，无需额外扩展
 
 // 扩展UnitManager，使用UserSettingManager
 fileprivate extension UnitManager {

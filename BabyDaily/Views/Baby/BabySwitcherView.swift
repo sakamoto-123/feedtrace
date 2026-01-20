@@ -5,10 +5,17 @@ struct BabySwitcherView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query private var babies: [Baby]
+    @Query private var allRecords: [Record]
     
     let currentBaby: Baby?
     let onSelectBaby: (Baby) -> Void
     let onAddBaby: () -> Void
+    
+    // 删除相关状态
+    @State private var showingDeleteConfirm = false
+    @State private var babyToDelete: Baby?
+    @State private var showingDeleteError = false
+    @State private var deleteErrorMessage = ""
     
     var body: some View {
         VStack(spacing: 0) {
@@ -75,6 +82,7 @@ struct BabySwitcherView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                .onDelete(perform: confirmDelete)
             }
             .listStyle(.plain)
             .padding(.horizontal, -16)
@@ -95,14 +103,70 @@ struct BabySwitcherView: View {
                 .padding(.bottom, 16)
                 .padding(.top, 24)
                 .background(.background)
-                .overlay(
-                    Divider()
-                        .offset(y: -0.5)
-                )
             }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        
+        // 删除确认对话框
+        .confirmationDialog("确认删除宝宝", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+            Button("删除", role: .destructive) {
+                if let baby = babyToDelete {
+                    deleteBaby(baby)
+                }
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            if let baby = babyToDelete {
+                Text("确定要删除宝宝 \(baby.name) 吗？此操作不可恢复，所有相关记录也将被删除。")
+            }
+        }
+        
+        // 删除错误提示
+        .alert("删除失败", isPresented: $showingDeleteError) {
+            Button("确定") {}
+        } message: {
+            Text(deleteErrorMessage)
+        }
+    }
+    
+    // MARK: - 删除相关方法
+    
+    /// 确认删除宝宝
+    private func confirmDelete(at offsets: IndexSet) {
+        guard let index = offsets.first, index < babies.count else { return }
+        babyToDelete = babies[index]
+        showingDeleteConfirm = true
+    }
+    
+    /// 删除宝宝及相关记录
+    private func deleteBaby(_ baby: Baby) {
+        do {
+            // 1. 删除与该宝宝关联的所有记录
+            let babyRecords = allRecords.filter { $0.babyId == baby.id }
+            for record in babyRecords {
+                modelContext.delete(record)
+            }
+            
+            // 2. 删除宝宝对象
+            modelContext.delete(baby)
+            
+            // 3. 保存更改
+            try modelContext.save()
+            
+            // 4. 如果删除的是当前选中的宝宝，关闭视图
+            if baby.id == currentBaby?.id {
+                dismiss()
+            }
+        } catch {
+            // 处理删除错误
+            deleteErrorMessage = "删除宝宝失败：\(error.localizedDescription)"
+            showingDeleteError = true
+        }
+        
+        // 重置状态
+        babyToDelete = nil
+        showingDeleteConfirm = false
     }
 }
 

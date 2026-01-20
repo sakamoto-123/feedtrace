@@ -83,37 +83,23 @@ public final class Record {
 final class UserSetting {
     var id: UUID = UUID()
     
-    // 语言设置
-    var language: String = ""
-    
-    // 主题设置
-    var themeMode: String = "system"
-    var themeColor: String = "blue"
-    
     // 单位设置
     var temperatureUnit: String = "°C"
     var weightUnit: String = "kg"
     var lengthUnit: String = "cm"
     var volumeUnit: String = "ml"
     
-    // 新增：选中的宝宝ID
-    var selectedBabyId: UUID?
-    
     // 创建时间
     var createdAt: Date = Date()
     // 更新时间
     var updatedAt: Date = Date()
     
-    init(id: UUID = UUID(), language: String = "", themeMode: String = "system", themeColor: String = "blue", temperatureUnit: String = "°C", weightUnit: String = "kg", lengthUnit: String = "cm", volumeUnit: String = "ml", selectedBabyId: UUID? = nil, createdAt: Date = Date(), updatedAt: Date = Date()) {
+    init(id: UUID = UUID(), temperatureUnit: String = "°C", weightUnit: String = "kg", lengthUnit: String = "cm", volumeUnit: String = "ml", createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
-        self.language = language
-        self.themeMode = themeMode
-        self.themeColor = themeColor
         self.temperatureUnit = temperatureUnit
         self.weightUnit = weightUnit
         self.lengthUnit = lengthUnit
         self.volumeUnit = volumeUnit
-        self.selectedBabyId = selectedBabyId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

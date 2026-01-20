@@ -67,9 +67,9 @@ extension Color {
         
         switch colorScheme {
         case .light:
-            return Color(uiColor: .systemBackground)
-        case .dark:
             return Color(uiColor: .systemGray6)
+        case .dark:
+            return Color(uiColor: .black)
         @unknown default:
             return Color(uiColor: .systemBackground)
         }

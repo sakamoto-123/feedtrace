@@ -52,10 +52,8 @@ class UnitManager: ObservableObject {
         didSet {
             // 更新UserDefaults和UserSetting
             UserDefaults.standard.set(temperatureUnit.rawValue, forKey: temperatureUnitKey)
-            Task {
-                await updateUserSetting { [self] setting in
-                    setting.temperatureUnit = temperatureUnit.rawValue
-                }
+            updateUserSetting { [self] setting in
+                setting.temperatureUnit = self.temperatureUnit.rawValue
             }
         }
     }
@@ -64,10 +62,8 @@ class UnitManager: ObservableObject {
         didSet {
             // 更新UserDefaults和UserSetting
             UserDefaults.standard.set(weightUnit.rawValue, forKey: weightUnitKey)
-            Task {
-                await updateUserSetting { [self] setting in
-                    setting.weightUnit = weightUnit.rawValue
-                }
+            updateUserSetting { [self] setting in
+                setting.weightUnit = self.weightUnit.rawValue
             }
         }
     }
@@ -76,10 +72,8 @@ class UnitManager: ObservableObject {
         didSet {
             // 更新UserDefaults和UserSetting
             UserDefaults.standard.set(lengthUnit.rawValue, forKey: lengthUnitKey)
-            Task {
-                await updateUserSetting { [self] setting in
-                    setting.lengthUnit = lengthUnit.rawValue
-                }
+            updateUserSetting { [self] setting in
+                setting.lengthUnit = self.lengthUnit.rawValue
             }
         }
     }
@@ -88,10 +82,8 @@ class UnitManager: ObservableObject {
         didSet {
             // 更新UserDefaults和UserSetting
             UserDefaults.standard.set(volumeUnit.rawValue, forKey: volumeUnitKey)
-            Task {
-                await updateUserSetting { [self] setting in
-                    setting.volumeUnit = volumeUnit.rawValue
-                }
+            updateUserSetting { [self] setting in
+                setting.volumeUnit = self.volumeUnit.rawValue
             }
         }
     }
@@ -126,16 +118,15 @@ class UnitManager: ObservableObject {
         return VolumeUnit(rawValue: savedUnit) ?? .ml
     }
     
-    // 获取或创建UserSetting实例
-    private func getUserSetting() async -> UserSetting? {
-        // 这里需要访问ModelContext，暂时返回nil
-        // 实际实现会在App启动后初始化
-        return nil
+    // 获取UserSetting实例
+    private func getUserSetting() -> UserSetting? {
+        // 通过单例访问UserSettingManager获取UserSetting
+        return UserSettingManager.shared.getUserSetting()
     }
     
     // 更新UserSetting实例
-    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
-        // 这里需要访问ModelContext，暂时不实现
-        // 实际实现会在App启动后初始化
+    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) {
+        // 使用UserSettingManager的API更新UserSetting
+        UserSettingManager.shared.updateUserSetting(updateBlock)
     }
 }

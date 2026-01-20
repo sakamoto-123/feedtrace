@@ -102,7 +102,6 @@ struct StatisticsView: View {
                     dateFormatter.dateFormat = "yyyy-MM-dd"
                     dateFormatter.timeZone = TimeZone.current
                     let localDateStr = dateFormatter.string(from: startOfDay)
-                    print("FeedingData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
                 } else {
                     print("FeedingData: Failed to calculate date for index \(i)")
                 }

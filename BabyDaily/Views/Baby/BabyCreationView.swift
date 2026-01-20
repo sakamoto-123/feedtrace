@@ -406,85 +406,9 @@ struct BabyCreationView: View {
             modelContext.insert(newBaby)
         }
         
-        dismiss()
-    }
-}
-
-// 颜色扩展，支持十六进制颜色
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let (a, r, g, b): (Int, Int, Int, Int)
-        if hex.count == 8 {
-            a = Int(int >> 24) & 0xff
-            r = Int(int >> 16) & 0xff
-            g = Int(int >> 8) & 0xff
-            b = Int(int) & 0xff
-        } else if hex.count == 6 {
-            a = 255
-            r = Int(int >> 16) & 0xff
-            g = Int(int >> 8) & 0xff
-            b = Int(int) & 0xff
-        } else {
-            a = 255
-            r = 0
-            g = 0
-            b = 0
-        }
+        // 保存更改到存储中
+        try? modelContext.save()
         
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
-
-// 日期选择器弹窗
-struct DatePickerOverlay: View {
-    @Binding var date: Date
-    var onDismiss: () -> Void
-    @EnvironmentObject var appSettings: AppSettings
-    
-    var body: some View {
-        ZStack {
-            // 半透明背景
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    onDismiss()
-                }
-            
-            // 日期选择器卡片
-            VStack {
-                HStack {
-                    Spacer()
-                    
-                    Button("complete".localized) {
-                    onDismiss()
-                }
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(appSettings.currentThemeColor)
-                }
-                .padding(16)
-                
-                DatePicker(
-                    "",
-                    selection: $date,
-                    in: ...Date(),
-                    displayedComponents: [.date]
-                )
-                .datePickerStyle(.graphical)
-                .padding()
-            }
-            .background(.background)
-            .cornerRadius(16)
-            .padding(.horizontal, 24)
-            .shadow(radius: 20)
-        }
+        dismiss()
     }
 }

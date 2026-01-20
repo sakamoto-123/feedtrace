@@ -27,4 +27,36 @@ extension Color {
     static func fromHex(_ hex: String) -> Color {
         return ColorUtils.hexToColor(hex)
     }
+    
+    // 从十六进制字符串初始化Color
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let (a, r, g, b): (Int, Int, Int, Int)
+        if hex.count == 8 {
+            a = Int(int >> 24) & 0xff
+            r = Int(int >> 16) & 0xff
+            g = Int(int >> 8) & 0xff
+            b = Int(int) & 0xff
+        } else if hex.count == 6 {
+            a = 255
+            r = Int(int >> 16) & 0xff
+            g = Int(int >> 8) & 0xff
+            b = Int(int) & 0xff
+        } else {
+            a = 255
+            r = 0
+            g = 0
+            b = 0
+        }
+        
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
 }

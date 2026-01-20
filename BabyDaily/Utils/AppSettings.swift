@@ -184,7 +184,6 @@ enum AppLanguage: String, CaseIterable, Identifiable, Codable {
 }
 
 // MARK: - 统一的应用设置管理器
-@MainActor
 class AppSettings: ObservableObject {
     // MARK: - 单例
     static let shared = AppSettings()
@@ -205,7 +204,6 @@ class AppSettings: ObservableObject {
     private init() {
         // 从UserDefaults加载设置，优先使用新键，如果没有则尝试旧键（向后兼容）
         let savedThemeMode = UserDefaults.standard.string(forKey: Keys.themeMode) 
-            ?? UserDefaults.standard.string(forKey: "selectedThemeMode")
             ?? ThemeMode.system.rawValue
         
         // 处理旧格式（中文）到新格式（英文）的转换
@@ -223,7 +221,6 @@ class AppSettings: ObservableObject {
         self.themeMode = ThemeMode(rawValue: themeModeValue) ?? .system
         
         let savedThemeColor = UserDefaults.standard.string(forKey: Keys.themeColor)
-            ?? UserDefaults.standard.string(forKey: "selectedThemeColor")
             ?? ThemeColor.blue.rawValue
         
         // 处理旧格式（中文）到新格式（英文）的转换
@@ -237,7 +234,6 @@ class AppSettings: ObservableObject {
         self.themeColor = ThemeColor(rawValue: themeColorValue) ?? .blue
         
         let savedLanguage = UserDefaults.standard.string(forKey: Keys.language)
-            ?? UserDefaults.standard.string(forKey: "appLanguage")
             ?? ""
         self.language = AppLanguage(rawValue: savedLanguage) ?? .system
     }
@@ -281,37 +277,22 @@ class AppSettings: ObservableObject {
     
     // MARK: - 主题设置
     func setThemeMode(_ mode: ThemeMode) {
-        // 立即更新主题模式，确保UI响应迅速
         themeMode = mode
         let modeValue = mode.rawValue
-        // UserDefaults写入很快，同步执行即可
         UserDefaults.standard.set(modeValue, forKey: Keys.themeMode)
-        UserDefaults.standard.set(modeValue, forKey: "selectedThemeMode")
-        // 延迟同步到UserSetting，确保UI先更新
-        syncToUserSetting()
     }
     
     func setThemeColor(_ color: ThemeColor) {
-        // 立即更新主题颜色，确保UI响应迅速
         themeColor = color
         let colorValue = color.rawValue
-        // UserDefaults写入很快，同步执行即可
         UserDefaults.standard.set(colorValue, forKey: Keys.themeColor)
-        UserDefaults.standard.set(colorValue, forKey: "selectedThemeColor")
-        // 延迟同步到UserSetting，确保UI先更新
-        syncToUserSetting()
     }
     
     // MARK: - 语言设置
     func setLanguage(_ language: AppLanguage) {
-        // 立即更新语言，确保UI响应迅速
         self.language = language
         let languageToSave = language == .system ? "" : language.rawValue
-        // UserDefaults写入很快，同步执行即可
         UserDefaults.standard.set(languageToSave, forKey: Keys.language)
-        UserDefaults.standard.set(languageToSave, forKey: "appLanguage")
-        // 延迟同步到UserSetting，确保UI先更新
-        syncToUserSetting()
     }
     
     // MARK: - 计算属性
@@ -336,44 +317,6 @@ class AppSettings: ObservableObject {
     /// 当前语言环境
     var currentLocale: Locale {
         return Locale(identifier: currentLanguageCode)
-    }
-    
-    // MARK: - 从UserSetting同步
-    func syncFromUserSetting(_ setting: UserSetting) {
-        // 同步主题模式
-        if let mode = ThemeMode(rawValue: setting.themeMode) {
-            themeMode = mode
-            UserDefaults.standard.set(mode.rawValue, forKey: Keys.themeMode)
-        }
-        
-        // 同步主题颜色
-        if let color = ThemeColor(rawValue: setting.themeColor) {
-            themeColor = color
-            UserDefaults.standard.set(color.rawValue, forKey: Keys.themeColor)
-        }
-        
-        // 同步语言
-        let languageValue = setting.language.isEmpty ? "" : setting.language
-        if let lang = AppLanguage(rawValue: languageValue) {
-            language = lang
-            UserDefaults.standard.set(languageValue, forKey: Keys.language)
-        }
-    }
-    
-    // MARK: - 同步到UserSetting
-    private func syncToUserSetting() {
-        // 延迟执行数据同步，确保 UI 更新优先
-        // 使用 Task.detached 在后台线程执行，完全不阻塞主线程
-        Task.detached { @MainActor in
-            // 延迟 0.1 秒执行，确保 UI 先更新
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 秒
-            
-            await UserSettingManager.shared.updateUserSetting { [self] setting in
-                setting.themeMode = self.themeMode.rawValue
-                setting.themeColor = self.themeColor.rawValue
-                setting.language = self.language == .system ? "" : self.language.rawValue
-            }
-        }
     }
 }
 
