@@ -18,7 +18,7 @@
 "started_at" = "Iniciado a las %@";
 
 // Quick Actions
-"breast_milk" = "Leche Materna";
+"breast_milk" = "Leche";
 "solid_food" = "Alimento Sólido";
 "water" = "Agua";
 "sleep" = "Sueño";
@@ -48,10 +48,10 @@
 
 // Health Actions
 "jaundice" = "Ictericia";
-"medical_visit" = "Consulta Médica";
-"vaccination" = "Vacunación";
-"temperature" = "Temperatura";
-"medication" = "Medicación";
+"medical_visit" = "Médico";
+"vaccination" = "Vacuna";
+"temperature" = "Temp";
+"medication" = "Medicina";
 "supplement" = "Suplemento";
 
 // Milestone Actions
@@ -66,7 +66,7 @@
 "language_setting" = "Configuración de Idioma";
 
 // Today Stats
-"breast_milk" = "Leche Materna";
+"breast_milk" = "Leche";
 "stool" = "Heces";
 "urine" = "Orina";
 "sleep_duration" = "Duración del Sueño";
@@ -113,6 +113,21 @@
 "records" = "Registros";
 "statistics" = "Estadísticas";
 "settings" = "Configuración";
+
+// RecordListView
+"today" = "Hoy";
+"yesterday" = "Ayer";
+"left" = "Izquierda";
+"right" = "Derecha";
+"minutes" = "minutos";
+
+// RecordEditView
+"create_record" = "Crear Registro";
+"edit_record" = "Editar Registro";
+"start" = "Iniciar";
+"end" = "Terminar";
+"save" = "Guardar";
+"cancel" = "Cancelar";
 
 // BabyCreationView
 "baby_name" = "Nombre del Bebé";
@@ -270,3 +285,14 @@
 "additional_information" = "Información Adicional";
 "14_days" = "14 Días";
 "first_walk" = "Primeros Pasos";
+
+// RecordEditView - Time
+"start_time" = "Hora de Inicio";
+"end_time" = "Hora de Fin";
+
+// RecordEditView - Information
+"mixed" = "Mixto";
+
+// RecordEditView - Additional Information
+"remark" = "Observación";
+"photos" = "Fotos";

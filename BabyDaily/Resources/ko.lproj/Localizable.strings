@@ -46,10 +46,10 @@
 
 // Health Actions
 "jaundice" = "황달";
-"medical_visit" = "의료 방문";
-"vaccination" = "예방 접종";
+"medical_visit" = "병원";
+"vaccination" = "접종";
 "temperature" = "체온";
-"medication" = "약물";
+"medication" = "약";
 "supplement" = "영양제";
 
 // Milestone Actions
@@ -111,6 +111,21 @@
 "records" = "기록";
 "statistics" = "통계";
 "settings" = "설정";
+
+// RecordListView
+"today" = "오늘";
+"yesterday" = "어제";
+"left" = "왼쪽";
+"right" = "오른쪽";
+"minutes" = "분";
+
+// RecordEditView
+"create_record" = "기록 만들기";
+"edit_record" = "기록 편집";
+"start" = "시작";
+"end" = "종료";
+"save" = "저장";
+"cancel" = "취소";
 
 // BabyCreationView
 "baby_name" = "아기 이름";
@@ -268,3 +283,14 @@
 "additional_information" = "추가 정보";
 "14_days" = "14일";
 "first_walk" = "첫 걸음";
+
+// RecordEditView - Time
+"start_time" = "시작 시간";
+"end_time" = "종료 시간";
+
+// RecordEditView - Information
+"mixed" = "혼합";
+
+// RecordEditView - Additional Information
+"remark" = "비고";
+"photos" = "사진";

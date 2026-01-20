@@ -37,7 +37,6 @@
 "started_at" = "Started at %@";
 
 // Quick Actions
-"breast_milk" = "Breast Milk";
 "solid_food" = "Solids";
 "water" = "Water";
 "sleep" = "Sleep";
@@ -54,7 +53,7 @@
 
 // Feeding Actions
 "nursing" = "nursing";
-"breast_bottle" = "Breast Bottle";
+"breast_bottle" = "Breast";
 "formula" = "Formula";
 "water_intake" = "Water";
 
@@ -66,12 +65,12 @@
 // Growth Actions
 
 // Health Actions
-"jaundice" = "Jaundice";
 "medical_visit" = "Doctor";
-"vaccination" = "Vaccination";
-"temperature" = "Temperature";
-"medication" = "Medication";
-"supplement" = "Supplement";
+"jaundice" = "Jaundice";
+"vaccination" = "Vaccine";
+"temperature" = "Temp";
+"medication" = "Medicine";
+"supplement" = "Suppl";
 
 // Milestone Actions
 "first_tooth" = "First Tooth";
@@ -85,7 +84,7 @@
 "language_setting" = "Language Setting";
 
 // Today Stats
-"breast_milk" = "Breast Milk";
+"breast_milk" = "BM";
 "stool" = "Stool";
 "urine" = "Urine";
 "sleep_duration" = "Sleep Duration";
@@ -132,6 +131,21 @@
 "records" = "Records";
 "statistics" = "Statistics";
 "settings" = "Settings";
+
+// RecordListView
+"today" = "Today";
+"yesterday" = "Yesterday";
+"left" = "Left";
+"right" = "Right";
+"minutes" = "minutes";
+
+// RecordEditView
+"create_record" = "Create Record";
+"edit_record" = "Edit Record";
+"start" = "Start";
+"end" = "End";
+"save" = "Save";
+"cancel" = "Cancel";
 
 // BabyCreationView
 "baby_name" = "Baby Name";
@@ -289,3 +303,14 @@
 "additional_information" = "Additional Information";
 "14_days" = "14 Days";
 "first_walk" = "First Walk";
+
+// RecordEditView - Time
+"start_time" = "Start Time";
+"end_time" = "End Time";
+
+// RecordEditView - Information
+"mixed" = "Mixed";
+
+// RecordEditView - Additional Information
+"remark" = "Remark";
+"photos" = "Photos";

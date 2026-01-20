@@ -110,7 +110,8 @@ struct StatisticsView: View {
             // 计算每个记录的数据
             for record in records {
                 let startOfDay = calendar.startOfDay(for: record.startTimestamp)
-                let value = Int(record.value ?? 0)
+                // 将容量单位转换为 ml
+                let valueInMl = UnitConverter.convertVolumeToMl(value: record.value ?? 0, unit: record.unit)
                 
                 // 使用本地时间格式输出日志
                 let dateFormatter = DateFormatter()
@@ -120,13 +121,13 @@ struct StatisticsView: View {
                 
                 // 根据子分类累加数据
                 if record.subCategory == "breast_bottle" {
-                    groupedData[startOfDay]?.breastMilk += value
+                    groupedData[startOfDay]?.breastMilk += valueInMl
                     groupedData[startOfDay]?.breastMilkCount += 1
                 } else if record.subCategory == "formula" {
-                    groupedData[startOfDay]?.formula += value
+                    groupedData[startOfDay]?.formula += valueInMl
                     groupedData[startOfDay]?.formulaCount += 1
                 } else if record.subCategory == "water_intake" {
-                    groupedData[startOfDay]?.water += value
+                    groupedData[startOfDay]?.water += valueInMl
                     groupedData[startOfDay]?.waterCount += 1
                 } else {
                     Logger.warning("FeedingData: Unknown subCategory \(record.subCategory) for record ID \(record.id)")

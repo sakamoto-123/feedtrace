@@ -48,11 +48,11 @@
 
 // Health Actions
 "jaundice" = "黄疸";
-"medical_visit" = "受診";
-"vaccination" = "予防接種";
+"medical_visit" = "診察";
+"vaccination" = "ワクチン";
 "temperature" = "体温";
-"medication" = "投薬";
-"supplement" = "サプリメント";
+"medication" = "薬";
+"supplement" = "サプリ";
 
 // Milestone Actions
 "first_tooth" = "最初の歯";
@@ -113,6 +113,21 @@
 "records" = "記録";
 "statistics" = "統計";
 "settings" = "設定";
+
+// RecordListView
+"today" = "今日";
+"yesterday" = "昨日";
+"left" = "左";
+"right" = "右";
+"minutes" = "分";
+
+// RecordEditView
+"create_record" = "記録を作成";
+"edit_record" = "記録を編集";
+"start" = "開始";
+"end" = "終了";
+"save" = "保存";
+"cancel" = "キャンセル";
 
 // BabyCreationView
 "baby_name" = "赤ちゃんの名前";
@@ -270,3 +285,14 @@
 "additional_information" = "追加情報";
 "14_days" = "14日間";
 "first_walk" = "初めての歩行";
+
+// RecordEditView - Time
+"start_time" = "開始時間";
+"end_time" = "終了時間";
+
+// RecordEditView - Information
+"mixed" = "混合";
+
+// RecordEditView - Additional Information
+"remark" = "備考";
+"photos" = "写真";

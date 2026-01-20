@@ -374,7 +374,7 @@ struct RecordInfoSection: View {
     let needsExcrementStatus: Bool
     
     // 单位管理
-    let unitManager: UnitManager
+    @ObservedObject var unitManager: UnitManager
     
     // 控制单位设置页面显示
     @State private var showUnitSettingSheet = false
@@ -437,7 +437,7 @@ struct RecordInfoSection: View {
                         showUnitSettingSheet.toggle()
                     }) {
                         Text(defaultUnit.localized ?? "")
-                            .font(.body)
+                            .font(.title)
                             .foregroundColor(.accentColor)
                     }
                 }

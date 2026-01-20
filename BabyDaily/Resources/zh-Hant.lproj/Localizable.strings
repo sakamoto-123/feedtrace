@@ -288,3 +288,14 @@
 "additional_information" = "補充信息";
 "14_days" = "14天";
 "first_walk" = "第一次走路";
+
+// RecordEditView - Time
+"start_time" = "開始時間";
+"end_time" = "結束時間";
+
+// RecordEditView - Information
+"mixed" = "混合";
+
+// RecordEditView - Additional Information
+"remark" = "備註";
+"photos" = "照片";
