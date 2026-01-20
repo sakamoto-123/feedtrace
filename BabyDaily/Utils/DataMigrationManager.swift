@@ -95,7 +95,7 @@ class DataMigrationManager {
                 } else if let existingSetting = existingItem as? UserSetting {
                     existingUpdatedAt = existingSetting.updatedAt
                 } else {
-                    log("未知模型类型: \(typeName)", level: .error)
+                    Logger.error("未知模型类型: \(typeName)")
                     continue
                 }
                 
@@ -259,7 +259,7 @@ class DataMigrationManager {
                 id = setting.id
                 updatedAt = setting.updatedAt
             } else {
-                log("未知模型类型: \(typeName)，跳过记录", level: .error)
+                Logger.error("未知模型类型: \(typeName)，跳过记录")
                 continue
             }
             

@@ -132,7 +132,7 @@ struct ImagePickerMenu: View {
                     sourceType = .camera
                     showImagePicker = true
                 }) {
-                    Label("拍照", systemImage: "camera")
+                    Label("take_photo".localized, systemImage: "camera")
                 }
             }
             
@@ -141,7 +141,7 @@ struct ImagePickerMenu: View {
                 sourceType = .photoLibrary
                 showImagePicker = true
             }) {
-                Label("从相册选择", systemImage: "photo.on.rectangle")
+                Label("select_from_album".localized, systemImage: "photo.on.rectangle")
             }
         } label: {
             ZStack {

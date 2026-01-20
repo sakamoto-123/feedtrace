@@ -48,7 +48,7 @@ struct DatePickerSheet: View {
                 
                 Spacer()
                 
-                Button("完成") {
+                Button("complete".localized) {
                     // 如果是可选日期，确保更新可选日期的值
                     if isOptional {
                         optionalDate = date

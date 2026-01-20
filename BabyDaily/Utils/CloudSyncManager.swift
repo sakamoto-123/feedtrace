@@ -21,11 +21,11 @@ enum iCloudStatus {
     var description: String {
         switch self {
         case .notLoggedIn:
-            return "未登录iCloud"
+            return "icloud_not_logged_in".localized
         case .insufficientSpace:
-            return "iCloud存储空间不足"
+            return "icloud_insufficient_space".localized
         case .available:
-            return "iCloud可用"
+            return "icloud_available".localized
         }
     }
 }

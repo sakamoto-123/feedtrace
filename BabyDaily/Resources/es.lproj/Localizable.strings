@@ -171,3 +171,102 @@
 "degree" = "℃";
 "tablet" = "tableta";
 "piece" = "pieza";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "Duración";
+"baby_age_at_record" = "Edad del bebé al registrar";
+"confirm_delete_record_title" = "¿Eliminar registro?";
+"delete_record_warning" = "Esta acción no se puede deshacer";
+
+// BabySwitcherView
+"select_baby" = "Seleccionar Bebé";
+"add_new_baby" = "Agregar Nuevo Bebé";
+"confirm_delete_baby_title" = "Eliminar Bebé";
+"confirm_delete_baby_message" = "¿Está seguro de que desea eliminar %@? Esta acción no se puede deshacer y todos los registros relacionados también se eliminarán.";
+"delete_baby_failed_title" = "Error al Eliminar";
+"delete_baby_failed_message" = "Error al eliminar bebé: %@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "Sincronización/Respaldo iCloud";
+"icloud_not_logged_in_title" = "iCloud No Iniciado";
+"icloud_not_logged_in_message" = "No ha iniciado sesión en iCloud. Por favor, inicie sesión en iCloud antes de habilitar la sincronización.";
+"icloud_insufficient_space_title" = "Almacenamiento iCloud Insuficiente";
+"icloud_insufficient_space_message" = "Su almacenamiento de iCloud es insuficiente. Por favor, libere espacio en iCloud e intente nuevamente.";
+"manual_sync" = "Sincronización Manual";
+"sync_now" = "Sincronizar Ahora";
+"share_app" = "Compartir Aplicación";
+"share_app_text" = "Te recomiendo usar BabyDaily - Asistente de Registro de Crecimiento del Bebé";
+
+// MembershipPrivilegesView
+"current_free_user" = "Usuario Gratuito Actual";
+"upgrade_membership_prompt" = "Actualiza a membresía para disfrutar de más privilegios";
+"upgrade_now" = "Actualizar Ahora";
+"icloud_sync_feature" = "Sincronización iCloud";
+"multi_device_sync" = "Sincronización Multi-Dispositivo";
+"data_stored_in_icloud" = "Los datos se almacenan en iCloud";
+"multi_device_sync_description" = "Soporte para sincronización de datos multi-dispositivo";
+"more_themes" = "Más Temas";
+"unlock_more_themes_description" = "Desbloquear más colores y estilos de tema";
+"no_ads" = "Sin Anuncios";
+"no_ads_description" = "Sin anuncios durante el uso";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "Duración del Sueño (horas)";
+"sleep_count_title" = "Recuento de Sueño";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "Volumen (%@)";
+"feeding_count_title" = "Recuento de Alimentación";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "Transcurrido %d días %d horas";
+"elapsed_time_days" = "Transcurrido %d días";
+"elapsed_time_hours_minutes" = "Transcurrido %d horas %d minutos";
+"elapsed_time_hours" = "Transcurrido %d horas";
+"elapsed_time_minutes_seconds" = "Transcurrido %d minutos %d segundos";
+"elapsed_time_minutes" = "Transcurrido %d minutos";
+"elapsed_time_seconds" = "Transcurrido %d segundos";
+"duration_label" = "Duración";
+"count_label" = "Cantidad";
+"hour_unit" = "h";
+
+// RecordEditView - Time Periods
+"days_later" = "En %d días";
+"days_ago" = "Hace %d días";
+"morning" = "Mañana";
+"noon" = "Mediodía";
+"afternoon" = "Tarde";
+"evening" = "Noche";
+"midnight" = "Medianoche";
+"remove_end_time" = "Eliminar Hora de Fin";
+"add_end_time" = "Agregar Hora de Fin";
+"basic_information" = "Información Básica";
+
+// ImagePicker
+"take_photo" = "Tomar Foto";
+"select_from_album" = "Seleccionar del Álbum";
+
+// BabyCreationView
+"edit_baby_info" = "Editar Información";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "iCloud No Iniciado";
+"icloud_insufficient_space" = "Almacenamiento iCloud Insuficiente";
+"icloud_available" = "iCloud Disponible";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "Inactivo";
+"icloud_sync_syncing" = "Sincronizando";
+"icloud_sync_completed" = "Completado";
+"icloud_sync_error" = "Error de Sincronización";
+
+// Punctuation
+"comma_separator" = ", ";
+"colon_separator" = ": ";
+
+// RecordEditView - Additional
+"time" = "Información de Tiempo";
+"information" = "Información";
+"additional_information" = "Información Adicional";
+"14_days" = "14 Días";
+"first_walk" = "Primeros Pasos";

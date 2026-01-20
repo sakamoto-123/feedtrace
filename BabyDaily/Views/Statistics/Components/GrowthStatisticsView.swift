@@ -222,6 +222,7 @@ struct GrowthStatisticsCard: View {
                     AxisValueLabel(format: FloatingPointFormatStyle<Double>.number.precision(.fractionLength(1)))
                 }
             }
+            .chartLegend(.hidden)
             .chartYScale(domain: defaultDomain)
             .chartScrollableAxes(.horizontal)
             .chartXVisibleDomain(length: 7)

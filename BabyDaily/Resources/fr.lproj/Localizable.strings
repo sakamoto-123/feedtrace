@@ -171,3 +171,102 @@
 "degree" = "℃";
 "tablet" = "comprimé";
 "piece" = "pièce";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "Durée";
+"baby_age_at_record" = "Âge du bébé lors de l'enregistrement";
+"confirm_delete_record_title" = "Supprimer l'enregistrement ?";
+"delete_record_warning" = "Cette action ne peut pas être annulée";
+
+// BabySwitcherView
+"select_baby" = "Sélectionner un bébé";
+"add_new_baby" = "Ajouter un nouveau bébé";
+"confirm_delete_baby_title" = "Supprimer le bébé";
+"confirm_delete_baby_message" = "Êtes-vous sûr de vouloir supprimer %@ ? Cette action ne peut pas être annulée et tous les enregistrements associés seront également supprimés.";
+"delete_baby_failed_title" = "Échec de la suppression";
+"delete_baby_failed_message" = "Échec de la suppression du bébé : %@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "Synchronisation/Sauvegarde iCloud";
+"icloud_not_logged_in_title" = "iCloud non connecté";
+"icloud_not_logged_in_message" = "Vous n'êtes pas connecté à iCloud. Veuillez vous connecter à iCloud avant d'activer la synchronisation.";
+"icloud_insufficient_space_title" = "Espace de stockage iCloud insuffisant";
+"icloud_insufficient_space_message" = "Votre espace de stockage iCloud est insuffisant. Veuillez libérer de l'espace iCloud et réessayer.";
+"manual_sync" = "Synchronisation manuelle";
+"sync_now" = "Synchroniser maintenant";
+"share_app" = "Partager l'application";
+"share_app_text" = "Je recommande d'utiliser BabyDaily - Assistant de suivi de croissance du bébé";
+
+// MembershipPrivilegesView
+"current_free_user" = "Utilisateur gratuit actuel";
+"upgrade_membership_prompt" = "Passez à l'abonnement pour profiter de plus de privilèges";
+"upgrade_now" = "Passer à l'abonnement maintenant";
+"icloud_sync_feature" = "Synchronisation iCloud";
+"multi_device_sync" = "Synchronisation multi-appareils";
+"data_stored_in_icloud" = "Données stockées dans iCloud";
+"multi_device_sync_description" = "Prise en charge de la synchronisation des données multi-appareils";
+"more_themes" = "Plus de thèmes";
+"unlock_more_themes_description" = "Débloquer plus de couleurs et styles de thème";
+"no_ads" = "Sans publicité";
+"no_ads_description" = "Aucune publicité pendant l'utilisation";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "Durée du sommeil (heures)";
+"sleep_count_title" = "Nombre de sommeils";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "Volume (%@)";
+"feeding_count_title" = "Nombre d'alimentations";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "Écoulé %d jours %d heures";
+"elapsed_time_days" = "Écoulé %d jours";
+"elapsed_time_hours_minutes" = "Écoulé %d heures %d minutes";
+"elapsed_time_hours" = "Écoulé %d heures";
+"elapsed_time_minutes_seconds" = "Écoulé %d minutes %d secondes";
+"elapsed_time_minutes" = "Écoulé %d minutes";
+"elapsed_time_seconds" = "Écoulé %d secondes";
+"duration_label" = "Durée";
+"count_label" = "Nombre";
+"hour_unit" = "h";
+
+// RecordEditView - Time Periods
+"days_later" = "Dans %d jours";
+"days_ago" = "Il y a %d jours";
+"morning" = "Matin";
+"noon" = "Midi";
+"afternoon" = "Après-midi";
+"evening" = "Soir";
+"midnight" = "Minuit";
+"remove_end_time" = "Supprimer l'heure de fin";
+"add_end_time" = "Ajouter l'heure de fin";
+"basic_information" = "Informations de base";
+
+// ImagePicker
+"take_photo" = "Prendre une photo";
+"select_from_album" = "Sélectionner dans l'album";
+
+// BabyCreationView
+"edit_baby_info" = "Modifier les informations";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "iCloud non connecté";
+"icloud_insufficient_space" = "Espace de stockage iCloud insuffisant";
+"icloud_available" = "iCloud disponible";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "En attente";
+"icloud_sync_syncing" = "Synchronisation";
+"icloud_sync_completed" = "Terminé";
+"icloud_sync_error" = "Erreur de synchronisation";
+
+// Punctuation
+"comma_separator" = ", ";
+"colon_separator" = " : ";
+
+// RecordEditView - Additional
+"time" = "Informations temporelles";
+"information" = "Informations";
+"additional_information" = "Informations supplémentaires";
+"14_days" = "14 jours";
+"first_walk" = "Premiers pas";

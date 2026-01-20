@@ -67,8 +67,8 @@
 
 // Today Stats
 "breast_milk" = "母乳";
-"stool" = "おしっこ";
-"urine" = "おむつ";
+"stool" = "うんち";
+"urine" = "おしっこ";
 "sleep_duration" = "睡眠時間";
 "sleep_count" = "睡眠回数";
 "hours" = "時間";
@@ -171,3 +171,102 @@
 "degree" = "度";
 "tablet" = "錠";
 "piece" = "個";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "持続時間";
+"baby_age_at_record" = "記録時の赤ちゃん月齢";
+"confirm_delete_record_title" = "記録を削除しますか？";
+"delete_record_warning" = "削除後は復元できません";
+
+// BabySwitcherView
+"select_baby" = "赤ちゃんを選択";
+"add_new_baby" = "新しい赤ちゃんを追加";
+"confirm_delete_baby_title" = "赤ちゃんを削除";
+"confirm_delete_baby_message" = "%@ を削除してもよろしいですか？この操作は取り消せず、関連するすべての記録も削除されます。";
+"delete_baby_failed_title" = "削除失敗";
+"delete_baby_failed_message" = "赤ちゃんの削除に失敗しました：%@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "iCloud同期/バックアップ";
+"icloud_not_logged_in_title" = "iCloudにログインしていません";
+"icloud_not_logged_in_message" = "iCloudにログインしていません。同期機能を有効にする前にiCloudにログインしてください。";
+"icloud_insufficient_space_title" = "iCloudストレージ不足";
+"icloud_insufficient_space_message" = "iCloudストレージが不足しています。iCloudの容量を確保してから再度お試しください。";
+"manual_sync" = "手動同期";
+"sync_now" = "今すぐ同期";
+"share_app" = "アプリを共有";
+"share_app_text" = "BabyDaily - 赤ちゃん成長記録アシスタントをおすすめします";
+
+// MembershipPrivilegesView
+"current_free_user" = "現在の無料ユーザー";
+"upgrade_membership_prompt" = "会員にアップグレードして特典を享受";
+"upgrade_now" = "今すぐアップグレード";
+"icloud_sync_feature" = "iCloud同期";
+"multi_device_sync" = "マルチデバイス同期";
+"data_stored_in_icloud" = "データはiCloudに保存されます";
+"multi_device_sync_description" = "複数デバイスでのデータ同期をサポート";
+"more_themes" = "より多くのテーマ";
+"unlock_more_themes_description" = "より多くのテーマカラーとスタイルをアンロック";
+"no_ads" = "広告なし";
+"no_ads_description" = "使用中に広告は一切表示されません";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "睡眠時間(時間)";
+"sleep_count_title" = "睡眠回数";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "数量(%@)";
+"feeding_count_title" = "授乳回数";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "経過 %d 日 %d 時間";
+"elapsed_time_days" = "経過 %d 日";
+"elapsed_time_hours_minutes" = "経過 %d 時間 %d 分";
+"elapsed_time_hours" = "経過 %d 時間";
+"elapsed_time_minutes_seconds" = "経過 %d 分 %d 秒";
+"elapsed_time_minutes" = "経過 %d 分";
+"elapsed_time_seconds" = "経過 %d 秒";
+"duration_label" = "時間";
+"count_label" = "回数";
+"hour_unit" = "時間";
+
+// RecordEditView - Time Periods
+"days_later" = "%d日後";
+"days_ago" = "%d日前";
+"morning" = "朝";
+"noon" = "昼";
+"afternoon" = "午後";
+"evening" = "夜";
+"midnight" = "深夜";
+"remove_end_time" = "終了時間を削除";
+"add_end_time" = "終了時間を追加";
+"basic_information" = "基本情報";
+
+// ImagePicker
+"take_photo" = "写真を撮る";
+"select_from_album" = "アルバムから選択";
+
+// BabyCreationView
+"edit_baby_info" = "情報を編集";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "iCloudにログインしていません";
+"icloud_insufficient_space" = "iCloudストレージ不足";
+"icloud_available" = "iCloud利用可能";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "待機中";
+"icloud_sync_syncing" = "同期中";
+"icloud_sync_completed" = "同期完了";
+"icloud_sync_error" = "同期エラー";
+
+// Punctuation
+"comma_separator" = "、";
+"colon_separator" = "：";
+
+// RecordEditView - Additional
+"time" = "時間情報";
+"information" = "情報";
+"additional_information" = "追加情報";
+"14_days" = "14日間";
+"first_walk" = "初めての歩行";

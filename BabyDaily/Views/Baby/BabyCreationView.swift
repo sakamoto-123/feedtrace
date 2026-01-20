@@ -77,7 +77,7 @@ struct BabyCreationView: View {
                     DatePickerOverlay(date: $birthday, onDismiss: { showingDatePicker = false })
                 }
             }
-            .navigationTitle(isEditing ? "修改信息".localized : "")
+            .navigationTitle(isEditing ? "edit_baby_info".localized : "")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .tabBar)
             .sheet(isPresented: $showingImagePicker) {

@@ -16,7 +16,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     
     private func shareApp() {
-        let shareText = "推荐你使用 BabyDaily - 宝宝成长记录助手"
+        let shareText = "share_app_text".localized
         if let url = URL(string: "https://apps.apple.com") {
             let activityVC = UIActivityViewController(activityItems: [shareText, url], applicationActivities: nil)
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -95,7 +95,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "icloud")
                                 .foregroundColor(Color.fromHex("#6cb09e"))
-                            Text("iCloud云同步/备份".localized)
+                            Text("icloud_sync_backup".localized)
                             Spacer()
                             Toggle(isOn: Binding(
                                 get: { isICloudSyncEnabled },
@@ -109,13 +109,13 @@ struct SettingsView: View {
                                             isICloudSyncEnabled = true
                                         case .notLoggedIn:
                                             // 未登录iCloud，显示提示
-                                            alertTitle = "未登录iCloud"
-                                            alertMessage = "您尚未登录iCloud，请先登录iCloud后再开启同步功能。"
+                                            alertTitle = "icloud_not_logged_in_title".localized
+                                            alertMessage = "icloud_not_logged_in_message".localized
                                             showAlert = true
                                         case .insufficientSpace:
                                             // 空间不足，显示提示
-                                            alertTitle = "iCloud空间不足"
-                                            alertMessage = "您的iCloud存储空间不足，无法开启同步功能。请清理iCloud空间后再尝试。"
+                                            alertTitle = "icloud_insufficient_space_title".localized
+                                            alertMessage = "icloud_insufficient_space_message".localized
                                             showAlert = true
                                         }
                                     } else {
@@ -148,12 +148,12 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "arrow.clockwise")
                                     .foregroundColor(Color.fromHex("#6cb09e"))
-                                Text("手动同步".localized)
+                                Text("manual_sync".localized)
                                 Spacer()
                                 Button(action: {
                                         cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
                                     }) {
-                                    Text("立即同步".localized)
+                                    Text("sync_now".localized)
                                         .font(.caption)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 4)
@@ -221,7 +221,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "square.and.arrow.up.circle.fill")
                                 .foregroundColor(Color.fromHex("#ffc76b"))
-                            Text("分享应用".localized)
+                            Text("share_app".localized)
                                 Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
@@ -268,7 +268,7 @@ struct SettingsView: View {
                 Alert(
                     title: Text(alertTitle),
                     message: Text(alertMessage),
-                    dismissButton: .default(Text("确定"))
+                    dismissButton: .default(Text("ok".localized))
                 )
             }
         }

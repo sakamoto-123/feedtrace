@@ -189,3 +189,102 @@
 "degree" = "度";
 "tablet" = "片";
 "piece" = "塊";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "持續時長";
+"baby_age_at_record" = "記錄時寶寶月齡";
+"confirm_delete_record_title" = "確定刪除記錄嗎？";
+"delete_record_warning" = "刪除之後無法恢復";
+
+// BabySwitcherView
+"select_baby" = "選擇寶寶";
+"add_new_baby" = "添加新的寶寶";
+"confirm_delete_baby_title" = "確認刪除寶寶";
+"confirm_delete_baby_message" = "確定要刪除寶寶 %@ 嗎？此操作不可恢復，所有相關記錄也將被刪除。";
+"delete_baby_failed_title" = "刪除失敗";
+"delete_baby_failed_message" = "刪除寶寶失敗：%@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "iCloud雲同步/備份";
+"icloud_not_logged_in_title" = "未登錄iCloud";
+"icloud_not_logged_in_message" = "您尚未登錄iCloud，請先登錄iCloud後再開啟同步功能。";
+"icloud_insufficient_space_title" = "iCloud空間不足";
+"icloud_insufficient_space_message" = "您的iCloud存儲空間不足，無法開啟同步功能。請清理iCloud空間後再嘗試。";
+"manual_sync" = "手動同步";
+"sync_now" = "立即同步";
+"share_app" = "分享應用";
+"share_app_text" = "推薦你使用 BabyDaily - 寶寶成長記錄助手";
+
+// MembershipPrivilegesView
+"current_free_user" = "當前為免費用戶";
+"upgrade_membership_prompt" = "升級會員享受更多特權";
+"upgrade_now" = "立即升級";
+"icloud_sync_feature" = "iCloud雲同步";
+"multi_device_sync" = "多設備同步";
+"data_stored_in_icloud" = "數據存儲在 iCloud";
+"multi_device_sync_description" = "支持多設備數據同步";
+"more_themes" = "更多主題";
+"unlock_more_themes_description" = "解鎖更多主題顏色和樣式";
+"no_ads" = "無廣告";
+"no_ads_description" = "使用過程中無任何廣告干擾";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "睡眠時長(小時)";
+"sleep_count_title" = "睡眠次數";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "數量(%@)";
+"feeding_count_title" = "餵養次數";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "已進行 %d 天 %d 時";
+"elapsed_time_days" = "已進行 %d 天";
+"elapsed_time_hours_minutes" = "已進行 %d 時 %d 分";
+"elapsed_time_hours" = "已進行 %d 時";
+"elapsed_time_minutes_seconds" = "已進行 %d 分 %d 秒";
+"elapsed_time_minutes" = "已進行 %d 分";
+"elapsed_time_seconds" = "已進行 %d 秒";
+"duration_label" = "時長";
+"count_label" = "次數";
+"hour_unit" = "時";
+
+// RecordEditView - Time Periods
+"days_later" = "%d天後";
+"days_ago" = "%d天前";
+"morning" = "早上";
+"noon" = "中午";
+"afternoon" = "下午";
+"evening" = "晚上";
+"midnight" = "凌晨";
+"remove_end_time" = "移除結束時間";
+"add_end_time" = "添加結束時間";
+"basic_information" = "基礎信息";
+
+// ImagePicker
+"take_photo" = "拍照";
+"select_from_album" = "從相冊選擇";
+
+// BabyCreationView
+"edit_baby_info" = "修改信息";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "未登錄iCloud";
+"icloud_insufficient_space" = "iCloud存儲空間不足";
+"icloud_available" = "iCloud可用";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "待同步";
+"icloud_sync_syncing" = "同步中";
+"icloud_sync_completed" = "同步完成";
+"icloud_sync_error" = "同步錯誤";
+
+// Punctuation
+"comma_separator" = "，";
+"colon_separator" = "：";
+
+// RecordEditView - Additional
+"time" = "時間信息";
+"information" = "信息";
+"additional_information" = "補充信息";
+"14_days" = "14天";
+"first_walk" = "第一次走路";

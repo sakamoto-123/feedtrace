@@ -190,3 +190,102 @@
 "degree" = "℃";
 "tablet" = "tablet";
 "piece" = "piece";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "Duration";
+"baby_age_at_record" = "Baby Age at Record";
+"confirm_delete_record_title" = "Delete Record?";
+"delete_record_warning" = "This action cannot be undone";
+
+// BabySwitcherView
+"select_baby" = "Select Baby";
+"add_new_baby" = "Add New Baby";
+"confirm_delete_baby_title" = "Delete Baby";
+"confirm_delete_baby_message" = "Are you sure you want to delete %@? This action cannot be undone and all related records will also be deleted.";
+"delete_baby_failed_title" = "Delete Failed";
+"delete_baby_failed_message" = "Failed to delete baby: %@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "iCloud Sync/Backup";
+"icloud_not_logged_in_title" = "iCloud Not Logged In";
+"icloud_not_logged_in_message" = "You are not logged in to iCloud. Please log in to iCloud before enabling sync.";
+"icloud_insufficient_space_title" = "Insufficient iCloud Storage";
+"icloud_insufficient_space_message" = "Your iCloud storage is insufficient. Please free up iCloud space and try again.";
+"manual_sync" = "Manual Sync";
+"sync_now" = "Sync Now";
+"share_app" = "Share App";
+"share_app_text" = "I recommend using BabyDaily - Baby Growth Tracker";
+
+// MembershipPrivilegesView
+"current_free_user" = "Current Free User";
+"upgrade_membership_prompt" = "Upgrade to enjoy more privileges";
+"upgrade_now" = "Upgrade Now";
+"icloud_sync_feature" = "iCloud Sync";
+"multi_device_sync" = "Multi-Device Sync";
+"data_stored_in_icloud" = "Data stored in iCloud";
+"multi_device_sync_description" = "Support multi-device data sync";
+"more_themes" = "More Themes";
+"unlock_more_themes_description" = "Unlock more theme colors and styles";
+"no_ads" = "No Ads";
+"no_ads_description" = "No ads during use";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "Sleep Duration (hours)";
+"sleep_count_title" = "Sleep Count";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "Volume (%@)";
+"feeding_count_title" = "Feeding Count";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "Elapsed %d days %d hours";
+"elapsed_time_days" = "Elapsed %d days";
+"elapsed_time_hours_minutes" = "Elapsed %d hours %d minutes";
+"elapsed_time_hours" = "Elapsed %d hours";
+"elapsed_time_minutes_seconds" = "Elapsed %d minutes %d seconds";
+"elapsed_time_minutes" = "Elapsed %d minutes";
+"elapsed_time_seconds" = "Elapsed %d seconds";
+"duration_label" = "Duration";
+"count_label" = "Count";
+"hour_unit" = "hr";
+
+// RecordEditView - Time Periods
+"days_later" = "%d days later";
+"days_ago" = "%d days ago";
+"morning" = "Morning";
+"noon" = "Noon";
+"afternoon" = "Afternoon";
+"evening" = "Evening";
+"midnight" = "Midnight";
+"remove_end_time" = "Remove End Time";
+"add_end_time" = "Add End Time";
+"basic_information" = "Basic Information";
+
+// ImagePicker
+"take_photo" = "Take Photo";
+"select_from_album" = "Select from Album";
+
+// BabyCreationView
+"edit_baby_info" = "Edit Info";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "iCloud Not Logged In";
+"icloud_insufficient_space" = "Insufficient iCloud Storage";
+"icloud_available" = "iCloud Available";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "Idle";
+"icloud_sync_syncing" = "Syncing";
+"icloud_sync_completed" = "Completed";
+"icloud_sync_error" = "Sync Error";
+
+// Punctuation
+"comma_separator" = ", ";
+"colon_separator" = ": ";
+
+// RecordEditView - Additional
+"time" = "Time Information";
+"information" = "Information";
+"additional_information" = "Additional Information";
+"14_days" = "14 Days";
+"first_walk" = "First Walk";

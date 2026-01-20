@@ -86,7 +86,7 @@ struct RecordDetailView: View {
 
                 if Constants.hasEndTimeCategories.contains(record.subCategory) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("持续时常")
+                        Text("duration_label".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                         if let end = record.endTimestamp {
@@ -100,7 +100,7 @@ struct RecordDetailView: View {
                 }
                    
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("记录时宝宝月龄")
+                    Text("baby_age_at_record".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(calculateBabyAge(baby!, record.startTimestamp))
@@ -161,7 +161,7 @@ struct RecordDetailView: View {
 
                      if let dayOrNight = record.dayOrNight {
                         HStack {
-                            Text("day_night".localized + ":")
+                            Text("day_night".localized + "colon_separator".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -324,7 +324,7 @@ struct RecordDetailView: View {
         }
         .background(Color(.systemGray6))
         // 删除确认弹窗
-        .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
+        .alert("confirm_delete_record_title".localized,  isPresented: $showingDeleteConfirmation) {
             Button("cancel".localized, role: .cancel) {}
             Button("delete".localized, role: .destructive) {
                 // 删除记录
@@ -332,7 +332,7 @@ struct RecordDetailView: View {
                 dismiss()
             }
         } message: {
-            Text("删除之后无法恢复")
+            Text("delete_record_warning".localized)
         }
         // 图片预览
         .fullScreenCover(isPresented: $isShowingImagePreview) {

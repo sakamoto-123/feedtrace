@@ -48,7 +48,8 @@ struct TimeRangeSegmentView: View {
             // Text("12_months".localized).tag("12_months")
         }
         .pickerStyle(.segmented)
-        .frame(height: 32)
+        .frame(width: 300, height: 32)
+        .tint(.accentColor)
     }
 }
 
@@ -64,7 +65,8 @@ struct GrowthDimensionSegmentView: View {
             Text("bmi".localized).tag("bmi")
         }
         .pickerStyle(.segmented)
-        .frame(height: 32)
+        .frame(width: 300, height: 32)
+        .tint(.accentColor)
     }
 }
 

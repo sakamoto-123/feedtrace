@@ -146,7 +146,7 @@ func formatRecordContent(_ record: Record) -> String {
         if let end = record.endTimestamp {
             let duration = end.timeIntervalSince(record.startTimestamp)
             let minutes = Int(duration / 60)
-            return "left".localized + " \(minutes/2) " + "minutes".localized + "，" + "right".localized + " \(minutes/2) " + "minutes".localized
+            return "left".localized + " \(minutes/2) " + "minutes".localized + "comma_separator".localized + "right".localized + " \(minutes/2) " + "minutes".localized
         } else {
             return "in_progress".localized
         }

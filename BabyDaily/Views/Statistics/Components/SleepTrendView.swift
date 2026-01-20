@@ -108,7 +108,7 @@ struct SleepDurationCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // 标题
             HStack {
-                Text("睡眠时长(" + "小时" + ")")
+                Text("sleep_duration_title_with_unit".localized)
                     .font(.system(size: 17, weight: .semibold))
                 Spacer()
             }
@@ -133,7 +133,7 @@ struct SleepCountCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // 标题
             HStack {
-                Text("睡眠次数")
+                Text("sleep_count_title".localized)
                     .font(.system(size: 17, weight: .semibold))
                 Spacer()
             }

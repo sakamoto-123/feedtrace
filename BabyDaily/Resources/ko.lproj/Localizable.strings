@@ -169,3 +169,102 @@
 "degree" = "℃";
 "tablet" = "정";
 "piece" = "조각";
+
+// RecordDetailView - Additional Labels
+"duration_label" = "지속 시간";
+"baby_age_at_record" = "기록 시 아기 월령";
+"confirm_delete_record_title" = "기록을 삭제하시겠습니까?";
+"delete_record_warning" = "삭제 후에는 복구할 수 없습니다";
+
+// BabySwitcherView
+"select_baby" = "아기 선택";
+"add_new_baby" = "새 아기 추가";
+"confirm_delete_baby_title" = "아기 삭제";
+"confirm_delete_baby_message" = "%@을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없으며 관련된 모든 기록도 삭제됩니다.";
+"delete_baby_failed_title" = "삭제 실패";
+"delete_baby_failed_message" = "아기 삭제 실패: %@";
+
+// SettingsView - iCloud
+"icloud_sync_backup" = "iCloud 동기화/백업";
+"icloud_not_logged_in_title" = "iCloud에 로그인하지 않음";
+"icloud_not_logged_in_message" = "iCloud에 로그인하지 않았습니다. 동기화 기능을 활성화하기 전에 iCloud에 로그인하세요.";
+"icloud_insufficient_space_title" = "iCloud 저장 공간 부족";
+"icloud_insufficient_space_message" = "iCloud 저장 공간이 부족합니다. iCloud 공간을 확보한 후 다시 시도하세요.";
+"manual_sync" = "수동 동기화";
+"sync_now" = "지금 동기화";
+"share_app" = "앱 공유";
+"share_app_text" = "BabyDaily - 아기 성장 기록 도우미를 추천합니다";
+
+// MembershipPrivilegesView
+"current_free_user" = "현재 무료 사용자";
+"upgrade_membership_prompt" = "회원으로 업그레이드하여 더 많은 특권을 누리세요";
+"upgrade_now" = "지금 업그레이드";
+"icloud_sync_feature" = "iCloud 동기화";
+"multi_device_sync" = "다중 기기 동기화";
+"data_stored_in_icloud" = "데이터가 iCloud에 저장됩니다";
+"multi_device_sync_description" = "다중 기기 데이터 동기화 지원";
+"more_themes" = "더 많은 테마";
+"unlock_more_themes_description" = "더 많은 테마 색상과 스타일 잠금 해제";
+"no_ads" = "광고 없음";
+"no_ads_description" = "사용 중 광고가 전혀 표시되지 않습니다";
+
+// SleepTrendView
+"sleep_duration_title_with_unit" = "수면 시간(시간)";
+"sleep_count_title" = "수면 횟수";
+
+// FeedingTrendView
+"feeding_volume_title_with_unit" = "수량(%@)";
+"feeding_count_title" = "수유 횟수";
+
+// HomeView - Elapsed Time
+"elapsed_time_days_hours" = "경과 %d일 %d시간";
+"elapsed_time_days" = "경과 %d일";
+"elapsed_time_hours_minutes" = "경과 %d시간 %d분";
+"elapsed_time_hours" = "경과 %d시간";
+"elapsed_time_minutes_seconds" = "경과 %d분 %d초";
+"elapsed_time_minutes" = "경과 %d분";
+"elapsed_time_seconds" = "경과 %d초";
+"duration_label" = "시간";
+"count_label" = "횟수";
+"hour_unit" = "시간";
+
+// RecordEditView - Time Periods
+"days_later" = "%d일 후";
+"days_ago" = "%d일 전";
+"morning" = "아침";
+"noon" = "정오";
+"afternoon" = "오후";
+"evening" = "저녁";
+"midnight" = "자정";
+"remove_end_time" = "종료 시간 제거";
+"add_end_time" = "종료 시간 추가";
+"basic_information" = "기본 정보";
+
+// ImagePicker
+"take_photo" = "사진 촬영";
+"select_from_album" = "앨범에서 선택";
+
+// BabyCreationView
+"edit_baby_info" = "정보 수정";
+
+// CloudSyncManager
+"icloud_not_logged_in" = "iCloud에 로그인하지 않음";
+"icloud_insufficient_space" = "iCloud 저장 공간 부족";
+"icloud_available" = "iCloud 사용 가능";
+
+// iCloud Sync Status
+"icloud_sync_idle" = "대기 중";
+"icloud_sync_syncing" = "동기화 중";
+"icloud_sync_completed" = "동기화 완료";
+"icloud_sync_error" = "동기화 오류";
+
+// Punctuation
+"comma_separator" = ", ";
+"colon_separator" = ": ";
+
+// RecordEditView - Additional
+"time" = "시간 정보";
+"information" = "정보";
+"additional_information" = "추가 정보";
+"14_days" = "14일";
+"first_walk" = "첫 걸음";

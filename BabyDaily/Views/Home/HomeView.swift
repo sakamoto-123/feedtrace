@@ -304,24 +304,24 @@ struct OngoingRecordCard: View {
         
         if days > 0 {
             if hours > 0 {
-                return String(format: "已进行 %d 天 %d 时", days, hours)
+                return String(format: "elapsed_time_days_hours".localized, days, hours)
             } else {
-                return String(format: "已进行 %d 天", days)
+                return String(format: "elapsed_time_days".localized, days)
             }
         } else if hours > 0 {
             if minutes > 0 {
-                return String(format: "已进行 %d 时 %d 分", hours, minutes)
+                return String(format: "elapsed_time_hours_minutes".localized, hours, minutes)
             } else {
-                return String(format: "已进行 %d 时", hours)
+                return String(format: "elapsed_time_hours".localized, hours)
             }
         } else if minutes > 0 {
             if seconds > 0 {
-                return String(format: "已进行 %d 分 %d 秒", minutes, seconds)
+                return String(format: "elapsed_time_minutes_seconds".localized, minutes, seconds)
             } else {
-                return String(format: "已进行 %d 分", minutes)
+                return String(format: "elapsed_time_minutes".localized, minutes)
             }
         } else {
-            return String(format: "已进行 %d 秒", seconds)
+            return String(format: "elapsed_time_seconds".localized, seconds)
         }
     }
     
@@ -400,9 +400,9 @@ struct TodayStatistics: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("formula".localized + ": \(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
+                    Text("formula".localized + "colon_separator".localized + "\(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))
-                    Text("breast_milk".localized + ": \(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
+                    Text("breast_milk".localized + "colon_separator".localized + "\(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))       
                 }
 
@@ -412,9 +412,9 @@ struct TodayStatistics: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("时长".localized + ": \(todayStats.sleepDurationInHours.smartDecimal) 时")
+                    Text("duration_label".localized + "colon_separator".localized + "\(todayStats.sleepDurationInHours.smartDecimal) " + "hour_unit".localized)
                         .font(.system(size: 14, weight: .medium))
-                    Text("次数".localized + ": \(todayStats.sleepCount) 次")
+                    Text("count_label".localized + "colon_separator".localized + "\(todayStats.sleepCount) " + "times".localized)
                         .font(.system(size: 14, weight: .medium))       
                 }
 

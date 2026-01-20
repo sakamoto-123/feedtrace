@@ -141,16 +141,16 @@ struct RecordTimeSelector: View {
         let now = Date()
         
         if calendar.isDateInToday(date) {
-            return "今天"
+            return "today".localized
         } else if calendar.isDateInYesterday(date) {
-            return "昨天"
+            return "yesterday".localized
         } else {
             let components = calendar.dateComponents([.day], from: date, to: now)
             let days = components.day ?? 0
             if days < 0 {
-                return "\(days)天后"
+                return String(format: "days_later".localized, abs(days))
             } else {
-                return "\(days)天前" 
+                return String(format: "days_ago".localized, days)
             }
         }
     }
@@ -161,15 +161,15 @@ struct RecordTimeSelector: View {
         let hour = calendar.component(.hour, from: date)
         
         if hour >= 6 && hour < 12 {
-            return "早上"
+            return "morning".localized
         } else if hour >= 12 && hour < 14 {
-            return "中午"
+            return "noon".localized
         } else if hour >= 14 && hour < 18 {
-            return "下午"
+            return "afternoon".localized
         } else if hour >= 18 && hour < 22 {
-            return "晚上"
+            return "evening".localized
         } else {
-            return "凌晨"
+            return "midnight".localized
         }
     }
     
@@ -299,7 +299,7 @@ struct RecordTimeSelector: View {
                 } label: {
                     Image(systemName: showEndTimePicker ? "minus.circle.fill" : "plus.circle.fill")
                             .foregroundColor(.accentColor)
-                    Text(showEndTimePicker ? "移除结束时间" : "添加结束时间")
+                    Text(showEndTimePicker ? "remove_end_time".localized : "add_end_time".localized)
                             .foregroundColor(.accentColor)
                 }
                     
@@ -701,7 +701,7 @@ struct RecordEditView: View {
     
     private var timeSection: some View {
         VStack (alignment: .leading, spacing: 8) {
-            Text("时间信息".localized)
+            Text("time".localized)
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -724,7 +724,7 @@ struct RecordEditView: View {
         if shouldShowInfoSection {
             return AnyView(
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("基础信息".localized)
+                    Text("basic_information".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
 
@@ -758,7 +758,7 @@ struct RecordEditView: View {
     
     private var additionalInfoSection: some View {
         VStack (alignment: .leading, spacing: 8) {
-            Text("补充信息".localized)
+            Text("additional_information".localized)
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -793,7 +793,7 @@ struct RecordEditView: View {
                 .alert(isPresented: $showingErrorAlert) {
                     errorAlert
                 }
-                .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
+                .alert("confirm_delete_record_title".localized,  isPresented: $showingDeleteConfirmation) {
                     Button("cancel".localized, role: .cancel) {}
                     Button("delete".localized, role: .destructive) {
                         // 删除记录
@@ -975,7 +975,7 @@ struct RecordEditView: View {
             }
             dismiss()
         } catch {
-            errorMessage = "save_failed".localized + "：\(error.localizedDescription)"
+            errorMessage = "save_failed".localized + "colon_separator".localized + "\(error.localizedDescription)"
             showingErrorAlert = true
         }
     }

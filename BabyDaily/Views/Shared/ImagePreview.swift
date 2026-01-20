@@ -75,7 +75,7 @@ struct ImagePreview: View {
             Button(action: {
                 dismiss()
             }) {
-                Text("完成")
+                Text("complete".localized)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundColor(.white)

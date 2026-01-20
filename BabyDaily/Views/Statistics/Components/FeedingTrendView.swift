@@ -31,7 +31,7 @@ enum FeedingType: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .breastMilk: return "母乳"
+        case .breastMilk: return "breast_milk".localized
         case .formula: return "formula".localized
         case .water: return "water_intake".localized
         }
@@ -158,7 +158,7 @@ struct FeedingVolumeCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // 标题
             HStack{
-                Text("数量(" + unitManager.volumeUnit.rawValue + ")")
+                Text(String(format: "feeding_volume_title_with_unit".localized, unitManager.volumeUnit.rawValue))
                     .font(.system(size: 17, weight: .semibold))
                 Spacer()
                 ChartLegend()
@@ -195,7 +195,7 @@ struct FeedingCountCard: View {
         VStack(alignment: .leading, spacing: 16) {
                // 标题
             HStack{
-                Text("喂养次数")
+                Text("feeding_count_title".localized)
                     .font(.system(size: 17, weight: .semibold))
                 Spacer()
                 ChartLegend()

@@ -27,7 +27,7 @@ struct BabySwitcherView: View {
         VStack(spacing: 0) {
             // 顶部标题和关闭按钮
             HStack {
-                Text("选择宝宝".localized)
+                Text("select_baby".localized)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.primary)
                 
@@ -101,7 +101,7 @@ struct BabySwitcherView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 18))
-                    Text("添加新的宝宝".localized)
+                    Text("add_new_baby".localized)
                         .font(.system(size: 16, weight: .medium))
                 }
                 .foregroundColor(AppSettings.shared.currentThemeColor)
@@ -115,24 +115,24 @@ struct BabySwitcherView: View {
         .presentationDragIndicator(.visible)
         
         // 删除确认对话框
-        .confirmationDialog("确认删除宝宝", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
-            Button("删除", role: .destructive) {
+        .confirmationDialog("confirm_delete_baby_title".localized, isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+            Button("delete".localized, role: .destructive) {
                 if let baby = babyToDelete {
                     deleteBaby(baby)
                 }
             }
-            Button("取消", role: .cancel) {
+            Button("cancel".localized, role: .cancel) {
                 babyToDeleteId = nil
             }
         } message: {
             if let baby = babyToDelete {
-                Text("确定要删除宝宝 \(baby.name) 吗？此操作不可恢复，所有相关记录也将被删除。")
+                Text(String(format: "confirm_delete_baby_message".localized, baby.name))
             }
         }
         
         // 删除错误提示
-        .alert("删除失败", isPresented: $showingDeleteError) {
-            Button("确定") {}
+        .alert("delete_baby_failed_title".localized, isPresented: $showingDeleteError) {
+            Button("ok".localized) {}
         } message: {
             Text(deleteErrorMessage)
         }
@@ -173,7 +173,7 @@ struct BabySwitcherView: View {
             }
         } catch {
             // 处理删除错误
-            deleteErrorMessage = "删除宝宝失败：\(error.localizedDescription)"
+            deleteErrorMessage = String(format: "delete_baby_failed_message".localized, error.localizedDescription)
             showingDeleteError = true
         }
         
