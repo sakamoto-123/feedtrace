@@ -4,6 +4,7 @@ import Charts
 // 睡眠时长图表子组件
 private struct SleepDurationChart: View {
     let data: [(date: Date, duration: Int, count: Int)]
+    let timeRange: String
     
     var body: some View {
         Chart(data, id: \.date) {item in
@@ -23,9 +24,8 @@ private struct SleepDurationChart: View {
         }
         .frame(height: 240)
         .padding(.horizontal, 8)
-        .chartScrollableAxes(.horizontal)
-        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
-//        .chartYScale(domain: .automatic(includesZero: true))
+        .chartScrollableAxes( timeRange == "7_days" ? [] : .horizontal)
+        .chartXScale(domain: makeDateDomain(range: timeRange))
         .chartYScale(domain: 0...20)
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) {
@@ -37,7 +37,7 @@ private struct SleepDurationChart: View {
             }
         }
         .chartYAxis {
-            AxisMarks(values: .automatic(desiredCount: 5)) {
+            AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
                 AxisValueLabel()
@@ -51,6 +51,8 @@ private struct SleepDurationChart: View {
 // 睡眠次数图表子组件
 private struct SleepCountChart: View {
     let data: [(date: Date, duration: Int, count: Int)]
+    let timeRange: String
+
     
     var body: some View {
         Chart(data, id: \.date) {item in 
@@ -70,10 +72,10 @@ private struct SleepCountChart: View {
         }
         .frame(height: 240)
         .padding(.horizontal, 8)
-//        .chartYScale(domain: .automatic(includesZero: true))
+        .padding(.trailing, 4)
         .chartYScale(domain: 0...15)
-        .chartScrollableAxes(.horizontal)
-        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
+        .chartScrollableAxes(timeRange == "7_days" ? [] : .horizontal)
+        .chartXScale(domain: makeDateDomain(range: timeRange))
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) {
                 AxisGridLine()
@@ -85,7 +87,7 @@ private struct SleepCountChart: View {
         }
       
         .chartYAxis {
-            AxisMarks(values: .automatic(desiredCount: 5)) {
+            AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
                 AxisValueLabel()
@@ -99,6 +101,7 @@ private struct SleepCountChart: View {
 // 睡眠时间卡片
 struct SleepDurationCard: View {
     let data: [(date: Date, duration: Int, count: Int)]
+    let timeRange: String
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
@@ -111,7 +114,7 @@ struct SleepDurationCard: View {
             }
             
             // 使用提取的子组件
-            SleepDurationChart(data: data)
+            SleepDurationChart(data: data, timeRange: timeRange)
         }
         .padding()
         .background(colorScheme == .light ? Color.white : Color(.systemGray6))
@@ -123,6 +126,7 @@ struct SleepDurationCard: View {
 // 睡眠次数卡片
 struct SleepCountCard: View {
     let data: [(date: Date, duration: Int, count: Int)]
+    let timeRange: String
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
@@ -135,7 +139,7 @@ struct SleepCountCard: View {
             }
             
             // 使用提取的子组件
-            SleepCountChart(data: data)
+            SleepCountChart(data: data, timeRange: timeRange)
         }
         .padding()
         .background(colorScheme == .light ? Color.white : Color(.systemGray6))
@@ -147,11 +151,12 @@ struct SleepCountCard: View {
 // 睡眠趋势组合视图
 struct SleepTrendView: View {
     let data: [(date: Date, duration: Int, count: Int)]
-    
+    let timeRange: String
+
     var body: some View {
         VStack(spacing: 16) {
-            SleepDurationCard(data: data)
-            SleepCountCard(data: data)
+            SleepDurationCard(data: data, timeRange: timeRange)
+            SleepCountCard(data: data, timeRange: timeRange)
         }
     }
 }

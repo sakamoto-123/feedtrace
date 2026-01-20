@@ -1,6 +1,20 @@
 import SwiftUI
 import Charts
 
+
+// Chart Y Scale Modifier
+private struct ChartYScaleModifier: ViewModifier {
+    let type: String
+    
+    func body(content: Content) -> some View {
+        if type == "count" {
+            content.chartYScale(domain: 0...15)
+        } else {
+            content.chartYScale(domain: .automatic(includesZero: false))
+        }
+    }
+}
+
 enum FeedingType: String, CaseIterable {
     case breastMilk, formula, water
 
@@ -64,9 +78,19 @@ private struct ChartLegend: View {
     }
 }
 
+
+
 // 奶量趋势图表子组件
 private struct FeedingBaseChart: View {
     let stackedData: [FeedingStackItem]
+    let timeRange: String
+    let type: String
+    
+    init(stackedData: [FeedingStackItem], timeRange: String, type: String = "volume") {
+        self.stackedData = stackedData
+        self.timeRange = timeRange
+        self.type = type
+    }
     
     var body: some View {
         Chart(stackedData) { item in
@@ -86,8 +110,9 @@ private struct FeedingBaseChart: View {
         }
         .frame(height: 240)
         .padding(.horizontal, 8)
-        .chartScrollableAxes(.horizontal)
-        .chartXVisibleDomain(length: TimeInterval(7 * 86400 * 1.05))
+        .chartXScale(domain: makeDateDomain(range: timeRange))
+         .modifier(ChartYScaleModifier(type: type))
+        .chartScrollableAxes(timeRange == "7_days" ? [] : .horizontal)
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) {
                 AxisGridLine()
@@ -98,7 +123,7 @@ private struct FeedingBaseChart: View {
             }
         }
         .chartYAxis {
-            AxisMarks(values: .automatic(desiredCount: 5)) {
+            AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
                 AxisValueLabel()
@@ -112,6 +137,8 @@ private struct FeedingBaseChart: View {
 // 奶量趋势卡片
 struct FeedingVolumeCard: View {
     let data: [(date: Date, breastMilk: Int, formula: Int, water: Int)]
+    let timeRange: String
+    let type: String
     @Environment(\.colorScheme) private var colorScheme
     // 单位管理
     @StateObject private var unitManager = UnitManager.shared
@@ -138,7 +165,7 @@ struct FeedingVolumeCard: View {
             }
             
             // 使用提取的子组件
-            FeedingBaseChart(stackedData: stackedData)
+            FeedingBaseChart(stackedData: stackedData, timeRange: timeRange, type: type)
         }
         .padding()
         .background(colorScheme == .light ? Color.white : Color(.systemGray6))
@@ -149,7 +176,9 @@ struct FeedingVolumeCard: View {
 
 // 喂养次数卡片
 struct FeedingCountCard: View {
-      let data: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
+      let data: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]    
+    let timeRange: String
+    let type: String
     @Environment(\.colorScheme) private var colorScheme
     // 添加明确的类型注解
     private var stackedData: [FeedingStackItem] {
@@ -173,7 +202,7 @@ struct FeedingCountCard: View {
             }
             
             // 使用提取的子组件
-            FeedingBaseChart(stackedData: stackedData)
+            FeedingBaseChart(stackedData: stackedData, timeRange: timeRange, type: type)
             
           
         }
@@ -188,11 +217,12 @@ struct FeedingCountCard: View {
 struct FeedingTrendView: View {
     let volumeData: [(date: Date, breastMilk: Int, formula: Int, water: Int)]
     let countData: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]
-    
+    let timeRange: String
+
     var body: some View {
         VStack(spacing: 16) {
-            FeedingVolumeCard(data: volumeData)
-            FeedingCountCard(data: countData)
+            FeedingVolumeCard(data: volumeData, timeRange: timeRange, type: "volume")
+            FeedingCountCard(data: countData, timeRange: timeRange, type: "count")
         }
     }
 }

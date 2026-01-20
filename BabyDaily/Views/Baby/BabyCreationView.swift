@@ -49,7 +49,7 @@ struct BabyCreationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(colorScheme == .light ? .systemGray6 : .black)
+                Color(colorScheme == .dark ? .black : .systemBackground)
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -147,7 +147,7 @@ struct BabyCreationView: View {
         }
         .padding(36)
         .frame(minWidth: 360, maxWidth: 600)
-        .background(colorScheme == .light ? Color.white : Color(.systemGray6))
+        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color(.systemBackground))
         .cornerRadius(Constants.cornerRadius)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }

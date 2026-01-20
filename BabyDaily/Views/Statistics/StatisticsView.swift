@@ -282,15 +282,17 @@ struct StatisticsView: View {
                             FeedingTrendView(
                                 volumeData: feedingVolumeData,
                                 countData: feedingCountData,
+                                timeRange: timeRange
                             )
                         } else if selectedTab == "sleep_trend" {
                             SleepTrendView(
-                                data: sleepTrendData
+                                data: sleepTrendData,
+                                timeRange: timeRange
                             )
                         } else if selectedTab == "growth_statistics" {
                             GrowthStatisticsView(
-                                data: growthCurveData,
-                                selectedDimension: $selectedGrowthDimension,
+                                gender: baby.gender.isEmpty ? "boy" : (baby.gender == "male" ? "boy" : "girl"),
+                                dimension: selectedGrowthDimension
                             )
                         } 
                     }

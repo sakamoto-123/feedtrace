@@ -43,7 +43,7 @@ struct ContentView: View {
                     .onAppear {
                         // 初始化UserSettingManager
                         userSettingManager.setup(modelContext: modelContext)
-                        // 加载选中的宝宝
+                        // 直接从UserDefaults加载选中的宝宝，减少延迟
                         loadSelectedBaby()
                     }
                     .onChange(of: babies) { 
@@ -58,6 +58,12 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .onChange(of: userSettingManager.isLoaded) { newValue in
+                        // 当UserSetting加载完成后，再次加载选中的宝宝，确保数据一致性
+                        if newValue {
+                            loadSelectedBaby()
+                        }
+                    }
                     .onChange(of: userSettingManager.userSetting?.selectedBabyId) {
                         // 当UserSetting中的selectedBabyId变化时，更新selectedBaby
                         loadSelectedBaby()
@@ -68,27 +74,31 @@ struct ContentView: View {
     
     // 从UserSetting加载选中的宝宝
     private func loadSelectedBaby() {
-        if let selectedBabyId = userSettingManager.getSelectedBabyId() {
-            if let baby = babies.first(where: { $0.id == selectedBabyId }) {
-                selectedBaby = baby
-            } else if !babies.isEmpty {
-                // 如果保存的宝宝ID不存在，使用第一个宝宝
-                selectedBaby = babies.first
-                // 更新UserSetting中的selectedBabyId
-                Task {
-                    if let firstBaby = babies.first {
-                        await userSettingManager.setSelectedBabyId(firstBaby.id)
-                    }
+        // 使用异步任务更新状态，避免在视图更新过程中修改状态
+        Task { @MainActor in
+            // 优先从UserDefaults获取选中的宝宝ID，用于快速加载
+            if let selectedBabyId = userSettingManager.getSelectedBabyIdFromDefaults() {
+                if let baby = babies.first(where: { $0.id == selectedBabyId }) {
+                    selectedBaby = baby
+                    return
                 }
             }
-        } else if !babies.isEmpty {
-            // 如果UserSetting中没有selectedBabyId，使用第一个宝宝
-            selectedBaby = babies.first
-            // 更新UserSetting中的selectedBabyId
-            Task {
-                if let firstBaby = babies.first {
-                    await userSettingManager.setSelectedBabyId(firstBaby.id)
+            
+            // 如果UserDefaults中没有，或者找不到对应的宝宝，再从UserSetting中获取
+            if let selectedBabyId = userSettingManager.getSelectedBabyId() {
+                if let baby = babies.first(where: { $0.id == selectedBabyId }) {
+                    selectedBaby = baby
+                } else if !babies.isEmpty {
+                    // 如果保存的宝宝ID不存在，使用第一个宝宝
+                    selectedBaby = babies.first
+                    // 更新UserSetting中的selectedBabyId
+                    await userSettingManager.setSelectedBabyId(babies.first!.id)
                 }
+            } else if !babies.isEmpty {
+                // 如果UserSetting中没有selectedBabyId，使用第一个宝宝
+                selectedBaby = babies.first
+                // 更新UserSetting中的selectedBabyId
+                await userSettingManager.setSelectedBabyId(babies.first!.id)
             }
         }
     }

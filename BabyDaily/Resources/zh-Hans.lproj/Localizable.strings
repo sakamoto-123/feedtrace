@@ -155,6 +155,7 @@
 "growth_statistics" = "成长统计";
 "daily_activity" = "每日活动";
 "7_days" = "7天";
+"14_days" = "14天";
 "30_days" = "30天";
 "90_days" = "90天";
 "12_months" = "12个月";

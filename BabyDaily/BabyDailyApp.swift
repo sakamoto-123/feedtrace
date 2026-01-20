@@ -94,8 +94,8 @@ struct BabyDailyApp: App {
         // 使用动态的modelContainer，确保每次变化时都会更新
         .modelContainer(sharedModelContainer)
         .onChange(of: isICloudSyncEnabled) { oldValue, newValue in
-            // 当iCloud开关状态变化时，执行数据迁移
-            Task {
+            // 当iCloud开关状态变化时，执行数据迁移（在后台线程）
+            Task.detached {
                 // 保存当前容器的引用
                 let oldContainer = self.modelContainer
                 
@@ -118,8 +118,16 @@ struct BabyDailyApp: App {
                 // 迁移数据从旧容器到新容器
                 await DataMigrationManager.shared.migrateData(from: oldContainer, to: newContainer)
                 
-                // 更新modelContainer
-                self.modelContainer = newContainer
+                // 添加全局去重步骤，确保不会有重复数据
+                await DataMigrationManager.shared.removeDuplicates(in: newContainer)
+                
+                // 更新modelContainer（在主线程）
+                await MainActor.run {
+                    self.modelContainer = newContainer
+                    // 重置UserSettingManager，确保它使用新的容器
+                    let newContext = ModelContext(newContainer)
+                    UserSettingManager.shared.setup(modelContext: newContext)
+                }
             }
         }
     }

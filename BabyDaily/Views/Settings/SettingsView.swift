@@ -1,13 +1,6 @@
 import SwiftUI
 import SwiftData
 
-// iCloud状态枚举
-enum iCloudStatus {
-    case notLoggedIn      // 未登录iCloud
-    case insufficientSpace // 存储空间不足
-    case available         // 可用
-}
-
 struct SettingsView: View {
     let baby: Baby
     @State private var showShareSheet = false
@@ -21,28 +14,6 @@ struct SettingsView: View {
     @StateObject private var cloudSyncManager = CloudSyncManager.shared
     // 获取ModelContext
     @Environment(\.modelContext) private var modelContext
-    
-    // 检查iCloud状态
-    private func checkiCloudStatus() async -> iCloudStatus {
-        // 检查是否登录iCloud
-        guard let ubiquityContainerURL = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
-            return .notLoggedIn
-        }
-        
-        do {
-            // 检查可用存储空间
-            let resourceValues = try ubiquityContainerURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
-            if let availableCapacity = resourceValues.volumeAvailableCapacityForImportantUsage {
-                // 检查可用空间是否大于100MB
-                let requiredSpace: Int64 = 100 * 1024 * 1024 // 100MB
-                return availableCapacity > requiredSpace ? .available : .insufficientSpace
-            }
-        } catch {
-            print("Error checking iCloud storage: \(error)")
-        }
-        
-        return .insufficientSpace
-    }
     
     private func shareApp() {
         let shareText = "推荐你使用 BabyDaily - 宝宝成长记录助手"
@@ -131,7 +102,7 @@ struct SettingsView: View {
                                 if newValue {
                                     // 当尝试开启时，检查iCloud状态
                                     Task {
-                                        let status = await checkiCloudStatus()
+                                        let status = await cloudSyncManager.checkiCloudStatus()
                                         switch status {
                                         case .available:
                                             // iCloud可用，开启同步

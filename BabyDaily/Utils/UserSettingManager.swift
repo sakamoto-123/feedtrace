@@ -20,6 +20,9 @@ class UserSettingManager: ObservableObject {
     // UserSetting实例
     @Published var userSetting: UserSetting?
     
+    // 新增：指示UserSetting是否已经加载完成
+    @Published var isLoaded = false
+    
     // 初始化
     private init() {}
     
@@ -64,6 +67,16 @@ class UserSettingManager: ObservableObject {
             } catch {
                 print("Failed to save default UserSetting: \(error)")
             }
+        }
+        
+        // 设置isLoaded为true，表示加载完成
+        isLoaded = true
+        
+        // 将selectedBabyId同步到UserDefaults，确保下次启动时能快速加载
+        if let selectedBabyId = userSetting?.selectedBabyId {
+            UserDefaults.standard.set(selectedBabyId.uuidString, forKey: "selectedBabyId")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "selectedBabyId")
         }
     }
     
@@ -147,14 +160,49 @@ class UserSettingManager: ObservableObject {
     
     // 获取选中的宝宝ID
     func getSelectedBabyId() -> UUID? {
-        return userSetting?.selectedBabyId
+        // 安全访问，避免访问已销毁的实例
+        do {
+            // 尝试访问属性，如果实例已销毁，会抛出错误
+            guard let setting = userSetting else { return nil }
+            // 这里使用try?来捕获可能的销毁错误
+            let result = try? setting.selectedBabyId
+            if result == nil {
+                // 如果访问失败，说明实例已销毁，重新加载
+                Task {
+                    await loadOrCreateUserSetting()
+                }
+            }
+            return result
+        } catch {
+            // 如果发生错误，重新加载
+            Task {
+                await loadOrCreateUserSetting()
+            }
+            return nil
+        }
+    }
+    
+    // 从UserDefaults同步获取选中的宝宝ID，用于快速加载
+    func getSelectedBabyIdFromDefaults() -> UUID? {
+        if let babyIdString = UserDefaults.standard.string(forKey: "selectedBabyId"), let babyId = UUID(uuidString: babyIdString) {
+            return babyId
+        }
+        return nil
     }
     
     // 设置选中的宝宝ID
     @MainActor
     func setSelectedBabyId(_ babyId: UUID?) async {
+        // 更新SwiftData中的UserSetting
         await updateUserSetting { setting in
             setting.selectedBabyId = babyId
+        }
+        
+        // 同时更新UserDefaults，用于快速加载
+        if let babyId = babyId {
+            UserDefaults.standard.set(babyId.uuidString, forKey: "selectedBabyId")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "selectedBabyId")
         }
     }
 }

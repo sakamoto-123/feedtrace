@@ -42,8 +42,9 @@ struct TimeRangeSegmentView: View {
     var body: some View {
         Picker("", selection: $timeRange) {
             Text("7_days".localized).tag("7_days")
+            Text("14_days".localized).tag("14_days")
             Text("30_days".localized).tag("30_days")
-            Text("90_days".localized).tag("90_days")
+            // Text("90_days".localized).tag("90_days")
             // Text("12_months".localized).tag("12_months")
         }
         .pickerStyle(.segmented)
