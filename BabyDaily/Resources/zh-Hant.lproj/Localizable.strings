@@ -1,4 +1,17 @@
 // 繁體中文本地化資源文件
+
+// Unit Setting
+"unit_setting" = "單位設置";
+"unit_settings" = "單位設置";
+"temperature_unit" = "溫度單位";
+"select_temperature_unit" = "選擇溫度測量的單位";
+"weight_unit" = "重量單位";
+"select_weight_unit" = "選擇重量測量的單位";
+"length_unit" = "長度單位";
+"select_length_unit" = "用於身高和頭圍測量";
+"volume_unit" = "體積單位";
+"select_volume_unit" = "選擇體積測量的單位";
+
 // HomeView
 "baby_diary" = "寶寶日記";
 "today_statistics" = "今日統計";
@@ -15,6 +28,13 @@
 "head" = "頭";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "開始於 %@";
 
 // Quick Actions
@@ -120,6 +140,11 @@
 "left" = "左";
 "right" = "右";
 "minutes" = "分鐘";
+"in_progress" = "進行中";
+"hours" = "小時";
+"records" = "記錄";
+"edit" = "編輯";
+"delete" = "刪除";
 
 // RecordEditView
 "create_record" = "創建記錄";
@@ -190,6 +215,11 @@
 "tablet" = "片";
 "piece" = "塊";
 
+// RecordDetailView
+"record_detail" = "記錄詳情";
+"duration" = "持續時間";
+"detailed_information" = "詳細信息";
+
 // RecordDetailView - Additional Labels
 "duration_label" = "持續時長";
 "baby_age_at_record" = "記錄時寶寶月齡";
@@ -227,6 +257,41 @@
 "unlock_more_themes_description" = "解鎖更多主題顏色和樣式";
 "no_ads" = "無廣告";
 "no_ads_description" = "使用過程中無任何廣告干擾";
+"membership_subscription" = "會員訂閱";
+"app_name" = "宝宝记";
+"feature_comparison" = "會員功能對比";
+"regular_user" = "普通用戶";
+"premium_member" = "高級會員";
+"remove_ads" = "去廣告";
+"basic_records" = "基礎記錄";
+"quick_action_records" = "快捷指令記錄";
+"chart_trends" = "圖表趨勢";
+"family_sharing" = "家人共享";
+"multiple_babies" = "多寶寶記錄";
+"unlimited_widgets" = "無限制小組件";
+"unlimited_custom_records" = "無限制自定義記錄";
+"icloud_sync_backup" = "iCloud 雲同步/備份";
+"apple_watch_feature" = "AppleWatch(開發中)";
+"future_more_features" = "未來更多高級功能";
+"premium_membership_monthly" = "高級會員(月訂閱)";
+"premium_membership_lifetime" = "高級會員(永久)";
+"original_price" = "原價";
+"subscribe_accept_terms" = "訂閱會員則表示您接受我們的隱私政策和使用條款。";
+"terms_of_service" = "使用條款";
+"redeem_code" = "兌換會員碼";
+"restore_purchases" = "恢復購買";
+"purchasing" = "購買中...";
+"purchase_success" = "購買成功";
+"purchase_failed" = "購買失敗";
+"restore_success" = "恢復購買成功";
+"restore_failed" = "恢復購買失敗";
+"no_products_available" = "暫無可購買產品";
+"failed_to_load_products" = "加載產品失敗";
+"purchase_pending" = "購買待審核";
+"unknown_purchase_status" = "未知購買狀態";
+"no_purchases_to_restore" = "沒有可恢復的購買";
+"transaction_verification_failed" = "交易驗證失敗";
+"purchase_cancelled" = "購買已取消";
 
 // SleepTrendView
 "sleep_duration_title_with_unit" = "睡眠時長(小時)";
@@ -294,8 +359,88 @@
 "end_time" = "結束時間";
 
 // RecordEditView - Information
+"name" = "名稱";
+"breast_side" = "餵養側";
+"both_sides" = "雙側";
+"left_side" = "左側";
+"right_side" = "右側";
+"amount" = "用量";
+"day_night" = "時段";
+"daytime" = "白天";
+"night" = "黑夜";
+"acceptance_level" = "接受程度";
+"like" = "喜歡";
+"neutral" = "一般";
+"dislike" = "不喜歡";
+"allergy" = "過敏";
+"excrement_type" = "排泄物類型";
+"urine" = "小便";
+"stool" = "大便";
 "mixed" = "混合";
 
 // RecordEditView - Additional Information
 "remark" = "備註";
 "photos" = "照片";
+
+// RecordEditView - Buttons and Navigation
+"save" = "保存";
+"delete" = "刪除";
+
+// RecordEditView - Error Messages
+"save_failed" = "保存失敗";
+"please_enter_name" = "請輸入名稱";
+"please_enter_amount" = "請輸入用量";
+"please_enter_valid_number" = "請輸入有效的數字";
+"record_type_incomplete" = "記錄類型信息不完整";
+"unknown_error" = "未知錯誤";
+"ok" = "確定";
+
+// Family Collaboration
+"family_collaboration" = "家庭協作";
+"collaboration_title" = "與家人共同記錄寶寶的成長歷程";
+"collaboration_subtitle" = "通過 iCloud 協作功能，您可以:";
+"invite_family" = "邀請家人加入";
+"record_together" = "共同記錄日常";
+"real_time_sync" = "實時同步數據";
+"select_baby_to_collaborate" = "選擇要協作的寶寶";
+"no_collaborators_yet" = "尚未添加協作者";
+"manage_collaboration" = "管理協作";
+"collaboration_invite_guide" = "協作邀請提示";
+"three_steps_to_share" = "三步完成分享";
+"step1_invite" = "先點擊`邀請家人加入`，再選擇短信 App";
+"step2_contact" = "填寫想邀請的聯繫人信息";
+"step3_send" = "立即發送邀請";
+"ensure_icloud_setup" = "確保 iCloud 已設置";
+"ensure_icloud_setup_desc" = "請確認邀請的家人已經登錄 iCloud，並預留足夠的可用空間，以免 BabyMemos 的同步因空間不足而中斷";
+"must_use_sms" = "必須使用短信 App 發送";
+"must_use_sms_desc" = "請使用短信 App 發送協作邀請，家人才能順利加入";
+"remind_install_app" = "提醒家人先安裝 Baby Memos";
+"remind_install_app_desc" = "請先提醒家人安裝最新版本的 Baby Memos，再打開邀請鏈接，才能順利同步";
+"owner" = "所有者";
+"read_only" = "只讀";
+"read_write" = "可編輯";
+"only_invited_can_edit" = "僅受邀用戶可編輯";
+"stop_sharing" = "停止共享";
+"collaborators_count" = "%d 位協作者";
+"not_shared" = "未共享";
+"shared" = "已共享";
+"sharing" = "共享中";
+"collaboration_error" = "協作錯誤";
+"close" = "關閉";
+"error" = "錯誤";
+"stop_sharing_confirm_message" = "確定要停止共享嗎？停止後，所有協作者將無法繼續訪問寶寶的記錄。";
+"permission_setting" = "權限設置";
+"read_only_desc" = "協作者只能查看記錄，無法編輯";
+"read_write_desc" = "協作者可以查看和編輯記錄";
+"sharing_all_data" = "共享所有數據";
+"sharing_all_data_desc" = "共享後，協作者可以查看和編輯所有寶寶及其記錄";
+"read_only_user_cannot_edit" = "只讀用戶無法編輯記錄";
+"read_only_user_cannot_delete" = "只讀用戶無法刪除記錄";
+"loading_share_data" = "正在加載共享數據...";
+"loading_share_data_title" = "正在加載共享數據";
+"accepting_share_invitation" = "正在接受共享邀請...";
+"loading_shared_babies" = "正在加載共享的寶寶信息...";
+"loading_shared_records" = "正在加載共享的記錄...";
+"loading_complete" = "加載完成！";
+"loading_failed" = "加載失敗";
+"retry" = "重試";

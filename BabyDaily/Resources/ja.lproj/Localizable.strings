@@ -1,4 +1,17 @@
 // 日本語ローカリゼーションリソースファイル
+
+// Unit Setting
+"unit_setting" = "単位設定";
+"unit_settings" = "単位設定";
+"temperature_unit" = "温度単位";
+"select_temperature_unit" = "温度測定の単位を選択";
+"weight_unit" = "重量単位";
+"select_weight_unit" = "重量測定の単位を選択";
+"length_unit" = "長さ単位";
+"select_length_unit" = "身長と頭囲の測定に使用";
+"volume_unit" = "体積単位";
+"select_volume_unit" = "体積測定の単位を選択";
+
 // HomeView
 "baby_diary" = "赤ちゃん日記";
 "today_statistics" = "今日の統計";
@@ -15,6 +28,13 @@
 "head" = "頭";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "開始 %@";
 
 // Quick Actions
@@ -120,6 +140,11 @@
 "left" = "左";
 "right" = "右";
 "minutes" = "分";
+"in_progress" = "進行中";
+"hours" = "時間";
+"records" = "記録";
+"edit" = "編集";
+"delete" = "削除";
 
 // RecordEditView
 "create_record" = "記録を作成";
@@ -186,6 +211,11 @@
 "degree" = "度";
 "tablet" = "錠";
 "piece" = "個";
+
+// RecordDetailView
+"record_detail" = "記録の詳細";
+"duration" = "持続時間";
+"detailed_information" = "詳細情報";
 
 // RecordDetailView - Additional Labels
 "duration_label" = "持続時間";
@@ -291,8 +321,88 @@
 "end_time" = "終了時間";
 
 // RecordEditView - Information
+"name" = "名前";
+"breast_side" = "授乳側";
+"both_sides" = "両側";
+"left_side" = "左側";
+"right_side" = "右側";
+"amount" = "量";
+"day_night" = "時間帯";
+"daytime" = "昼";
+"night" = "夜";
+"acceptance_level" = "受け入れ度";
+"like" = "好き";
+"neutral" = "普通";
+"dislike" = "嫌い";
+"allergy" = "アレルギー";
+"excrement_type" = "排泄物の種類";
+"urine" = "おしっこ";
+"stool" = "うんち";
 "mixed" = "混合";
 
 // RecordEditView - Additional Information
 "remark" = "備考";
 "photos" = "写真";
+
+// Family Collaboration
+"family_collaboration" = "家族協力";
+"collaboration_title" = "家族と一緒に赤ちゃんの成長を記録";
+"collaboration_subtitle" = "iCloud 協力機能により、以下が可能です:";
+"invite_family" = "家族を招待";
+"record_together" = "日常を一緒に記録";
+"real_time_sync" = "リアルタイムデータ同期";
+"select_baby_to_collaborate" = "協力する赤ちゃんを選択";
+"no_collaborators_yet" = "まだ協力者が追加されていません";
+"manage_collaboration" = "協力を管理";
+"collaboration_invite_guide" = "協力招待ガイド";
+"three_steps_to_share" = "共有を完了する3つのステップ";
+"step1_invite" = "まず「家族を招待」をクリックし、次にメッセージアプリを選択";
+"step2_contact" = "招待したい連絡先情報を入力";
+"step3_send" = "すぐに招待を送信";
+"ensure_icloud_setup" = "iCloud が設定されていることを確認";
+"ensure_icloud_setup_desc" = "招待する家族が iCloud にログインし、十分な空き容量を確保していることを確認してください。BabyMemos の同期が容量不足で中断されないようにします";
+"must_use_sms" = "メッセージアプリを使用して送信する必要があります";
+"must_use_sms_desc" = "メッセージアプリを使用して協力招待を送信してください。そうすれば家族が正常に参加できます";
+"remind_install_app" = "家族に先に Baby Memos をインストールするよう伝える";
+"remind_install_app_desc" = "家族に最新バージョンの Baby Memos をインストールしてから、招待リンクを開くよう伝えてください。そうすれば正常に同期できます";
+"owner" = "所有者";
+"read_only" = "読み取り専用";
+"read_write" = "編集可能";
+"only_invited_can_edit" = "招待されたユーザーのみが編集可能";
+"stop_sharing" = "共有を停止";
+"collaborators_count" = "%d 人の協力者";
+"not_shared" = "未共有";
+"shared" = "共有済み";
+"sharing" = "共有中";
+"collaboration_error" = "協力エラー";
+"close" = "閉じる";
+"error" = "エラー";
+"stop_sharing_confirm_message" = "共有を停止してもよろしいですか？停止後、すべての協力者が赤ちゃんの記録にアクセスできなくなります。";
+"permission_setting" = "権限設定";
+"read_only_desc" = "協力者は記録を閲覧することのみ可能で、編集できません";
+"read_write_desc" = "協力者は記録を閲覧および編集できます";
+"sharing_all_data" = "すべてのデータを共有";
+"sharing_all_data_desc" = "共有後、協力者はすべての赤ちゃんとその記録を閲覧および編集できます";
+"read_only_user_cannot_edit" = "読み取り専用ユーザーは記録を編集できません";
+"read_only_user_cannot_delete" = "読み取り専用ユーザーは記録を削除できません";
+"loading_share_data" = "共有データを読み込み中...";
+"loading_share_data_title" = "共有データを読み込み中";
+"accepting_share_invitation" = "共有招待を受け入れ中...";
+"loading_shared_babies" = "共有された赤ちゃん情報を読み込み中...";
+"loading_shared_records" = "共有された記録を読み込み中...";
+"loading_complete" = "読み込み完了！";
+"loading_failed" = "読み込み失敗";
+"retry" = "再試行";
+
+// RecordEditView - Buttons and Navigation
+"save" = "保存";
+"delete" = "削除";
+
+// RecordEditView - Error Messages
+"save_failed" = "保存に失敗しました";
+"please_enter_name" = "名前を入力してください";
+"please_enter_amount" = "量を入力してください";
+"please_enter_valid_number" = "有効な数字を入力してください";
+"record_type_incomplete" = "記録タイプの情報が不完全です";
+"unknown_error" = "不明なエラー";
+"ok" = "OK";

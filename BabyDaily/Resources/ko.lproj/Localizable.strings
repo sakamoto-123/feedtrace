@@ -1,4 +1,17 @@
 // 한국어 로컬라이제이션 리소스 파일
+
+// Unit Setting
+"unit_setting" = "단위 설정";
+"unit_settings" = "단위 설정";
+"temperature_unit" = "온도 단위";
+"select_temperature_unit" = "온도 측정 단위 선택";
+"weight_unit" = "무게 단위";
+"select_weight_unit" = "무게 측정 단위 선택";
+"length_unit" = "길이 단위";
+"select_length_unit" = "키와 머리 둘레 측정에 사용";
+"volume_unit" = "부피 단위";
+"select_volume_unit" = "부피 측정 단위 선택";
+
 // HomeView
 "baby_diary" = "아기 일기";
 "today_statistics" = "오늘의 통계";
@@ -15,6 +28,13 @@
 "head" = "머리";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "시작 %@";
 
 // Quick Actions
@@ -118,6 +138,11 @@
 "left" = "왼쪽";
 "right" = "오른쪽";
 "minutes" = "분";
+"in_progress" = "진행 중";
+"hours" = "시간";
+"records" = "기록";
+"edit" = "편집";
+"delete" = "삭제";
 
 // RecordEditView
 "create_record" = "기록 만들기";
@@ -190,6 +215,56 @@
 "baby_age_at_record" = "기록 시 아기 월령";
 "confirm_delete_record_title" = "기록을 삭제하시겠습니까?";
 "delete_record_warning" = "삭제 후에는 복구할 수 없습니다";
+
+// Family Collaboration
+"family_collaboration" = "가족 협력";
+"collaboration_title" = "가족과 함께 아기의 성장을 기록";
+"collaboration_subtitle" = "iCloud 협력 기능을 통해 다음을 수행할 수 있습니다:";
+"invite_family" = "가족 초대";
+"record_together" = "일상을 함께 기록";
+"real_time_sync" = "실시간 데이터 동기화";
+"select_baby_to_collaborate" = "협력할 아기 선택";
+"no_collaborators_yet" = "아직 협력자가 추가되지 않았습니다";
+"manage_collaboration" = "협력 관리";
+"collaboration_invite_guide" = "협력 초대 가이드";
+"three_steps_to_share" = "공유를 완료하는 3단계";
+"step1_invite" = "먼저 '가족 초대'를 클릭한 다음 메시지 앱을 선택";
+"step2_contact" = "초대하고 싶은 연락처 정보를 입력";
+"step3_send" = "즉시 초대 전송";
+"ensure_icloud_setup" = "iCloud가 설정되어 있는지 확인";
+"ensure_icloud_setup_desc" = "초대하는 가족이 iCloud에 로그인하고 충분한 여유 공간을 확보했는지 확인하세요. BabyMemos 동기화가 공간 부족으로 중단되지 않도록 합니다";
+"must_use_sms" = "메시지 앱을 사용하여 전송해야 합니다";
+"must_use_sms_desc" = "메시지 앱을 사용하여 협력 초대를 전송하세요. 그러면 가족이 성공적으로 참여할 수 있습니다";
+"remind_install_app" = "가족에게 먼저 Baby Memos를 설치하도록 알리기";
+"remind_install_app_desc" = "가족에게 최신 버전의 Baby Memos를 설치한 후 초대 링크를 열도록 알려주세요. 그러면 성공적으로 동기화할 수 있습니다";
+"owner" = "소유자";
+"read_only" = "읽기 전용";
+"read_write" = "편집 가능";
+"only_invited_can_edit" = "초대된 사용자만 편집 가능";
+"stop_sharing" = "공유 중지";
+"collaborators_count" = "%d명의 협력자";
+"not_shared" = "공유되지 않음";
+"shared" = "공유됨";
+"sharing" = "공유 중";
+"collaboration_error" = "협력 오류";
+"close" = "닫기";
+"error" = "오류";
+"stop_sharing_confirm_message" = "공유를 중지하시겠습니까? 중지 후 모든 협력자가 아기의 기록에 액세스할 수 없게 됩니다.";
+"permission_setting" = "권한 설정";
+"read_only_desc" = "협력자는 기록을 볼 수만 있고 편집할 수 없습니다";
+"read_write_desc" = "협력자는 기록을 보고 편집할 수 있습니다";
+"sharing_all_data" = "모든 데이터 공유";
+"sharing_all_data_desc" = "공유 후 협력자는 모든 아기와 그 기록을 보고 편집할 수 있습니다";
+"read_only_user_cannot_edit" = "읽기 전용 사용자는 기록을 편집할 수 없습니다";
+"read_only_user_cannot_delete" = "읽기 전용 사용자는 기록을 삭제할 수 없습니다";
+"loading_share_data" = "공유 데이터 로드 중...";
+"loading_share_data_title" = "공유 데이터 로드 중";
+"accepting_share_invitation" = "공유 초대 수락 중...";
+"loading_shared_babies" = "공유된 아기 정보 로드 중...";
+"loading_shared_records" = "공유된 기록 로드 중...";
+"loading_complete" = "로드 완료!";
+"loading_failed" = "로드 실패";
+"retry" = "다시 시도";
 
 // BabySwitcherView
 "select_baby" = "아기 선택";
@@ -289,8 +364,43 @@
 "end_time" = "종료 시간";
 
 // RecordEditView - Information
+"name" = "이름";
+"breast_side" = "수유 측면";
+"both_sides" = "양쪽";
+"left_side" = "왼쪽";
+"right_side" = "오른쪽";
+"amount" = "양";
+"day_night" = "시간대";
+"daytime" = "낮";
+"night" = "밤";
+"acceptance_level" = "수용 수준";
+"like" = "좋아함";
+"neutral" = "보통";
+"dislike" = "싫어함";
+"allergy" = "알레르기";
+"excrement_type" = "배설물 유형";
+"urine" = "소변";
+"stool" = "대변";
 "mixed" = "혼합";
 
 // RecordEditView - Additional Information
 "remark" = "비고";
 "photos" = "사진";
+
+// RecordEditView - Buttons and Navigation
+"save" = "저장";
+"delete" = "삭제";
+
+// RecordEditView - Error Messages
+"save_failed" = "저장 실패";
+"please_enter_name" = "이름을 입력하세요";
+"please_enter_amount" = "양을 입력하세요";
+"please_enter_valid_number" = "유효한 숫자를 입력하세요";
+"record_type_incomplete" = "기록 유형 정보가 불완전합니다";
+"unknown_error" = "알 수 없는 오류";
+"ok" = "확인";
+
+// RecordDetailView
+"record_detail" = "기록 상세";
+"duration" = "지속 시간";
+"detailed_information" = "상세 정보";

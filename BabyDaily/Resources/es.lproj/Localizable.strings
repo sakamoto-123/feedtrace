@@ -1,4 +1,17 @@
 // Archivo de recursos de localización en español
+
+// Unit Setting
+"unit_setting" = "Configuración de unidad";
+"unit_settings" = "Configuración de unidad";
+"temperature_unit" = "Unidad de temperatura";
+"select_temperature_unit" = "Seleccionar unidad de medición de temperatura";
+"weight_unit" = "Unidad de peso";
+"select_weight_unit" = "Seleccionar unidad de medición de peso";
+"length_unit" = "Unidad de longitud";
+"select_length_unit" = "Para la medición de altura y circunferencia de la cabeza";
+"volume_unit" = "Unidad de volumen";
+"select_volume_unit" = "Seleccionar unidad de medición de volumen";
+
 // HomeView
 "baby_diary" = "Diario del Bebé";
 "today_statistics" = "Estadísticas de Hoy";
@@ -15,6 +28,13 @@
 "head" = "Cabeza";
 "kg" = "kg";
 "cm" = "cm";
+"in" = "in";
+"ft" = "ft";
+"ml" = "ml";
+"oz" = "oz";
+"lb" = "lb";
+"°C" = "°C";
+"°F" = "°F";
 "started_at" = "Iniciado a las %@";
 
 // Quick Actions
@@ -120,6 +140,11 @@
 "left" = "Izquierda";
 "right" = "Derecha";
 "minutes" = "minutos";
+"in_progress" = "En Curso";
+"hours" = "horas";
+"records" = "Registros";
+"edit" = "Editar";
+"delete" = "Eliminar";
 
 // RecordEditView
 "create_record" = "Crear Registro";
@@ -192,6 +217,56 @@
 "baby_age_at_record" = "Edad del bebé al registrar";
 "confirm_delete_record_title" = "¿Eliminar registro?";
 "delete_record_warning" = "Esta acción no se puede deshacer";
+
+// Family Collaboration
+"family_collaboration" = "Colaboración Familiar";
+"collaboration_title" = "Registre el viaje de crecimiento de su bebé con la familia";
+"collaboration_subtitle" = "Con la colaboración de iCloud, puede:";
+"invite_family" = "Invitar miembros de la familia";
+"record_together" = "Registrar actividades diarias juntos";
+"real_time_sync" = "Sincronización de datos en tiempo real";
+"select_baby_to_collaborate" = "Seleccionar bebé para colaborar";
+"no_collaborators_yet" = "Aún no se han agregado colaboradores";
+"manage_collaboration" = "Gestionar Colaboración";
+"collaboration_invite_guide" = "Guía de Invitación de Colaboración";
+"three_steps_to_share" = "Tres pasos para completar el intercambio";
+"step1_invite" = "Primero haga clic en \"Invitar miembros de la familia\", luego seleccione la aplicación Mensajes";
+"step2_contact" = "Complete la información de contacto de la persona que desea invitar";
+"step3_send" = "Enviar invitación inmediatamente";
+"ensure_icloud_setup" = "Asegúrese de que iCloud esté configurado";
+"ensure_icloud_setup_desc" = "Por favor, confirme que los miembros de la familia invitados han iniciado sesión en iCloud y han reservado suficiente espacio disponible para evitar que la sincronización de BabyMemos se interrumpa debido a espacio insuficiente";
+"must_use_sms" = "Debe usar la aplicación Mensajes para enviar";
+"must_use_sms_desc" = "Por favor, use la aplicación Mensajes para enviar invitaciones de colaboración para que los miembros de la familia puedan unirse con éxito";
+"remind_install_app" = "Recordar a la familia que instale Baby Memos primero";
+"remind_install_app_desc" = "Por favor, recuerde a los miembros de la familia que instalen la última versión de Baby Memos primero, luego abran el enlace de invitación para sincronizar con éxito";
+"owner" = "Propietario";
+"read_only" = "Solo lectura";
+"read_write" = "Puede editar";
+"only_invited_can_edit" = "Solo los usuarios invitados pueden editar";
+"stop_sharing" = "Dejar de compartir";
+"collaborators_count" = "%d colaboradores";
+"not_shared" = "No compartido";
+"shared" = "Compartido";
+"sharing" = "Compartiendo";
+"collaboration_error" = "Error de colaboración";
+"close" = "Cerrar";
+"error" = "Error";
+"stop_sharing_confirm_message" = "¿Está seguro de que desea dejar de compartir? Después de detener, todos los colaboradores ya no podrán acceder a los registros del bebé.";
+"permission_setting" = "Configuración de permisos";
+"read_only_desc" = "Los colaboradores solo pueden ver los registros, no pueden editarlos";
+"read_write_desc" = "Los colaboradores pueden ver y editar los registros";
+"sharing_all_data" = "Compartir todos los datos";
+"sharing_all_data_desc" = "Después de compartir, los colaboradores pueden ver y editar todos los bebés y sus registros";
+"read_only_user_cannot_edit" = "Los usuarios de solo lectura no pueden editar los registros";
+"read_only_user_cannot_delete" = "Los usuarios de solo lectura no pueden eliminar los registros";
+"loading_share_data" = "Cargando datos compartidos...";
+"loading_share_data_title" = "Cargando Datos Compartidos";
+"accepting_share_invitation" = "Aceptando invitación de compartir...";
+"loading_shared_babies" = "Cargando información de bebés compartidos...";
+"loading_shared_records" = "Cargando registros compartidos...";
+"loading_complete" = "¡Carga completa!";
+"loading_failed" = "Error de carga";
+"retry" = "Reintentar";
 
 // BabySwitcherView
 "select_baby" = "Seleccionar Bebé";
@@ -291,8 +366,43 @@
 "end_time" = "Hora de Fin";
 
 // RecordEditView - Information
+"name" = "Nombre";
+"breast_side" = "Lado del pecho";
+"both_sides" = "Ambos lados";
+"left_side" = "Lado izquierdo";
+"right_side" = "Lado derecho";
+"amount" = "Cantidad";
+"day_night" = "Período";
+"daytime" = "Día";
+"night" = "Noche";
+"acceptance_level" = "Nivel de aceptación";
+"like" = "Me gusta";
+"neutral" = "Neutral";
+"dislike" = "No me gusta";
+"allergy" = "Alergia";
+"excrement_type" = "Tipo de excremento";
+"urine" = "Orina";
+"stool" = "Heces";
 "mixed" = "Mixto";
 
 // RecordEditView - Additional Information
 "remark" = "Observación";
 "photos" = "Fotos";
+
+// RecordEditView - Buttons and Navigation
+"save" = "Guardar";
+"delete" = "Eliminar";
+
+// RecordEditView - Error Messages
+"save_failed" = "Error al guardar";
+"please_enter_name" = "Por favor, ingrese el nombre";
+"please_enter_amount" = "Por favor, ingrese la cantidad";
+"please_enter_valid_number" = "Por favor, ingrese un número válido";
+"record_type_incomplete" = "Información del tipo de registro incompleta";
+"unknown_error" = "Error desconocido";
+"ok" = "OK";
+
+// RecordDetailView
+"record_detail" = "Detalle del Registro";
+"duration" = "Duración";
+"detailed_information" = "Información Detallada";

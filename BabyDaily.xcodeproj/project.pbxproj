@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		52C27C6C2F208EEE003205EC /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52C27C6B2F208EEE003205EC /* StoreKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		52B274AC2F19295500A665C8 /* BabyDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		52C27C6B2F208EEE003205EC /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52C27C6C2F208EEE003205EC /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				52B274AE2F19295500A665C8 /* BabyDaily */,
+				52C27C6A2F208EEE003205EC /* Frameworks */,
 				52B274AD2F19295500A665C8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +63,14 @@
 				52B274AC2F19295500A665C8 /* BabyDaily.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		52C27C6A2F208EEE003205EC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				52C27C6B2F208EEE003205EC /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

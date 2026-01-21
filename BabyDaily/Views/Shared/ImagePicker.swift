@@ -9,18 +9,28 @@ struct ImagePicker: UIViewControllerRepresentable {
     let allowsEditing: Bool
     @Environment(\.dismiss) private var dismiss
     
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var configuration = PHPickerConfiguration()
-        configuration.filter = .images
-        configuration.selectionLimit = allowsMultipleSelection ? 9 : 1
-        configuration.preferredAssetRepresentationMode = .automatic
-        
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = context.coordinator
-        return picker
+    func makeUIViewController(context: Context) -> UIViewController {
+        // 如果需要编辑功能，使用 UIImagePickerController（PHPickerViewController 不支持编辑）
+        if allowsEditing && !allowsMultipleSelection {
+            let picker = UIImagePickerController()
+            picker.delegate = context.coordinator
+            picker.sourceType = .photoLibrary
+            picker.allowsEditing = true
+            return picker
+        } else {
+            // 否则使用 PHPickerViewController（支持多选）
+            var configuration = PHPickerConfiguration()
+            configuration.filter = .images
+            configuration.selectionLimit = allowsMultipleSelection ? 9 : 1
+            configuration.preferredAssetRepresentationMode = .automatic
+            
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = context.coordinator
+            return picker
+        }
     }
     
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -51,18 +61,10 @@ struct ImagePicker: UIViewControllerRepresentable {
                         return
                     }
                     
-                    if self.parent.allowsEditing {
-                        // 直接使用原始图片（编辑功能在BabyCreationView中通过UIImagePickerControllerWrapper实现）
-                        newImages.append(Image(uiImage: uiImage))
-                        if let data = uiImage.jpegData(compressionQuality: 0.8) {
-                            newImageDatas.append(data)
-                        }
-                    } else {
-                        // 直接使用原始图片
-                        newImages.append(Image(uiImage: uiImage))
-                        if let data = uiImage.jpegData(compressionQuality: 0.8) {
-                            newImageDatas.append(data)
-                        }
+                    // 直接使用原始图片（PHPickerViewController 不支持编辑）
+                    newImages.append(Image(uiImage: uiImage))
+                    if let data = uiImage.jpegData(compressionQuality: 0.8) {
+                        newImageDatas.append(data)
                     }
                 }
             }
@@ -82,12 +84,13 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
         }
         
-        // UIImagePickerControllerDelegate 方法
+        // UIImagePickerControllerDelegate 方法（当使用 UIImagePickerController 时调用）
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            picker.dismiss(animated: true)
+            parent.dismiss()
             
             let uiImage: UIImage?
             if parent.allowsEditing {
+                // 使用编辑后的图片
                 uiImage = info[.editedImage] as? UIImage
             } else {
                 uiImage = info[.originalImage] as? UIImage
@@ -96,21 +99,15 @@ struct ImagePicker: UIViewControllerRepresentable {
             if let image = uiImage {
                 let newImage = Image(uiImage: image)
                 if let data = image.jpegData(compressionQuality: 0.8) {
-                    if parent.allowsMultipleSelection {
-                        // 多选模式：追加图片
-                        parent.images.append(newImage)
-                        parent.imageDatas.append(data)
-                    } else {
-                        // 单选模式：替换图片
-                        parent.images = [newImage]
-                        parent.imageDatas = [data]
-                    }
+                    // ImagePicker 中使用 UIImagePickerController 时总是单选模式
+                    parent.images = [newImage]
+                    parent.imageDatas = [data]
                 }
             }
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
+            parent.dismiss()
         }
     }
 }

@@ -138,6 +138,11 @@
 "left" = "Left";
 "right" = "Right";
 "minutes" = "minutes";
+"in_progress" = "In Progress";
+"hours" = "hours";
+"records" = "Records";
+"edit" = "Edit";
+"delete" = "Delete";
 
 // RecordEditView
 "create_record" = "Create Record";
@@ -205,6 +210,11 @@
 "tablet" = "tablet";
 "piece" = "piece";
 
+// RecordDetailView
+"record_detail" = "Record Detail";
+"duration" = "Duration";
+"detailed_information" = "Detailed Information";
+
 // RecordDetailView - Additional Labels
 "duration_label" = "Duration";
 "baby_age_at_record" = "Baby Age at Record";
@@ -242,6 +252,41 @@
 "unlock_more_themes_description" = "Unlock more theme colors and styles";
 "no_ads" = "No Ads";
 "no_ads_description" = "No ads during use";
+"membership_subscription" = "Membership Subscription";
+"app_name" = "BabyDaily";
+"feature_comparison" = "Feature Comparison";
+"regular_user" = "Regular User";
+"premium_member" = "Premium Member";
+"remove_ads" = "Remove Ads";
+"basic_records" = "Basic Records";
+"quick_action_records" = "Quick Action Records";
+"chart_trends" = "Chart Trends";
+"family_sharing" = "Family Sharing";
+"multiple_babies" = "Multiple Babies";
+"unlimited_widgets" = "Unlimited Widgets";
+"unlimited_custom_records" = "Unlimited Custom Records";
+"icloud_sync_backup" = "iCloud Sync/Backup";
+"apple_watch_feature" = "Apple Watch (In Development)";
+"future_more_features" = "Future Premium Features";
+"premium_membership_monthly" = "Premium Membership (Monthly)";
+"premium_membership_lifetime" = "Premium Membership (Lifetime)";
+"original_price" = "Original Price";
+"subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
+"terms_of_service" = "Terms of Service";
+"redeem_code" = "Redeem Code";
+"restore_purchases" = "Restore Purchases";
+"purchasing" = "Purchasing...";
+"purchase_success" = "Purchase Successful";
+"purchase_failed" = "Purchase Failed";
+"restore_success" = "Restore Successful";
+"restore_failed" = "Restore Failed";
+"no_products_available" = "No products available";
+"failed_to_load_products" = "Failed to load products";
+"purchase_pending" = "Purchase pending approval";
+"unknown_purchase_status" = "Unknown purchase status";
+"no_purchases_to_restore" = "No purchases to restore";
+"transaction_verification_failed" = "Transaction verification failed";
+"purchase_cancelled" = "Purchase cancelled";
 
 // SleepTrendView
 "sleep_duration_title_with_unit" = "Sleep Duration (hours)";
@@ -309,8 +354,88 @@
 "end_time" = "End Time";
 
 // RecordEditView - Information
+"name" = "Name";
+"breast_side" = "Breast Side";
+"both_sides" = "Both Sides";
+"left_side" = "Left Side";
+"right_side" = "Right Side";
+"amount" = "Amount";
+"day_night" = "Time Period";
+"daytime" = "Daytime";
+"night" = "Night";
+"acceptance_level" = "Acceptance Level";
+"like" = "Like";
+"neutral" = "Neutral";
+"dislike" = "Dislike";
+"allergy" = "Allergy";
+"excrement_type" = "Excrement Type";
+"urine" = "Urine";
+"stool" = "Stool";
 "mixed" = "Mixed";
 
 // RecordEditView - Additional Information
 "remark" = "Remark";
 "photos" = "Photos";
+
+// RecordEditView - Buttons and Navigation
+"save" = "Save";
+"delete" = "Delete";
+
+// RecordEditView - Error Messages
+"save_failed" = "Save Failed";
+"please_enter_name" = "Please enter name";
+"please_enter_amount" = "Please enter amount";
+"please_enter_valid_number" = "Please enter a valid number";
+"record_type_incomplete" = "Record type information incomplete";
+"unknown_error" = "Unknown error";
+"ok" = "OK";
+
+// Family Collaboration
+"family_collaboration" = "Family Collaboration";
+"collaboration_title" = "Record your baby's growth journey with family";
+"collaboration_subtitle" = "With iCloud collaboration, you can:";
+"invite_family" = "Invite family members";
+"record_together" = "Record daily activities together";
+"real_time_sync" = "Real-time data sync";
+"select_baby_to_collaborate" = "Select baby to collaborate";
+"no_collaborators_yet" = "No collaborators added yet";
+"manage_collaboration" = "Manage Collaboration";
+"collaboration_invite_guide" = "Collaboration Invitation Guide";
+"three_steps_to_share" = "Three steps to complete sharing";
+"step1_invite" = "First click \"Invite family members\", then select Messages App";
+"step2_contact" = "Fill in the contact information of the person you want to invite";
+"step3_send" = "Send invitation immediately";
+"ensure_icloud_setup" = "Ensure iCloud is set up";
+"ensure_icloud_setup_desc" = "Please confirm that the invited family members have logged in to iCloud and reserved sufficient available space to prevent BabyMemos sync from being interrupted due to insufficient space";
+"must_use_sms" = "Must use Messages App to send";
+"must_use_sms_desc" = "Please use the Messages App to send collaboration invitations so family members can join successfully";
+"remind_install_app" = "Remind family to install Baby Memos first";
+"remind_install_app_desc" = "Please remind family members to install the latest version of Baby Memos first, then open the invitation link to sync successfully";
+"owner" = "Owner";
+"read_only" = "Read Only";
+"read_write" = "Can Edit";
+"only_invited_can_edit" = "Only invited users can edit";
+"stop_sharing" = "Stop Sharing";
+"collaborators_count" = "%d collaborators";
+"not_shared" = "Not Shared";
+"shared" = "Shared";
+"sharing" = "Sharing";
+"collaboration_error" = "Collaboration Error";
+"close" = "Close";
+"error" = "Error";
+"stop_sharing_confirm_message" = "Are you sure you want to stop sharing? After stopping, all collaborators will no longer be able to access the baby's records.";
+"permission_setting" = "Permission Setting";
+"read_only_desc" = "Collaborators can only view records, cannot edit";
+"read_write_desc" = "Collaborators can view and edit records";
+"sharing_all_data" = "Sharing All Data";
+"sharing_all_data_desc" = "After sharing, collaborators can view and edit all babies and their records";
+"read_only_user_cannot_edit" = "Read-only users cannot edit records";
+"read_only_user_cannot_delete" = "Read-only users cannot delete records";
+"loading_share_data" = "Loading shared data...";
+"loading_share_data_title" = "Loading Shared Data";
+"accepting_share_invitation" = "Accepting share invitation...";
+"loading_shared_babies" = "Loading shared baby information...";
+"loading_shared_records" = "Loading shared records...";
+"loading_complete" = "Loading complete!";
+"loading_failed" = "Loading failed";
+"retry" = "Retry";
