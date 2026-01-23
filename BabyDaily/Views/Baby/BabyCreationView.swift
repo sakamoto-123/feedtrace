@@ -22,6 +22,10 @@ struct BabyCreationView: View {
     
     @State private var showingImagePicker = false
     @State private var showingDatePicker = false
+    @State private var showingUnitSettingSheet = false
+    @State private var showingMembershipView = false
+    @StateObject private var unitManager = UnitManager.shared
+    @StateObject private var membershipManager = MembershipManager.shared
     
     // 初始化：如果是编辑模式，加载现有宝宝数据
     init(isEditing: Bool = false, existingBaby: Baby? = nil, isFirstCreation: Bool = true) {
@@ -88,6 +92,20 @@ struct BabyCreationView: View {
                     allowsEditing: true
                 )
             }
+            .sheet(isPresented: $showingUnitSettingSheet) {
+                UnitSettingView()
+            }
+            .sheet(isPresented: $showingMembershipView) {
+                MembershipPrivilegesView()
+            }
+                 // 添加点击手势，点击外部关闭键盘
+            .gesture(
+                TapGesture()
+                    .onEnded {
+                        // 关闭所有键盘
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
+            )
         }
     }
     
@@ -136,9 +154,7 @@ struct BabyCreationView: View {
             genderField
                   
             // 身高体重一行 - 仅在非编辑模式显示
-            if !isEditing && isFirstCreation {
-                bodyDataRow
-            }
+            bodyDataRow
 
             // 主题颜色选择
             if isFirstCreation && !isEditing {
@@ -160,7 +176,6 @@ struct BabyCreationView: View {
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 8)
                 .frame(width: 200)
-                .keyboardDoneButton()
                 .submitLabel(.done)
                 .autocorrectionDisabled()
                 .overlay(
@@ -263,6 +278,25 @@ struct BabyCreationView: View {
         }
     }
     
+    // 前6个颜色是免费的（索引0-5）
+    private let freeColorCount = 6
+    
+    // 判断颜色是否需要会员
+    private func isColorPremium(_ color: ThemeColor) -> Bool {
+        guard let index = ThemeColor.allCases.firstIndex(of: color) else {
+            return false
+        }
+        return index >= freeColorCount
+    }
+    
+    // 判断颜色是否可用（免费或会员已购买）
+    private func isColorAvailable(_ color: ThemeColor) -> Bool {
+        if !isColorPremium(color) {
+            return true // 免费颜色总是可用
+        }
+        return membershipManager.isPremiumMember // 会员颜色需要会员身份
+    }
+    
     // 主题颜色选择器
     private var themeColorPicker: some View {
         VStack(alignment: .center, spacing: 8) {
@@ -274,8 +308,16 @@ struct BabyCreationView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                HStack(spacing: 16) {
                     ForEach(ThemeColor.allCases) { themeColor in
+                        let isPremium = isColorPremium(themeColor)
+                        let isAvailable = isColorAvailable(themeColor)
+                        
                         Button(action: {
-                            appSettings.setThemeColor(themeColor)
+                            if isAvailable {
+                                appSettings.setThemeColor(themeColor)
+                            } else {
+                                // 非会员点击会员颜色，弹出会员页面
+                                showingMembershipView = true
+                            }
                         }) {
                             ZStack {
                                 Circle()
@@ -287,6 +329,12 @@ struct BabyCreationView: View {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundColor(.white)
+                                } else if isPremium && !isAvailable {
+                                    // 非会员的会员颜色显示锁图标
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                                 }
                             }
                         }
@@ -312,13 +360,16 @@ struct BabyCreationView: View {
                             .font(.system(size: 16))
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.center)
-                            .keyboardDoneButton()
                             .submitLabel(.done)
                             .autocorrectionDisabled()
                         
-                        Text("cm".localized)
-                            .font(.system(size: 16))
-                            .foregroundColor(.secondary)
+                        Button(action: {
+                            showingUnitSettingSheet = true
+                        }) {
+                            Text(unitManager.lengthUnit.rawValue)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(appSettings.currentThemeColor)
+                        }
                     }
                     .padding(.vertical, 8)
                     .overlay(
@@ -341,13 +392,16 @@ struct BabyCreationView: View {
                             .font(.system(size: 16))
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.center)
-                            .keyboardDoneButton()
                             .submitLabel(.done)
                             .autocorrectionDisabled()
                         
-                        Text("kg".localized)
-                            .font(.system(size: 16))
-                            .foregroundColor(.secondary)
+                        Button(action: {
+                            showingUnitSettingSheet = true
+                        }) {
+                            Text(unitManager.weightUnit.rawValue)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(appSettings.currentThemeColor)
+                        }
                     }
                     .padding(.vertical, 8)
                     .overlay(
@@ -384,6 +438,10 @@ struct BabyCreationView: View {
         let weightValue = Double(weight) ?? 3.5
         
         if isEditing, let baby = existingBaby {
+            // 保存旧值用于比较
+            let oldHeight = baby.height
+            let oldWeight = baby.weight
+            
             // 更新现有宝宝数据
             baby.name = name
             baby.photo = photoDatas.first
@@ -391,6 +449,34 @@ struct BabyCreationView: View {
             baby.gender = gender
             baby.weight = weightValue
             baby.height = heightValue
+            
+            // 如果身高改变了，创建新的身高记录
+            if abs(oldHeight - heightValue) > 0.01 { // 使用小的容差值来比较浮点数
+                let heightRecord = Record(
+                    babyId: baby.id,
+                    icon: "📏",
+                    category: "growth_category",
+                    subCategory: "height",
+                    startTimestamp: Date(),
+                    value: heightValue,
+                    unit: unitManager.lengthUnit.rawValue
+                )
+                modelContext.insert(heightRecord)
+            }
+            
+            // 如果体重改变了，创建新的体重记录
+            if abs(oldWeight - weightValue) > 0.01 { // 使用小的容差值来比较浮点数
+                let weightRecord = Record(
+                    babyId: baby.id,
+                    icon: "⚖️",
+                    category: "growth_category",
+                    subCategory: "weight",
+                    startTimestamp: Date(),
+                    value: weightValue,
+                    unit: unitManager.weightUnit.rawValue
+                )
+                modelContext.insert(weightRecord)
+            }
         } else {
             // 创建新宝宝
             let newBaby = Baby(
@@ -400,10 +486,37 @@ struct BabyCreationView: View {
                 gender: gender,
                 weight: weightValue,
                 height: heightValue,
-                headCircumference: 34 // 默认值
+                headCircumference: 0.0
             )
             
             modelContext.insert(newBaby)
+            
+            // 保存宝宝以便获取 ID
+            try? modelContext.save()
+            
+            // 创建身高记录（使用实际输入的值或默认值）
+            let heightRecord = Record(
+                babyId: newBaby.id,
+                icon: "📏",
+                category: "growth_category",
+                subCategory: "height",
+                startTimestamp: Date(),
+                value: heightValue,
+                unit: unitManager.lengthUnit.rawValue
+            )
+            modelContext.insert(heightRecord)
+            
+            // 创建体重记录（使用实际输入的值或默认值）
+            let weightRecord = Record(
+                babyId: newBaby.id,
+                icon: "⚖️",
+                category: "growth_category",
+                subCategory: "weight",
+                startTimestamp: Date(),
+                value: weightValue,
+                unit: unitManager.weightUnit.rawValue
+            )
+            modelContext.insert(weightRecord)
         }
         
         // 保存更改到存储中

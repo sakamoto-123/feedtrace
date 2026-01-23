@@ -17,10 +17,20 @@ struct BabySwitcherView: View {
     @State private var showingDeleteError = false
     @State private var deleteErrorMessage = ""
     
+    // 编辑相关状态
+    @State private var isNavigatingToEdit = false
+    @State private var selectedBabyId: UUID?
+    
     // 计算属性：从当前有效的 babies 数组中获取要删除的宝宝实例
     private var babyToDelete: Baby? {
         guard let id = babyToDeleteId else { return nil }
         return babies.first(where: { $0.id == id })
+    }
+    
+    // 计算属性：从当前有效的 babies 数组中获取要编辑的宝宝实例
+    private var selectedBaby: Baby? {
+        guard let selectedBabyId = selectedBabyId else { return nil }
+        return babies.first(where: { $0.id == selectedBabyId })
     }
     
     var body: some View {
@@ -87,6 +97,16 @@ struct BabySwitcherView: View {
                         .padding(.horizontal, 24)
                     }
                     .buttonStyle(.plain)
+                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                        Button {
+                            // 编辑宝宝信息
+                            selectedBabyId = baby.id
+                            isNavigatingToEdit = true
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                        }
+                        .tint(.accentColor)
+                    }
                 }
                 .onDelete(perform: confirmDelete)
             }
@@ -135,6 +155,12 @@ struct BabySwitcherView: View {
             Button("ok".localized) {}
         } message: {
             Text(deleteErrorMessage)
+        }
+        // 编辑页面以 sheet 形式弹出
+        .sheet(isPresented: $isNavigatingToEdit) {
+            if let baby = selectedBaby {
+                BabyCreationView(isEditing: true, existingBaby: baby, isFirstCreation: false)
+            }
         }
     }
     

@@ -129,8 +129,6 @@ struct StatisticsView: View {
                 } else if record.subCategory == "water_intake" {
                     groupedData[startOfDay]?.water += valueInMl
                     groupedData[startOfDay]?.waterCount += 1
-                } else {
-                    Logger.warning("FeedingData: Unknown subCategory \(record.subCategory) for record ID \(record.id)")
                 }
             }
             

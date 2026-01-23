@@ -52,7 +52,7 @@
 "milestone_category" = "Milestones";
 
 // Feeding Actions
-"nursing" = "nursing";
+"nursing" = "Nursing";
 "breast_bottle" = "Breast";
 "formula" = "Formula";
 "water_intake" = "Water";
@@ -244,6 +244,15 @@
 "current_free_user" = "Current Free User";
 "upgrade_membership_prompt" = "Upgrade to enjoy more privileges";
 "upgrade_now" = "Upgrade Now";
+"current_membership_status" = "Current Membership Status";
+"membership_type" = "Membership Type";
+"membership_status" = "Membership Status";
+"expiration_date" = "Expiration Date";
+"subscription_expiring_today" = "Subscription expires today";
+"subscription_expiring_soon_reminder" = "Subscription expiring soon, please renew";
+"membership_active" = "Active";
+"membership_expired" = "Expired";
+"membership_not_subscribed" = "Not Subscribed";
 "icloud_sync_feature" = "iCloud Sync";
 "multi_device_sync" = "Multi-Device Sync";
 "data_stored_in_icloud" = "Data stored in iCloud";
@@ -388,6 +397,7 @@
 "please_enter_valid_number" = "Please enter a valid number";
 "record_type_incomplete" = "Record type information incomplete";
 "unknown_error" = "Unknown error";
+"unknown" = "Unknown";
 "ok" = "OK";
 
 // Family Collaboration

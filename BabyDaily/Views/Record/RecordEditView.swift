@@ -407,7 +407,6 @@ struct RecordInfoSection: View {
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(Constants.cornerRadius)
-                    .keyboardDoneButton()
                     .submitLabel(.done)
             }
             
@@ -427,9 +426,8 @@ struct RecordInfoSection: View {
             // 用量输入
             if needsValue {
                 HStack(spacing: 4) {
-                    TextField("数量".localized, text: $value)
+                    TextField("amount".localized, text: $value)
                         .keyboardType(.decimalPad)
-                        .keyboardDoneButton()
                         .submitLabel(.done)
                         .autocorrectionDisabled()
 
@@ -513,59 +511,60 @@ struct RecordAdditionalInfoSection: View {
     
     var body: some View {
         // 备注
-        TextField("remark".localized, text: $remark, axis: .vertical)
-            .padding()
-            .frame(minHeight: 120) // 确保至少显示4行，根据字体大小调整高度
-            .background(Color(.systemGray6))
-            .cornerRadius(Constants.cornerRadius)
-            .lineLimit(10) // 设置最大10行的限制
-            .keyboardDoneButton()
-            .submitLabel(.done)
+        MultilineTextView(
+            text: $remark,
+            placeholder: "remark".localized,
+            minHeight: 120,
+            maxLines: 10
+        )
+        .background(Color(.systemGray6))
+        .cornerRadius(Constants.cornerRadius)
         
-        Divider()
-            .padding(.bottom, 8)
+    //     Divider()
+    //         .padding(.bottom, 8)
 
-        // 照片
-        VStack(alignment: .leading, spacing: 12) {
-            Text("photos".localized)
-                .font(.caption)
-                .foregroundColor(.secondary)
+    //     // 照片
+    //     VStack(alignment: .leading, spacing: 12) {
+    //         Text("photos".localized)
+    //             .font(.caption)
+    //             .foregroundColor(.secondary)
             
-            LazyVGrid(columns:  [GridItem(.adaptive(minimum: 75), spacing: 12)], spacing: 12) {
-                ForEach(photos.indices, id: \.self) { index in
-                    let photoData = photos[index]
-                    if let uiImage = UIImage(data: photoData) {
-                        ZStack(alignment: .topTrailing) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 75, height: 75)
-                                .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
+    //         LazyVGrid(columns:  [GridItem(.adaptive(minimum: 75), spacing: 12)], spacing: 12) {
+    //             ForEach(photos.indices, id: \.self) { index in
+    //                 let photoData = photos[index]
+    //                 if let uiImage = UIImage(data: photoData) {
+    //                     ZStack(alignment: .topTrailing) {
+    //                         Image(uiImage: uiImage)
+    //                             .resizable()
+    //                             .scaledToFill()
+    //                             .frame(width: 75, height: 75)
+    //                             .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                             
-                            Button(action: {
-                                // 删除照片
-                                photos.remove(at: index)
-                            }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.red)
-                                    .background(Color.themeCardBackground(for: colorScheme))
-                                    .clipShape(Circle())
-                            }
-                            .offset(x: 4, y: -4)
-                            .zIndex(1)
-                        }
-                    }
-                }
+    //                         Button(action: {
+    //                             // 删除照片
+    //                             photos.remove(at: index)
+    //                         }) {
+    //                             Image(systemName: "xmark.circle.fill")
+    //                                 .foregroundColor(.red)
+    //                                 .background(Color.themeCardBackground(for: colorScheme))
+    //                                 .clipShape(Circle())
+    //                         }
+    //                         .offset(x: 4, y: -4)
+    //                         .zIndex(1)
+    //                     }
+    //                 }
+    //             }
                 
-                // 添加照片按钮
-                ImagePickerMenu(
-                    images: $tempImages,
-                    imageDatas: $tempImageDatas,
-                    allowsMultipleSelection: true,
-                    allowsEditing: false
-                )
-            }.padding(.leading, 0)
-        }
+    //             // 添加照片按钮
+    //             ImagePickerMenu(
+    //                 images: $tempImages,
+    //                 imageDatas: $tempImageDatas,
+    //                 allowsMultipleSelection: true,
+    //                 allowsEditing: false
+    //             )
+    //         }.padding(.leading, 0)
+    //     }
+    // }
     }
 }
 
@@ -608,9 +607,6 @@ struct RecordEditView: View {
     // 错误信息
     @State private var errorMessage: String? = nil
     @State private var showingErrorAlert = false
-    
-    // 删除确认
-    @State private var showingDeleteConfirmation = false
     
     // 当前选择的记录类型（用于支持选择和重新选择）
     @State private var selectedRecordType: (category: String, subCategory: String, icon: String)?
@@ -793,13 +789,6 @@ struct RecordEditView: View {
                 .alert(isPresented: $showingErrorAlert) {
                     errorAlert
                 }
-                .alert("confirm_delete_record_title".localized,  isPresented: $showingDeleteConfirmation) {
-                    Button("cancel".localized, role: .cancel) {}
-                    Button("delete".localized, role: .destructive) {
-                        // 删除记录
-                        deleteRecord()
-                    }
-                }
             }
             .accentColor(appSettings.currentThemeColor)
     }
@@ -817,6 +806,7 @@ struct RecordEditView: View {
             .padding(.top, 0)
             .padding(.bottom, 24)
         }
+        .scrollDismissesKeyboard(.interactively)
         // 添加点击手势，点击外部关闭键盘
         .gesture(
             TapGesture()
@@ -836,26 +826,10 @@ struct RecordEditView: View {
     private func toolbarContent() -> some ToolbarContent {
         // 使用Group来组合多个ToolbarItem
         Group {
-            // 删除按钮（仅编辑模式）
-            if existingRecord != nil {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    deleteButton
-                }
-            }
-            
             // 保存按钮
             ToolbarItem(placement: .navigationBarTrailing) {
                 saveButton
             }
-        }
-    }
-    
-    // 删除按钮
-    private var deleteButton: some View {
-        Button(role: .destructive, action: {
-            showingDeleteConfirmation = true
-        }) {
-            Text("delete".localized)
         }
     }
     
@@ -978,13 +952,5 @@ struct RecordEditView: View {
             errorMessage = "save_failed".localized + "colon_separator".localized + "\(error.localizedDescription)"
             showingErrorAlert = true
         }
-    }
-    
-    // 删除记录
-    private func deleteRecord() {
-        if let existing = existingRecord {
-            modelContext.delete(existing)
-        }
-        dismiss()
     }
 }

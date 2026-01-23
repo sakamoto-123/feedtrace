@@ -125,7 +125,7 @@ func localizedDuration(from start: Date, to end: Date) -> String {
     let interval = max(end.timeIntervalSince1970 - start.timeIntervalSince1970, 0)
     
     let formatter = DateComponentsFormatter()
-    formatter.allowedUnits = [.year, .month,.hour, .minute]   // 允许显示的单位
+    formatter.allowedUnits = [.year, .month, .day, .hour, .minute]   // 允许显示的单位
     formatter.unitsStyle = .full                          // full/short/abbreviated
     formatter.zeroFormattingBehavior = .dropAll          // 不显示0单位
     

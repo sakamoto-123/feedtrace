@@ -217,7 +217,7 @@ struct GrowthStatisticsCard: View {
                 }
             }
             .chartYAxis {
-                AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
+                AxisMarks(preset: .automatic, position: .leading, values: .automatic(desiredCount: 5)) {
                     AxisGridLine()
                     AxisValueLabel(format: FloatingPointFormatStyle<Double>.number.precision(.fractionLength(1)))
                 }

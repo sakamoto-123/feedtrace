@@ -26,11 +26,17 @@ struct RecordItem: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    HStack(spacing: 8) {
+                    HStack(spacing: 5) {
                         Text(record.startTimestamp, format: Date.FormatStyle(time: .shortened))
                             .font(.caption)
                             .foregroundColor(.secondary)
                         
+                        if let name = record.name, !name.isEmpty {
+                            Text(name)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
                         if let remark = record.remark, !remark.isEmpty {
                             Text(remark)
                                 .font(.caption)
@@ -51,7 +57,7 @@ struct RecordItem: View {
                 // 编辑记录
                 onEdit()
             } label: {
-                Label("edit".localized, systemImage: "square.and.pencil")
+                Image(systemName: "square.and.pencil")
             }
             .tint(.accentColor)
             
@@ -59,7 +65,7 @@ struct RecordItem: View {
                 // 删除记录
                 onDelete()
             } label: {
-                Label("delete".localized, systemImage: "trash")
+                Image(systemName: "trash")
             }
         }
     }
@@ -69,13 +75,29 @@ struct RecordItem: View {
         let subCategory = record.subCategory
         
         switch subCategory {
-        case "nursing", "sleep", "pumping":
+        case "nursing", "sleep":
+            var label = ""
+            if let breastType = record.breastType {
+                label =  breastType == "BOTH" ? "both_sides".localized : breastType == "LEFT" ? "left_side".localized : "right_side".localized
+            }
+
+            if let dayOrNight = record.dayOrNight {
+               label = dayOrNight == "DAY" ? "daytime".localized + "☀️" : "night".localized + "🌙"
+            }
+
             if let endTime = record.endTimestamp {
-                let duration = endTime.timeIntervalSince(record.startTimestamp)
-                let minutes = Int(duration / 60)
-                return "\(minutes) " + "minutes".localized
+                return label + " " + localizedDuration(from: record.startTimestamp, to: endTime)
             } else {
-                return "in_progress".localized
+                return label + " " + "in_progress".localized
+            }
+        case "pumping":
+            var label = ""
+            if let breastType = record.breastType {
+                label =  breastType == "BOTH" ? "both_sides".localized : breastType == "LEFT" ? "left_side".localized : "right_side".localized
+            }
+            
+            if let value = record.value, let unit = record.unit {
+                return label + " " + "\(value.smartDecimal) \(unit)"
             }
         case "breast_bottle", "formula", "water_intake":
             if let value = record.value, let unit = record.unit {
@@ -97,38 +119,30 @@ struct RecordItem: View {
             if let value = record.value, let unit = record.unit {
                 return "\(value.smartDecimal)°\(unit)"
             }
-        case "excrement":
+        case "diaper":
             if let status = record.excrementStatus {
-                return status.localized
+                return status.lowercased().localized
             }
         case "solid_food":
-            if let name = record.name, let acceptance = record.acceptance {
-                return "\(name) · \(acceptance.localized)"
-            } else if let name = record.name {
-                return name
-            } else if let acceptance = record.acceptance {
-                return acceptance.localized
+            if let acceptance = record.acceptance {
+                return acceptance.lowercased().localized
             }
-        case "medical_visit":
-            if let name = record.name {
-                return name
-            }
+        // case "medical_visit":
+        //     if let name = record.name {
+        //         return name
+        //     }
         case "medication":
-            if let name = record.name, let value = record.value, let unit = record.unit {
-                return "\(name) · \(value) \(unit)"
-            } else if let name = record.name {
-                return name
+            if let value = record.value, let unit = record.unit {
+                return "(value) \(unit)"
             }
         case "supplement":
-            if let name = record.name, let value = record.value, let unit = record.unit {
-                return "\(name) · \(value) \(unit)"
-            } else if let name = record.name {
-                return name
+            if let value = record.value, let unit = record.unit {
+                return "(value) \(unit)"
             }
-        case "vaccination":
-            if let name = record.name {
-                return name
-            }
+        // case "vaccination":
+        //     if let name = record.name {
+        //         return name
+        //     }
         default:
             break
         }
@@ -208,8 +222,8 @@ struct RecordListView: View {
     }
     
     // 删除确认
-    // @State private var showingDeleteConfirmation = false
-    // @State private var recordToDelete: Record?
+    @State private var showingDeleteConfirmation = false
+    @State private var recordToDelete: Record?
     
     var body: some View {
         ZStack {
@@ -233,18 +247,10 @@ struct RecordListView: View {
                         }
                     }
                 }
+                .listStyle(.insetGrouped)
+                .padding(.top, 0)
                 .navigationTitle("records".localized)
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            // 导航到创建记录页面
-                            isNavigatingToCreate = true
-                        }) {
-                            Image(systemName: "plus")
-                        }
-                    }
-                }
                 // 编辑页面以 sheet 形式弹出
                 .sheet(isPresented: $isNavigatingToEdit) {
                     if let record = selectedRecord {
@@ -278,17 +284,40 @@ struct RecordListView: View {
                 repetitionInterval: 0.5,
                 hapticFeedback: true
             )
+            
+            // 固定悬浮在右下角的添加按钮
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        // 导航到创建记录页面
+                        isNavigatingToCreate = true
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(Color.accentColor)
+                            .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                }
+            }
         }
-        // // 删除确认弹窗
-        // .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
-        //     Button("cancel".localized, role: .cancel) {}
-        //     Button("delete".localized, role: .destructive) {
-        //         // 删除记录
-        //         if let record = recordToDelete {
-        //             modelContext.delete(record)
-        //         }
-        //     }
-        // }
+        // 删除确认弹窗
+        .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
+            Button("cancel".localized, role: .cancel) {}
+            Button("delete".localized, role: .destructive) {
+                // 删除记录
+                if let record = recordToDelete {
+                    modelContext.delete(record)
+                }
+            }
+        }
         .onChange(of: showConfetti) {
             if $0 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -299,8 +328,8 @@ struct RecordListView: View {
     }
     
     private func deleteRecord(_ record: Record) {
-        // recordToDelete = record
-        // showingDeleteConfirmation = true
-        modelContext.delete(record)
+        recordToDelete = record
+        showingDeleteConfirmation = true
+        // modelContext.delete(record)
     }
 }

@@ -246,6 +246,15 @@
 "current_free_user" = "現在の無料ユーザー";
 "upgrade_membership_prompt" = "会員にアップグレードして特典を享受";
 "upgrade_now" = "今すぐアップグレード";
+"current_membership_status" = "現在の会員ステータス";
+"membership_type" = "会員タイプ";
+"membership_status" = "会員ステータス";
+"expiration_date" = "有効期限";
+"subscription_expiring_today" = "サブスクリプションは本日期限切れです";
+"subscription_expiring_soon_reminder" = "サブスクリプションがまもなく期限切れになります。更新してください";
+"membership_active" = "有効";
+"membership_expired" = "期限切れ";
+"membership_not_subscribed" = "未購読";
 "icloud_sync_feature" = "iCloud同期";
 "multi_device_sync" = "マルチデバイス同期";
 "data_stored_in_icloud" = "データはiCloudに保存されます";
@@ -405,4 +414,5 @@
 "please_enter_valid_number" = "有効な数字を入力してください";
 "record_type_incomplete" = "記録タイプの情報が不完全です";
 "unknown_error" = "不明なエラー";
+"unknown" = "不明";
 "ok" = "OK";

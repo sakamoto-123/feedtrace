@@ -34,10 +34,11 @@ private struct SleepDurationChart: View {
                 AxisValueLabel(format: .dateTime.month(.defaultDigits).day(.defaultDigits))
                     .font(.system(size: 10))
                     .foregroundStyle(Color.secondary)
+                    .offset(x: -14)
             }
         }
         .chartYAxis {
-            AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
+            AxisMarks(preset: .automatic, position: .leading, values: .automatic(desiredCount: 5)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
                 AxisValueLabel()
@@ -87,12 +88,13 @@ private struct SleepCountChart: View {
         }
       
         .chartYAxis {
-            AxisMarks(preset: .inset, position: .leading, values: .automatic(desiredCount: 5)) {
+            AxisMarks(preset: .automatic, position: .leading, values: .automatic(desiredCount: 5)) {
                 AxisGridLine()
                     .foregroundStyle(Color.gray.opacity(0.12))
                 AxisValueLabel()
                     .font(.system(size: 11))
                     .foregroundStyle(Color.secondary)
+                    .offset(x: -14)
             }
         }
     }

@@ -144,40 +144,38 @@ struct RecordDetailView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                            Text(record.breastType ?? "both_sides".localized)
-                                .font(.subheadline)
+                            Text(record.breastType == "BOTH" ? "both_sides".localized : record.breastType == "LEFT" ? "left_side".localized : "right_side".localized)
+                                .font(.title2)
                         }
                     }
 
                     if let name = record.name, !name.isEmpty {
                         Text(name)
-                            .font(.subheadline)
+                            .font(.title2)
                     }
                     
                     if let value = record.value, let unit = record.unit {
-                        Text("\(value.smartDecimal) · \(unit.localized)")
-                            .font(.subheadline)
+                        Text("\(value.smartDecimal) \(unit.localized)")
+                            .font(.title2)
                     }
 
                      if let dayOrNight = record.dayOrNight {
-                        HStack {
+                       VStack(alignment: .leading, spacing: 10) {
                             Text("day_night".localized + "colon_separator".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                            Spacer()
                             Text(dayOrNight == "DAY" ? "daytime".localized + "☀️" : "night".localized + "🌙")
-                                .font(.subheadline)
+                                .font(.title2)
                         }
                     }
                     
                     if let acceptance = record.acceptance {
-                        HStack {
+                       VStack(alignment: .leading, spacing: 10) {
                             Text("acceptance_level".localized )
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Spacer()
-                            Text(acceptance == "LIKE" ? "like".localized : acceptance == "NEUTRAL" ? "neutral".localized : acceptance == "DISLIKE" ? "dislike".localized : "allergy".localized)
-                                .font(.subheadline)
+                            Text(acceptance.lowercased().localized)
+                                .font(.title2)
                         }
                     }
                     
@@ -186,8 +184,8 @@ struct RecordDetailView: View {
                             Text("excrement_type".localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Text(excrementStatus == "URINE" ? "urine".localized : excrementStatus == "STOOL" ? "stool".localized : "mixed".localized)
-                                .font(.subheadline)
+                            Text(excrementStatus.lowercased().localized)
+                               .font(.title2)
                         }
                     }
                 } 

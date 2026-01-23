@@ -135,6 +135,12 @@ struct BabyInfoHeader: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showingDeleteConfirm = false
     @Query private var records: [Record]
+    @Query private var allBabies: [Baby]
+    
+    // 判断是否有多个宝宝
+    private var hasMultipleBabies: Bool {
+        allBabies.count > 1
+    }
     
     init(baby: Baby, latestGrowthData: GrowthData, showingBabySwitcher: Binding<Bool>) {
         self.baby = baby
@@ -142,6 +148,7 @@ struct BabyInfoHeader: View {
         self._showingBabySwitcher = showingBabySwitcher
         let babyId = baby.id
         _records = Query(filter: #Predicate { $0.babyId == babyId })
+        _allBabies = Query(sort: [SortDescriptor(\Baby.createdAt)])
     }
     
     #if DEBUG
@@ -203,12 +210,16 @@ struct BabyInfoHeader: View {
                         .foregroundColor(.secondary)
                 }
 
-                Button(action: {
-                    showingBabySwitcher = true
-                }) {
-                    Image(systemName: "arrow.left.arrow.right.circle")
-                        .font(.system(size: 16))
-                        .foregroundColor(.accentColor)
+                // 只在有多个宝宝时显示切换按钮
+                if hasMultipleBabies {
+                    Button(action: {
+                        showingBabySwitcher = true
+                    }) {
+                        Image(systemName: "arrow.left.arrow.right.circle")
+                            .font(.system(size: 16))
+                            .foregroundColor(.accentColor)
+                            .padding(.leading, -4)
+                    }
                 }
                 
                 Spacer()
@@ -292,6 +303,7 @@ struct OngoingRecordCard: View {
     // 计时器相关状态
     @State private var timer: Timer?
     @State private var elapsedTime: TimeInterval = 0
+    @State private var isNavigatingToDetail = false
     
     // 计算已过时间并格式化
     private var formattedElapsedTime: String {
@@ -327,27 +339,35 @@ struct OngoingRecordCard: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            Text(record.icon)
-                .font(.title)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .center) {
-                    Text("\(record.subCategory.localized)")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+            // 左侧可点击区域
+            HStack(spacing: 12) {
+                Text(record.icon)
+                    .font(.title)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .center) {
+                        Text("\(record.subCategory.localized)")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    // 计时器显示
+                    Text(formattedElapsedTime)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
                 }
-                // 计时器显示
-                Text(formattedElapsedTime)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                isNavigatingToDetail = true
             }
             
             Spacer()
             
+            // 右侧按钮区域
             Button("ending".localized) {
                 // 结束记录
                 record.endTimestamp = Date()
@@ -364,6 +384,9 @@ struct OngoingRecordCard: View {
         .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(12)
         .padding(.horizontal, 20)
+        .navigationDestination(isPresented: $isNavigatingToDetail) {
+            RecordDetailView(record: record)
+        }
         .onAppear {
             // 初始化已过时间
             elapsedTime = Date().timeIntervalSince(record.startTimestamp)
@@ -402,8 +425,10 @@ struct TodayStatistics: View {
                     
                     Text("formula".localized + "colon_separator".localized + "\(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
                     Text("breast_milk".localized + "colon_separator".localized + "\(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
                         .font(.system(size: 14, weight: .medium))       
+                        .foregroundColor(.secondary)
                 }
 
                 // 睡眠信息
@@ -414,8 +439,10 @@ struct TodayStatistics: View {
                     
                     Text("duration_label".localized + "colon_separator".localized + "\(todayStats.sleepDurationInHours.smartDecimal) " + "hour_unit".localized)
                         .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
                     Text("count_label".localized + "colon_separator".localized + "\(todayStats.sleepCount) " + "times".localized)
                         .font(.system(size: 14, weight: .medium))       
+                        .foregroundColor(.secondary)
                 }
 
                 // 补剂信息
@@ -429,6 +456,7 @@ struct TodayStatistics: View {
                             let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
                             Text("\(record.name!)\(valueText)")
                                 .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
                         }   
                     }
                }
@@ -444,6 +472,7 @@ struct TodayStatistics: View {
                             let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
                             Text("\(record.name!)\(valueText)")
                                 .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
                         } 
                     }
                }
@@ -516,6 +545,7 @@ struct AllActionsSection: View {
                                 category: categoryItem.category,
                                 baby: baby
                             )
+                            .frame(maxHeight: .infinity, alignment: .top)
                         }
                     }
 
@@ -545,7 +575,7 @@ struct CategoryActionButton: View {
     let size: CGFloat = 60
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .center, spacing: 8) {
             NavigationLink(destination: RecordEditView(baby: baby, recordType: (category: category, subCategory: name, icon: icon))) {
                 ZStack {
                     Circle()
@@ -565,7 +595,10 @@ struct CategoryActionButton: View {
             Text(name.localized)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .top)
     }
 }

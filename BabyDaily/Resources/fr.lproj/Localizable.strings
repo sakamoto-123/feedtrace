@@ -291,6 +291,15 @@
 "current_free_user" = "Utilisateur gratuit actuel";
 "upgrade_membership_prompt" = "Passez à l'abonnement pour profiter de plus de privilèges";
 "upgrade_now" = "Passer à l'abonnement maintenant";
+"current_membership_status" = "Statut d'adhésion actuel";
+"membership_type" = "Type d'adhésion";
+"membership_status" = "Statut d'adhésion";
+"expiration_date" = "Date d'expiration";
+"subscription_expiring_today" = "L'abonnement expire aujourd'hui";
+"subscription_expiring_soon_reminder" = "L'abonnement expire bientôt, veuillez renouveler";
+"membership_active" = "Actif";
+"membership_expired" = "Expiré";
+"membership_not_subscribed" = "Non abonné";
 "icloud_sync_feature" = "Synchronisation iCloud";
 "multi_device_sync" = "Synchronisation multi-appareils";
 "data_stored_in_icloud" = "Données stockées dans iCloud";
@@ -400,6 +409,7 @@
 "please_enter_valid_number" = "Veuillez entrer un nombre valide";
 "record_type_incomplete" = "Informations sur le type d'enregistrement incomplètes";
 "unknown_error" = "Erreur inconnue";
+"unknown" = "Inconnu";
 "ok" = "OK";
 
 // RecordDetailView

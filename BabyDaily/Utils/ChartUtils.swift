@@ -32,17 +32,23 @@ func makeDateDomain(
     }
 
     let end = calendar.startOfDay(for: now)
-    guard let start = calendar.date(
+    guard let startBase = calendar.date(
         byAdding: .day,
         value: -(dayCount - 1),
         to: end
     ),
-    let upperBound = calendar.date(byAdding: .day, value: 1, to: end)
+    let upperBoundBase = calendar.date(byAdding: .day, value: 1, to: end)
     else {
         // 如果计算失败，返回当天到第二天
         return end...calendar.date(byAdding: .day, value: 1, to: end)!
     }
+    
+    // 为柱状图添加缓冲空间：开始日期提前 0.5 天，结束日期延后 0.5 天
+    // 这样可以避免柱状图超出图表边界
+    let start = startBase.addingTimeInterval(-8 * 60 * 60) // 减去 12 小时
+    let upperBound = upperBoundBase.addingTimeInterval(8 * 60 * 60) // 加上 12 小时
 
     // 注意：end 要加 1 天，才能完整显示最后一天
+    // 同时添加 0.5 天的缓冲空间，确保柱状图不会超出边界
     return start...upperBound
 }

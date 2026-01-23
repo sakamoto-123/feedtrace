@@ -190,7 +190,7 @@ class AppSettings: ObservableObject {
     
     // MARK: - Published Properties
     @Published var themeMode: ThemeMode
-    @Published var themeColor: ThemeColor
+    @Published var themeColor: ThemeColor = .blue
     @Published var language: AppLanguage
     
     // MARK: - UserDefaults Keys

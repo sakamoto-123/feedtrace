@@ -234,6 +234,7 @@
 "please_enter_valid_number" = "请输入有效的数字";
 "record_type_incomplete" = "记录类型信息不完整";
 "unknown_error" = "未知错误";
+"unknown" = "未知";
 "ok" = "确定";
 
 // RecordDetailView
@@ -293,6 +294,15 @@
 "current_free_user" = "当前为免费用户";
 "upgrade_membership_prompt" = "升级会员享受更多特权";
 "upgrade_now" = "立即升级";
+"current_membership_status" = "当前会员状态";
+"membership_type" = "会员类型";
+"membership_status" = "会员状态";
+"expiration_date" = "过期时间";
+"subscription_expiring_today" = "订阅将于今日到期";
+"subscription_expiring_soon_reminder" = "订阅即将到期，请及时续费";
+"membership_active" = "有效";
+"membership_expired" = "已过期";
+"membership_not_subscribed" = "未订阅";
 "icloud_sync_feature" = "iCloud云同步";
 "multi_device_sync" = "多设备同步";
 "data_stored_in_icloud" = "数据存储在 iCloud";

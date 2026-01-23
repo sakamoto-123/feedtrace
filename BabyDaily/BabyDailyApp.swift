@@ -26,7 +26,19 @@ struct BabyDailyApp: App {
     // 初始化方法
     init() {
         // 首先从UserDefaults获取iCloud同步状态
-        let isSyncEnabled = UserDefaults.standard.bool(forKey: "isICloudSyncEnabled")
+        var isSyncEnabled = UserDefaults.standard.bool(forKey: "isICloudSyncEnabled")
+        
+        // 检查会员状态：非会员不能使用iCloud云同步功能
+        let membershipManager = MembershipManager.shared
+        let isICloudSyncAvailable = membershipManager.isFeatureAvailable(.iCloudSync)
+        
+        // 如果用户不是会员，强制禁用iCloud同步
+        if !isICloudSyncAvailable {
+            isSyncEnabled = false
+            // 更新UserDefaults中的设置
+            UserDefaults.standard.set(false, forKey: "isICloudSyncEnabled")
+        }
+        
         // 初始创建ModelContainer - 使用CloudSyncManager的API
         let initialContainer = CloudSyncManager.createModelContainer(isICloudSyncEnabled: isSyncEnabled)
         _modelContainer = State(initialValue: initialContainer)
@@ -53,6 +65,25 @@ struct BabyDailyApp: App {
                 .id(appSettings.language)
                 // 注意：不需要 .id(isICloudSyncEnabled)
                 // 因为 @Query 会自动响应 ModelContainer 的变化，并且 ContentView 中已有 onChange(of: babies) 处理数据更新
+                .onAppear {
+                    // 应用启动时检查会员状态
+                    Task {
+                        Logger.info("App launched, checking membership status...")
+                        await IAPManager.shared.checkMembershipStatus()
+                        // 输出会员信息
+                        logMembershipInfo()
+                        // 检查订阅提醒
+                        SubscriptionReminderManager.shared.checkSubscriptionStatus()
+                    }
+                }
+                .onChange(of: isICloudSyncEnabled) { _, _ in
+                    // 当iCloud状态变化时，也检查会员状态（因为可能影响数据同步）
+                    Task {
+                        await IAPManager.shared.checkMembershipStatus()
+                        // 输出会员信息
+                        logMembershipInfo()
+                    }
+                }
         }
         // 使用动态的modelContainer，确保每次变化时都会更新
         .modelContainer(sharedModelContainer)
@@ -60,6 +91,20 @@ struct BabyDailyApp: App {
             // 如果正在迁移中，忽略此次变化（防止循环触发）
             guard !isMigrating else {
                 return
+            }
+            
+            // 检查会员状态：如果用户尝试开启iCloud同步但不是会员，则阻止并恢复原状态
+            if newValue {
+                let membershipManager = MembershipManager.shared
+                let isICloudSyncAvailable = membershipManager.isFeatureAvailable(.iCloudSync)
+                
+                if !isICloudSyncAvailable {
+                    // 非会员不能使用iCloud同步，恢复原状态
+                    Logger.warning("Non-premium user attempted to enable iCloud sync. Blocking and reverting.")
+                    // 直接使用 UserDefaults 设置，避免触发 @AppStorage 的 onChange
+                    UserDefaults.standard.set(false, forKey: "isICloudSyncEnabled")
+                    return
+                }
             }
             
             // 标记开始迁移
@@ -104,5 +149,49 @@ struct BabyDailyApp: App {
                 }
             }
         }
+    }
+    
+    // MARK: - Helper Methods
+    /// 输出会员信息
+    private func logMembershipInfo() {
+        let iapManager = IAPManager.shared
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+        dateFormatter.locale = Locale(identifier: "zh_CN")
+        
+        Logger.info("========== 会员信息 ==========")
+        Logger.info("是否为高级会员: \(iapManager.isPremiumMember)")
+        Logger.info("会员状态: \(iapManager.membershipStatus.rawValue) (\(iapManager.membershipStatus.localizedName))")
+        
+        if let membershipInfo = iapManager.membershipInfo {
+            Logger.info("会员类型: \(membershipInfo.membershipType.rawValue) (\(membershipInfo.membershipType.localizedName))")
+            Logger.info("产品ID: \(membershipInfo.productID)")
+            Logger.info("交易ID: \(membershipInfo.transactionID)")
+            Logger.info("购买日期: \(dateFormatter.string(from: membershipInfo.purchaseDate))")
+            
+            if let expirationDate = membershipInfo.expirationDate {
+                Logger.info("过期日期: \(dateFormatter.string(from: expirationDate))")
+                let daysRemaining = Calendar.current.dateComponents([.day], from: Date(), to: expirationDate).day ?? 0
+                if daysRemaining > 0 {
+                    Logger.info("剩余天数: \(daysRemaining) 天")
+                } else {
+                    Logger.info("已过期")
+                }
+            } else {
+                Logger.info("过期日期: 永久会员")
+            }
+            
+            Logger.info("会员是否有效: \(membershipInfo.isActive)")
+        } else {
+            Logger.info("会员信息: 无")
+        }
+        
+        if let expirationDate = iapManager.expirationDate {
+            Logger.info("过期时间: \(dateFormatter.string(from: expirationDate))")
+        }
+        
+        Logger.info("=============================")
     }
 }

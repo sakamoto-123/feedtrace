@@ -12,6 +12,14 @@ struct SettingsView: View {
     @State private var alertMessage = ""
     // 同步管理器
     @StateObject private var cloudSyncManager = CloudSyncManager.shared
+    // 会员管理器
+    @StateObject private var membershipManager = MembershipManager.shared
+    // 导航到会员特权页面
+    @State private var showMembershipPrivileges = false
+    // 导航到编辑宝宝页面
+    @State private var showEditBaby = false
+    // 导航到新增宝宝页面
+    @State private var showAddBaby = false
     // 获取ModelContext
     @Environment(\.modelContext) private var modelContext
     
@@ -49,36 +57,63 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 // 宝宝信息
-            Section {
-                NavigationLink(destination: BabyCreationView(isEditing: true, existingBaby: baby)) {
+                Section {
                     HStack {
                         if let photoData = baby.photo, let uiImage = UIImage(data: photoData) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 60, height: 60)
+                                .frame(width: 46, height: 46)
                                 .clipShape(Circle())
                         } else {
                             Image(systemName: "person.crop.circle.fill")
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 60, height: 60)
-                                .foregroundColor(.gray)
-                                .overlay(Circle().stroke(.secondary, lineWidth: 2))
+                                .frame(width: 46, height: 46)
+                                .foregroundColor(.accentColor)
                         }
                         
-                        VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 8) {
                             Text(baby.name)
                                 .font(.headline)
-                            Text("tap_to_edit_baby_info".localized)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            
+                            Button(action: {
+                                showEditBaby = true
+                            }) {
+                                Image(systemName: "square.and.pencil")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.accentColor)
+                            }
+                            .buttonStyle(.plain)
                         }
                         .padding(.leading, 12)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            // 检查是否是会员
+                            if membershipManager.isFeatureAvailable(.multipleBabies) {
+                                // 会员，跳转到新增宝宝页面
+                                showAddBaby = true
+                            } else {
+                                // 非会员，跳转到会员特权页面
+                                showMembershipPrivileges = true
+                            }
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.accentColor)
+                        }
+                        .buttonStyle(.plain)
                     }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        // 点击行的其他区域（非按钮区域）跳转到编辑页面
+                        showEditBaby = true
+                    }
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 8, trailing: 16))
                 }
-            }
-
+                
                 // 会员特权
                 Section {
                     NavigationLink(destination: MembershipPrivilegesView()) {
@@ -87,8 +122,6 @@ struct SettingsView: View {
                                 .foregroundColor(Color.fromHex("#ffb658"))
                             Text("membership_privileges".localized)
                             Spacer()
-                            Text("free".localized)
-                                .foregroundColor(.secondary)
                         }
                     }
                     VStack(alignment: .leading, spacing: 8) {
@@ -101,7 +134,14 @@ struct SettingsView: View {
                                 get: { isICloudSyncEnabled },
                                 set: { newValue in
                                     if newValue {
-                                        // 当尝试开启时，检查iCloud状态
+                                        // 检查是否是会员
+                                        if !membershipManager.isFeatureAvailable(.iCloudSync) {
+                                            // 非会员，跳转到会员特权页面
+                                            showMembershipPrivileges = true
+                                            return
+                                        }
+                                        
+                                        // 会员用户，检查iCloud状态
                                         let status = cloudSyncManager.checkiCloudStatus()
                                         switch status {
                                         case .available:
@@ -126,9 +166,10 @@ struct SettingsView: View {
                             )) {
                                 Text("")
                             }
-                            .toggleStyle(SwitchToggleStyle(tint: Color.fromHex("#6cb09e")))
+                            .toggleStyle(SwitchToggleStyle(tint: .accentColor))
                         }
                         
+#if DEBUG
                         // 显示iCloud状态信息
                         if isICloudSyncEnabled {
                             HStack {
@@ -140,9 +181,11 @@ struct SettingsView: View {
                                 Spacer()
                             }
                         }
+#endif
                     }
                     
                     // 手动同步按钮和状态显示
+#if DEBUG
                     if isICloudSyncEnabled {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
@@ -151,8 +194,8 @@ struct SettingsView: View {
                                 Text("manual_sync".localized)
                                 Spacer()
                                 Button(action: {
-                                        cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
-                                    }) {
+                                    cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
+                                }) {
                                     Text("sync_now".localized)
                                         .font(.caption)
                                         .padding(.horizontal, 12)
@@ -174,10 +217,11 @@ struct SettingsView: View {
                             }
                         }
                     }
+#endif
                 }
                 
                 // 个性化设置
-                Section("personalization_settings".localized) {
+                Section {
                     NavigationLink(destination: ThemeColorSettingView()) {
                         HStack {
                             Image(systemName: "paintpalette.fill")
@@ -222,45 +266,46 @@ struct SettingsView: View {
                             Image(systemName: "square.and.arrow.up.circle.fill")
                                 .foregroundColor(Color.fromHex("#ffc76b"))
                             Text("share_app".localized)
-                                Spacer()
+                            Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
                         }
                     }
                     .buttonStyle(.plain)
-
+                    
                     Button(action: openAppStoreReview) {
                         HStack {
                             Image(systemName: "questionmark.circle.fill")
                                 .foregroundColor(Color.fromHex("#ff9066"))
                             Text("help_and_feedback".localized)
-                                Spacer()
+                            Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
                         }
                     }
-                    .buttonStyle(.plain)                  
+                    .buttonStyle(.plain)
                 }
-
-                HStack(alignment: .center, spacing: 12) {
-                    Spacer()
-                     Button(action: openPrivacyPolicy) {
-                        Text("privacy_policy".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: openUserAgreement) {
-                        Text("user_agreement".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    Spacer()
-                }.listRowBackground(Color.clear)
-                .padding(.top, -44)
+                
+                // HStack(alignment: .center, spacing: 12) {
+                //     Spacer()
+                //      Button(action: openPrivacyPolicy) {
+                //         Text("privacy_policy".localized)
+                //             .font(.caption)
+                //             .foregroundColor(.secondary)
+                //     }
+                //     .buttonStyle(.plain)
+                
+                //     Button(action: openUserAgreement) {
+                //         Text("user_agreement".localized)
+                //             .font(.caption)
+                //             .foregroundColor(.secondary)
+                //     }
+                //     .buttonStyle(.plain)
+                //     Spacer()
+                // }.listRowBackground(Color.clear)
             }
+            .listStyle(.insetGrouped)
+            .padding(.top, -20)
             .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)
             // 显示提示信息
@@ -270,6 +315,18 @@ struct SettingsView: View {
                     message: Text(alertMessage),
                     dismissButton: .default(Text("ok".localized))
                 )
+            }
+            // 导航到会员特权页面
+            .navigationDestination(isPresented: $showMembershipPrivileges) {
+                MembershipPrivilegesView()
+            }
+            // 导航到编辑宝宝页面
+            .navigationDestination(isPresented: $showEditBaby) {
+                BabyCreationView(isEditing: true, existingBaby: baby)
+            }
+            // 导航到新增宝宝页面
+            .navigationDestination(isPresented: $showAddBaby) {
+                BabyCreationView(isEditing: false, isFirstCreation: false)
             }
         }
     }

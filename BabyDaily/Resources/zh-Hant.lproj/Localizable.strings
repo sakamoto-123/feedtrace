@@ -249,6 +249,15 @@
 "current_free_user" = "當前為免費用戶";
 "upgrade_membership_prompt" = "升級會員享受更多特權";
 "upgrade_now" = "立即升級";
+"current_membership_status" = "當前會員狀態";
+"membership_type" = "會員類型";
+"membership_status" = "會員狀態";
+"expiration_date" = "過期時間";
+"subscription_expiring_today" = "訂閱將於今日到期";
+"subscription_expiring_soon_reminder" = "訂閱即將到期，請及時續費";
+"membership_active" = "有效";
+"membership_expired" = "已過期";
+"membership_not_subscribed" = "未訂閱";
 "icloud_sync_feature" = "iCloud雲同步";
 "multi_device_sync" = "多設備同步";
 "data_stored_in_icloud" = "數據存儲在 iCloud";
@@ -393,6 +402,7 @@
 "please_enter_valid_number" = "請輸入有效的數字";
 "record_type_incomplete" = "記錄類型信息不完整";
 "unknown_error" = "未知錯誤";
+"unknown" = "未知";
 "ok" = "確定";
 
 // Family Collaboration

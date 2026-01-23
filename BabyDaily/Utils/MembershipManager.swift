@@ -71,6 +71,18 @@ class MembershipManager: ObservableObject {
     /// 是否为高级会员
     @Published var isPremiumMember: Bool = false
     
+    /// 会员状态
+    @Published var membershipStatus: MembershipStatus = .notSubscribed
+    
+    /// 会员过期时间（仅订阅会员）
+    @Published var expirationDate: Date?
+    
+    /// 会员类型
+    @Published var membershipType: MembershipType?
+    
+    /// 会员信息
+    @Published var membershipInfo: MembershipInfo?
+    
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let iapManager = IAPManager.shared
@@ -83,8 +95,33 @@ class MembershipManager: ObservableObject {
             .assign(to: \.isPremiumMember, on: self)
             .store(in: &cancellables)
         
+        // 监听会员状态
+        iapManager.$membershipStatus
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.membershipStatus, on: self)
+            .store(in: &cancellables)
+        
+        // 监听过期时间
+        iapManager.$expirationDate
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.expirationDate, on: self)
+            .store(in: &cancellables)
+        
+        // 监听会员信息
+        iapManager.$membershipInfo
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] info in
+                self?.membershipInfo = info
+                self?.membershipType = info?.membershipType
+            }
+            .store(in: &cancellables)
+        
         // 初始化会员状态
         isPremiumMember = iapManager.isPremiumMember
+        membershipStatus = iapManager.membershipStatus
+        expirationDate = iapManager.expirationDate
+        membershipInfo = iapManager.membershipInfo
+        membershipType = iapManager.membershipInfo?.membershipType
     }
     
     // MARK: - Feature Check
@@ -93,11 +130,65 @@ class MembershipManager: ObservableObject {
         if feature.isAvailableForFreeUser {
             return true
         }
-        return isPremiumMember
+        // 检查会员状态是否为有效
+        return membershipStatus == .active && isPremiumMember
     }
     
     /// 检查多个功能是否都可用
     func areFeaturesAvailable(_ features: [MembershipFeature]) -> Bool {
         return features.allSatisfy { isFeatureAvailable($0) }
+    }
+    
+    // MARK: - Membership Status Check
+    /// 检查会员状态（实时更新）
+    func checkMembershipStatus() async {
+        await iapManager.checkMembershipStatus()
+    }
+    
+    /// 获取会员状态描述
+    var membershipStatusDescription: String {
+        switch membershipStatus {
+        case .active:
+            if let type = membershipType {
+                if type == .lifetime {
+                    return "premium_membership_lifetime_active".localized
+                } else if let expirationDate = expirationDate {
+                    let formatter = DateFormatter()
+                    formatter.dateStyle = .medium
+                    formatter.timeStyle = .none
+                    return String(format: "membership_active_until".localized, formatter.string(from: expirationDate))
+                } else {
+                    return "membership_active".localized
+                }
+            }
+            return "membership_active".localized
+        case .expired:
+            return "membership_expired".localized
+        case .notSubscribed:
+            return "membership_not_subscribed".localized
+        }
+    }
+    
+    /// 检查订阅是否即将过期（3天内）
+    var isSubscriptionExpiringSoon: Bool {
+        guard membershipStatus == .active,
+              membershipType == .subscription,
+              let expirationDate = expirationDate else {
+            return false
+        }
+        
+        let daysUntilExpiration = Calendar.current.dateComponents([.day], from: Date(), to: expirationDate).day ?? 0
+        return daysUntilExpiration > 0 && daysUntilExpiration <= 3
+    }
+    
+    /// 检查订阅是否今天过期
+    var isSubscriptionExpiringToday: Bool {
+        guard membershipStatus == .active,
+              membershipType == .subscription,
+              let expirationDate = expirationDate else {
+            return false
+        }
+        
+        return Calendar.current.isDateInToday(expirationDate)
     }
 }

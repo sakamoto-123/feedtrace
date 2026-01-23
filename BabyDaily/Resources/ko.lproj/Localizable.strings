@@ -289,6 +289,15 @@
 "current_free_user" = "현재 무료 사용자";
 "upgrade_membership_prompt" = "회원으로 업그레이드하여 더 많은 특권을 누리세요";
 "upgrade_now" = "지금 업그레이드";
+"current_membership_status" = "현재 회원 상태";
+"membership_type" = "회원 유형";
+"membership_status" = "회원 상태";
+"expiration_date" = "만료 날짜";
+"subscription_expiring_today" = "구독이 오늘 만료됩니다";
+"subscription_expiring_soon_reminder" = "구독이 곧 만료됩니다. 갱신해 주세요";
+"membership_active" = "활성";
+"membership_expired" = "만료됨";
+"membership_not_subscribed" = "구독하지 않음";
 "icloud_sync_feature" = "iCloud 동기화";
 "multi_device_sync" = "다중 기기 동기화";
 "data_stored_in_icloud" = "데이터가 iCloud에 저장됩니다";
@@ -398,6 +407,7 @@
 "please_enter_valid_number" = "유효한 숫자를 입력하세요";
 "record_type_incomplete" = "기록 유형 정보가 불완전합니다";
 "unknown_error" = "알 수 없는 오류";
+"unknown" = "알 수 없음";
 "ok" = "확인";
 
 // RecordDetailView
