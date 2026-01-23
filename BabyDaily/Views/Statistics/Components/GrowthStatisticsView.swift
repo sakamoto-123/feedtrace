@@ -18,10 +18,37 @@ struct GrowthChartDataPoint: Identifiable {
 
 struct GrowthStatisticsCard: View {
     let data: GrowthDataset
+    let growthCurveData: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)]
+    let dimension: String
+    let themeColor: Color
+    
     @Environment(\.colorScheme) private var colorScheme
     
     private let colors: [Color] = [.blue, .green, .red, .orange, .purple]
     private let legendItems = ["5th", "25th", "50th", "75th", "95th"]
+    
+    // 根据 dimension 获取真实数据值
+    private var realDataPoints: [GrowthChartDataPoint] {
+        growthCurveData.map { dataPoint in
+            let value: Double
+            switch dimension {
+            case "weight":
+                value = dataPoint.weight
+            case "height":
+                value = dataPoint.height
+            case "head":
+                value = dataPoint.headCircumference
+            default:
+                value = dataPoint.weight
+            }
+            return GrowthChartDataPoint(
+                month: dataPoint.month,
+                value: value,
+                series: "real",
+                isDashed: false
+            )
+        }
+    }
     
     @State private var xVisibleDomain: (Double, Double) = (0, 6)
     
@@ -141,8 +168,8 @@ struct GrowthStatisticsCard: View {
         let data95th = series95th
         
         // 定义线型样式
-        let dashedStyle = StrokeStyle(lineWidth: 1, dash: [5, 5])
-        let solidStyle = StrokeStyle(lineWidth: 1)
+        let dashedStyle = StrokeStyle(lineWidth: 0.5, dash: [8, 4])
+        let solidStyle = StrokeStyle(lineWidth: 0.5)
         
         // 先创建基础图表内容
         let chart = Chart {
@@ -178,7 +205,7 @@ struct GrowthStatisticsCard: View {
                     series: .value("Series", "50th")
                 )
                 .foregroundStyle(by: .value("Series", "50th"))
-                .lineStyle(solidStyle)
+                .lineStyle(dashedStyle)
                 .interpolationMethod(.catmullRom)
             }
             
@@ -203,6 +230,18 @@ struct GrowthStatisticsCard: View {
                 )
                 .foregroundStyle(by: .value("Series", "95th"))
                 .lineStyle(dashedStyle)
+                .interpolationMethod(.catmullRom)
+            }
+            
+            // 真实数据 - 使用主题颜色，实线，线宽为2
+            ForEach(realDataPoints) { point in
+                LineMark(
+                    x: .value("Month", point.month),
+                    y: .value("Value", point.value),
+                    series: .value("Series", "real")
+                )
+                .foregroundStyle(themeColor)
+                .lineStyle(StrokeStyle(lineWidth: 2))
                 .interpolationMethod(.catmullRom)
             }
         }
@@ -256,6 +295,9 @@ struct GrowthStatisticsCard: View {
 struct GrowthStatisticsView: View {
     let gender: String
     let dimension: String
+    let growthCurveData: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)]
+    
+    @EnvironmentObject var appSettings: AppSettings
     
     private var growthData: GrowthDataset {
         CSVReader.readGrowthData(for: gender, dimension: dimension)
@@ -263,7 +305,12 @@ struct GrowthStatisticsView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            GrowthStatisticsCard(data: growthData)
+            GrowthStatisticsCard(
+                data: growthData,
+                growthCurveData: growthCurveData,
+                dimension: dimension,
+                themeColor: appSettings.currentThemeColor
+            )
         }
         .padding(.bottom, 20)
     }

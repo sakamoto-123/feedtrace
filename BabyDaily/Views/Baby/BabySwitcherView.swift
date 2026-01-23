@@ -94,10 +94,11 @@ struct BabySwitcherView: View {
                             }
                         }
                         .padding(.vertical, 0)
-                        .padding(.horizontal, 24)
+                        .padding(.leading, 24)
+                        .padding(.trailing, 8)
                     }
                     .buttonStyle(.plain)
-                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button {
                             // 编辑宝宝信息
                             selectedBabyId = baby.id
@@ -106,12 +107,18 @@ struct BabySwitcherView: View {
                             Image(systemName: "square.and.pencil")
                         }
                         .tint(.accentColor)
+                        Button(role: .destructive) {
+                            // 删除宝宝
+                            babyToDeleteId = baby.id
+                            showingDeleteConfirm = true
+                        } label: {
+                            Image(systemName: "trash")
+                        }
                     }
                 }
-                .onDelete(perform: confirmDelete)
             }
             .listStyle(.plain)
-            .padding(.horizontal, -16)
+            .padding(.leading, -16)
             
             // 新增宝宝按钮
             Button(action: {
@@ -165,14 +172,6 @@ struct BabySwitcherView: View {
     }
     
     // MARK: - 删除相关方法
-    
-    /// 确认删除宝宝
-    private func confirmDelete(at offsets: IndexSet) {
-        guard let index = offsets.first, index < babies.count else { return }
-        // 只存储ID，不存储实例
-        babyToDeleteId = babies[index].id
-        showingDeleteConfirm = true
-    }
     
     /// 删除宝宝及相关记录
     private func deleteBaby(_ baby: Baby) {

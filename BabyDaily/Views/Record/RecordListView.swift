@@ -221,9 +221,15 @@ struct RecordListView: View {
         return records.first(where: { $0.id == selectedRecordId })
     }
     
-    // 删除确认
+    // 删除确认 - 只存储要删除的记录ID，不存储实例，避免持有失效的模型引用
     @State private var showingDeleteConfirmation = false
-    @State private var recordToDelete: Record?
+    @State private var recordToDeleteId: UUID?
+    
+    // 计算属性：从当前有效的 records 数组中获取要删除的记录实例
+    private var recordToDelete: Record? {
+        guard let recordToDeleteId = recordToDeleteId else { return nil }
+        return records.first(where: { $0.id == recordToDeleteId })
+    }
     
     var body: some View {
         ZStack {
@@ -310,12 +316,24 @@ struct RecordListView: View {
         }
         // 删除确认弹窗
         .alert("确定删除记录吗？",  isPresented: $showingDeleteConfirmation) {
-            Button("cancel".localized, role: .cancel) {}
+            Button("cancel".localized, role: .cancel) {
+                // 取消时重置状态
+                recordToDeleteId = nil
+            }
             Button("delete".localized, role: .destructive) {
                 // 删除记录
                 if let record = recordToDelete {
                     modelContext.delete(record)
+                    // 保存更改
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        // 如果保存失败，记录错误（可以添加错误提示）
+                        print("删除记录失败: \(error.localizedDescription)")
+                    }
                 }
+                // 重置状态
+                recordToDeleteId = nil
             }
         }
         .onChange(of: showConfetti) {
@@ -328,8 +346,8 @@ struct RecordListView: View {
     }
     
     private func deleteRecord(_ record: Record) {
-        recordToDelete = record
+        // 只存储ID，不存储实例，避免持有失效的模型引用
+        recordToDeleteId = record.id
         showingDeleteConfirmation = true
-        // modelContext.delete(record)
     }
 }

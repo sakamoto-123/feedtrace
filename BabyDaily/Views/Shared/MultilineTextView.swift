@@ -1,21 +1,93 @@
 import SwiftUI
 import UIKit
 
+// MARK: - 自定义 UITextView 包装器（限制水平扩展）
+class BoundedTextView: UIView {
+    let textView: UITextView
+    
+    init(textView: UITextView) {
+        self.textView = textView
+        super.init(frame: .zero)
+        addSubview(textView)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            textView.topAnchor.constraint(equalTo: topAnchor),
+            textView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            textView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            textView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        // 限制水平方向，只返回垂直方向的大小
+        // 使用 noIntrinsicMetric 告诉布局系统不要依赖内在宽度
+        let width = bounds.width > 0 ? bounds.width : 100 // 使用一个默认值，避免计算错误
+        let textSize = textView.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
+        return CGSize(width: UIView.noIntrinsicMetric, height: textSize.height)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // 当布局改变时，更新内在内容大小
+        invalidateIntrinsicContentSize()
+    }
+    
+    override func setNeedsLayout() {
+        super.setNeedsLayout()
+        invalidateIntrinsicContentSize()
+    }
+}
+
 // MARK: - 多行文本输入视图（光标从顶部开始，自动调整高度）
-struct MultilineTextView: UIViewRepresentable {
+struct MultilineTextView: View {
     @Binding var text: String
     let placeholder: String
     let minHeight: CGFloat
     let maxLines: Int
     
-    func makeUIView(context: Context) -> UITextView {
+    @State private var textViewHeight: CGFloat
+    
+    init(text: Binding<String>, placeholder: String, minHeight: CGFloat, maxLines: Int) {
+        self._text = text
+        self.placeholder = placeholder
+        self.minHeight = minHeight
+        self.maxLines = maxLines
+        self._textViewHeight = State(initialValue: minHeight)
+    }
+    
+    var body: some View {
+        TextViewWrapper(
+            text: $text,
+            placeholder: placeholder,
+            minHeight: minHeight,
+            maxLines: maxLines,
+            height: $textViewHeight
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: textViewHeight)
+    }
+}
+
+// MARK: - UITextView 包装器
+private struct TextViewWrapper: UIViewRepresentable {
+    @Binding var text: String
+    let placeholder: String
+    let minHeight: CGFloat
+    let maxLines: Int
+    @Binding var height: CGFloat
+    
+    func makeUIView(context: Context) -> BoundedTextView {
         let textView = UITextView()
         textView.delegate = context.coordinator
         textView.font = .systemFont(ofSize: 17)
         textView.backgroundColor = .clear
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         textView.textContainer.lineFragmentPadding = 0
-        textView.textContainer.maximumNumberOfLines = 0 // 设置为0表示不限制行数，由maxLines控制
+        textView.textContainer.maximumNumberOfLines = 0
         textView.textContainer.lineBreakMode = .byWordWrapping
         textView.isScrollEnabled = false // 禁用滚动，让高度自动增长
         
@@ -32,35 +104,45 @@ struct MultilineTextView: UIViewRepresentable {
         textView.contentInset = .zero
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         
+        // 创建包装视图
+        let boundedTextView = BoundedTextView(textView: textView)
+        context.coordinator.textView = textView
+        
         // 设置初始光标位置在顶部
         DispatchQueue.main.async {
             textView.selectedRange = NSRange(location: 0, length: 0)
             textView.scrollRangeToVisible(NSRange(location: 0, length: 0))
-            // 更新高度
             context.coordinator.updateHeight(textView)
         }
         
-        return textView
+        return boundedTextView
     }
     
-    func updateUIView(_ uiView: UITextView, context: Context) {
+    func updateUIView(_ uiView: BoundedTextView, context: Context) {
+        let textView = uiView.textView
+        
         // 更新文本内容
-        if uiView.text != text && !context.coordinator.isEditing {
+        if textView.text != text && !context.coordinator.isEditing {
             if text.isEmpty {
-                uiView.text = placeholder
-                uiView.textColor = .placeholderText
+                textView.text = placeholder
+                textView.textColor = .placeholderText
             } else {
-                uiView.text = text
-                uiView.textColor = .label
+                textView.text = text
+                textView.textColor = .label
             }
             // 文本内容变化时更新高度
-            context.coordinator.updateHeight(uiView)
+            DispatchQueue.main.async {
+                context.coordinator.updateHeight(textView)
+            }
         }
         
         // 确保光标在顶部（当文本为空时）
-        if text.isEmpty && !uiView.isFirstResponder {
-            uiView.selectedRange = NSRange(location: 0, length: 0)
+        if text.isEmpty && !textView.isFirstResponder {
+            textView.selectedRange = NSRange(location: 0, length: 0)
         }
+        
+        // 更新包装视图的布局
+        uiView.invalidateIntrinsicContentSize()
     }
     
     func makeCoordinator() -> Coordinator {
@@ -68,11 +150,11 @@ struct MultilineTextView: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, UITextViewDelegate {
-        let parent: MultilineTextView
+        let parent: TextViewWrapper
         var isEditing = false
-        var heightConstraint: NSLayoutConstraint?
+        weak var textView: UITextView?
         
-        init(_ parent: MultilineTextView) {
+        init(_ parent: TextViewWrapper) {
             self.parent = parent
         }
         
@@ -80,7 +162,7 @@ struct MultilineTextView: UIViewRepresentable {
             // 确保布局已更新
             textView.layoutIfNeeded()
             
-            // 获取文本容器的宽度（考虑内边距）
+            // 获取文本容器的宽度
             let fixedWidth = textView.bounds.width
             guard fixedWidth > 0 else {
                 // 如果宽度还未确定，延迟更新
@@ -111,18 +193,10 @@ struct MultilineTextView: UIViewRepresentable {
                 textView.isScrollEnabled = false
             }
             
-            // 更新高度约束
-            if heightConstraint == nil {
-                heightConstraint = textView.heightAnchor.constraint(equalToConstant: calculatedHeight)
-                heightConstraint?.priority = UILayoutPriority(999)
-                heightConstraint?.isActive = true
-            } else {
-                // 只有当高度真正改变时才更新，避免不必要的布局
-                if abs(heightConstraint?.constant ?? 0 - calculatedHeight) > 1 {
-                    heightConstraint?.constant = calculatedHeight
-                    // 触发布局更新
-                    textView.superview?.setNeedsLayout()
-                    textView.superview?.layoutIfNeeded()
+            // 更新高度绑定
+            if abs(parent.height - calculatedHeight) > 1 {
+                DispatchQueue.main.async {
+                    self.parent.height = calculatedHeight
                 }
             }
         }

@@ -23,5 +23,8 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<!-- Photo Library Permission: For selecting photos to record baby's growth -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select photos for recording your baby's growth moments</string>
 </dict>
 </plist>

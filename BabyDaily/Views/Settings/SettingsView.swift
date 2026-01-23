@@ -73,7 +73,7 @@ struct SettingsView: View {
                                 .foregroundColor(.accentColor)
                         }
                         
-                        HStack(spacing: 8) {
+                        HStack(alignment: .center, spacing: 8) {
                             Text(baby.name)
                                 .font(.headline)
                             

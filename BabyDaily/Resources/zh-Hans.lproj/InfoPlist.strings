@@ -1,0 +1,2 @@
+/* 相册权限 */
+"NSPhotoLibraryUsageDescription" = "我们需要访问您的相册以选择照片来记录宝宝的成长时刻";

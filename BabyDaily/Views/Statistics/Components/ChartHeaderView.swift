@@ -62,7 +62,7 @@ struct GrowthDimensionSegmentView: View {
             Text("weight".localized).tag("weight")
             Text("height".localized).tag("height")
             Text("head".localized).tag("head")
-            Text("bmi".localized).tag("bmi")
+            // Text("bmi".localized).tag("bmi")
         }
         .pickerStyle(.segmented)
         .frame(width: 300, height: 32)

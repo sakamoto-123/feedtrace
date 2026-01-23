@@ -31,6 +31,9 @@ public class StatsCalculator {
         // 过滤出指定日期的所有记录
         let dayRecords = records.filter { calendar.isDate($0.startTimestamp, inSameDayAs: date) }
         
+        // 获取用户设置的容量单位
+        let targetVolumeUnit = UnitManager.shared.volumeUnit.rawValue
+        
         // 初始化统计变量
         var totalFeedingAmount = 0.0
         var totalFeedingCount = 0
@@ -47,31 +50,48 @@ public class StatsCalculator {
         var solidFoodRecords: [Record] = []
         var supplementRecords: [Record] = []
         
+        // 辅助函数：将容量值转换为用户设置的单位
+        func convertToTargetUnit(value: Double, fromUnit: String?) -> Double {
+            guard let fromUnit = fromUnit, !fromUnit.isEmpty else {
+                // 如果没有单位，假设已经是目标单位
+                return value
+            }
+            
+            // 如果单位相同，直接返回
+            if fromUnit.lowercased() == targetVolumeUnit.lowercased() {
+                return value
+            }
+            
+            // 使用 UnitConverter 进行转换
+            return UnitConverter.convertVolume(value: value, fromUnit: fromUnit, toUnit: targetVolumeUnit)
+        }
+        
         // 遍历记录，计算统计数据
         for record in dayRecords {
             switch record.category {
             case "feeding_category":
                 // 喂养记录处理
-                let value = record.value ?? 0.0
+                let originalValue = record.value ?? 0.0
+                let convertedValue = convertToTargetUnit(value: originalValue, fromUnit: record.unit)
                 
                 switch record.subCategory {
                 case "nursing", "breast_bottle":
                     // 母乳记录
-                    breastMilkAmount += value
+                    breastMilkAmount += convertedValue
                     breastMilkCount += 1
-                    totalFeedingAmount += value
+                    totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "formula":
                     // 奶粉记录
-                    formulaAmount += value
+                    formulaAmount += convertedValue
                     formulaCount += 1
-                    totalFeedingAmount += value
+                    totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "water_intake":
                     // 水记录
-                    waterAmount += value
+                    waterAmount += convertedValue
                     waterCount += 1
-                    totalFeedingAmount += value
+                    totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "solid_food":
                     // 辅食记录

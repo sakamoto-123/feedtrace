@@ -37,8 +37,14 @@ struct BabyCreationView: View {
             _name = State(initialValue: baby.name)
             _birthday = State(initialValue: baby.birthday)
             _gender = State(initialValue: baby.gender)
-            _height = State(initialValue: String(baby.height))
-            _weight = State(initialValue: String(baby.weight))
+            
+            // 将存储的 cm 和 kg 值转换为用户当前设置的单位显示
+            let unitManager = UnitManager.shared
+            let heightInUserUnit = UnitConverter.convertLength(value: baby.height, fromUnit: "cm", toUnit: unitManager.lengthUnit.rawValue)
+            let weightInUserUnit = UnitConverter.convertWeight(value: baby.weight, fromUnit: "kg", toUnit: unitManager.weightUnit.rawValue)
+            
+            _height = State(initialValue: String(heightInUserUnit))
+            _weight = State(initialValue: String(weightInUserUnit))
             
             // 加载照片数据
             if let photoData = baby.photo {
@@ -64,21 +70,33 @@ struct BabyCreationView: View {
                         // 保存按钮
                         saveButton
                         
-                        // 辅助文字
-                        Text("partner_device_tip".localized)
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 32)
+                        // // 辅助文字
+                        // Text("partner_device_tip".localized)
+                        //     .font(.system(size: 12))
+                        //     .foregroundColor(.secondary)
+                        //     .multilineTextAlignment(.center)
+                        //     .padding(.horizontal, 32)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 50)
                     .padding(.bottom, 32)
                 }
+                // 添加点击手势，点击外部关闭键盘（只在日期选择器未显示时生效）
+                .gesture(
+                    TapGesture()
+                        .onEnded {
+                            // 如果日期选择器未显示，关闭键盘
+                            if !showingDatePicker {
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            }
+                        }
+                )
                 
                 // 日期选择器弹窗
                 if showingDatePicker {
                     DatePickerOverlay(date: $birthday, onDismiss: { showingDatePicker = false })
+                        .allowsHitTesting(true)
+                        .zIndex(1)
                 }
             }
             .navigationTitle(isEditing ? "edit_baby_info".localized : "")
@@ -98,14 +116,6 @@ struct BabyCreationView: View {
             .sheet(isPresented: $showingMembershipView) {
                 MembershipPrivilegesView()
             }
-                 // 添加点击手势，点击外部关闭键盘
-            .gesture(
-                TapGesture()
-                    .onEnded {
-                        // 关闭所有键盘
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    }
-            )
         }
     }
     
@@ -434,58 +444,63 @@ struct BabyCreationView: View {
     }
     
     private func saveBaby() {
-        let heightValue = Double(height) ?? 50
-        let weightValue = Double(weight) ?? 3.5
+        // 获取用户输入的原始值
+        let heightInputValue = Double(height) ?? 50
+        let weightInputValue = Double(weight) ?? 3.5
+        
+        // 将用户输入的值转换为标准单位存储（身高转 cm，体重转 kg）
+        let heightInCm = UnitConverter.convertLength(value: heightInputValue, fromUnit: unitManager.lengthUnit.rawValue, toUnit: "cm")
+        let weightInKg = UnitConverter.convertWeight(value: weightInputValue, fromUnit: unitManager.weightUnit.rawValue, toUnit: "kg")
         
         if isEditing, let baby = existingBaby {
-            // 保存旧值用于比较
+            // 保存旧值用于比较（Baby 模型中存储的是 cm 和 kg）
             let oldHeight = baby.height
             let oldWeight = baby.weight
             
-            // 更新现有宝宝数据
+            // 更新现有宝宝数据（存储标准单位）
             baby.name = name
             baby.photo = photoDatas.first
             baby.birthday = birthday
             baby.gender = gender
-            baby.weight = weightValue
-            baby.height = heightValue
+            baby.weight = weightInKg
+            baby.height = heightInCm
             
-            // 如果身高改变了，创建新的身高记录
-            if abs(oldHeight - heightValue) > 0.01 { // 使用小的容差值来比较浮点数
+            // 如果身高改变了，创建新的身高记录（使用用户输入的值和单位）
+            if abs(oldHeight - heightInCm) > 0.01 { // 使用小的容差值来比较浮点数
                 let heightRecord = Record(
                     babyId: baby.id,
                     icon: "📏",
                     category: "growth_category",
                     subCategory: "height",
                     startTimestamp: Date(),
-                    value: heightValue,
+                    value: heightInputValue,
                     unit: unitManager.lengthUnit.rawValue
                 )
                 modelContext.insert(heightRecord)
             }
             
-            // 如果体重改变了，创建新的体重记录
-            if abs(oldWeight - weightValue) > 0.01 { // 使用小的容差值来比较浮点数
+            // 如果体重改变了，创建新的体重记录（使用用户输入的值和单位）
+            if abs(oldWeight - weightInKg) > 0.01 { // 使用小的容差值来比较浮点数
                 let weightRecord = Record(
                     babyId: baby.id,
                     icon: "⚖️",
                     category: "growth_category",
                     subCategory: "weight",
                     startTimestamp: Date(),
-                    value: weightValue,
+                    value: weightInputValue,
                     unit: unitManager.weightUnit.rawValue
                 )
                 modelContext.insert(weightRecord)
             }
         } else {
-            // 创建新宝宝
+            // 创建新宝宝（存储标准单位）
             let newBaby = Baby(
                 name: name,
                 photo: photoDatas.first,
                 birthday: birthday,
                 gender: gender,
-                weight: weightValue,
-                height: heightValue,
+                weight: weightInKg,
+                height: heightInCm,
                 headCircumference: 0.0
             )
             
@@ -494,26 +509,26 @@ struct BabyCreationView: View {
             // 保存宝宝以便获取 ID
             try? modelContext.save()
             
-            // 创建身高记录（使用实际输入的值或默认值）
+            // 创建身高记录（使用用户输入的值和单位）
             let heightRecord = Record(
                 babyId: newBaby.id,
                 icon: "📏",
                 category: "growth_category",
                 subCategory: "height",
                 startTimestamp: Date(),
-                value: heightValue,
+                value: heightInputValue,
                 unit: unitManager.lengthUnit.rawValue
             )
             modelContext.insert(heightRecord)
             
-            // 创建体重记录（使用实际输入的值或默认值）
+            // 创建体重记录（使用用户输入的值和单位）
             let weightRecord = Record(
                 babyId: newBaby.id,
                 icon: "⚖️",
                 category: "growth_category",
                 subCategory: "weight",
                 startTimestamp: Date(),
-                value: weightValue,
+                value: weightInputValue,
                 unit: unitManager.weightUnit.rawValue
             )
             modelContext.insert(weightRecord)

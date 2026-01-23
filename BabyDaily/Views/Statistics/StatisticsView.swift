@@ -263,7 +263,132 @@ struct StatisticsView: View {
     }
     
     private var growthCurveData: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] {
-        StatisticsDataGenerator.generateGrowthCurveData()
+        fetchGrowthCurveData()
+    }
+    
+    // 从SwiftData查询真实成长曲线数据
+    private func fetchGrowthCurveData() -> [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] {
+        let calendar = Calendar.current
+        let babyId = baby.id
+        let birthday = baby.birthday
+        let birthStartOfDay = calendar.startOfDay(for: birthday)
+        
+        // 创建查询描述符：获取所有 growth_category 的记录
+        let fetchDescriptor: FetchDescriptor<Record> = FetchDescriptor(
+            predicate: #Predicate { record in
+                record.babyId == babyId &&
+                record.category == "growth_category"
+            },
+            sortBy: [SortDescriptor(\Record.startTimestamp)]
+        )
+        
+        do {
+            // 执行查询
+            let records: [Record] = try modelContext.fetch(fetchDescriptor)
+            
+            // 计算从出生到现在有多少个30天周期（最多24个月，即720天）
+            let now = Date()
+            let daysSinceBirth = calendar.dateComponents([.day], from: birthStartOfDay, to: now).day ?? 0
+            let maxMonths = max(1, min(24, (daysSinceBirth / 30) + 1)) // 至少1个月，最多24个月
+            
+            // 使用字典存储每个周期的最新数据，键为月份索引
+            // 值包含该周期内最新的体重、身高、头围及其时间戳
+            struct PeriodLatest {
+                var weight: (value: Double, timestamp: Date)?
+                var height: (value: Double, timestamp: Date)?
+                var head: (value: Double, timestamp: Date)?
+            }
+            var periodData: [Int: PeriodLatest] = [:]
+            
+            // 只遍历一次记录，根据日期计算属于哪个周期
+            for record in records {
+                guard let value = record.value else { continue }
+                
+                // 计算记录属于哪个周期（30天周期）
+                let recordDate = calendar.startOfDay(for: record.startTimestamp)
+                guard recordDate >= birthStartOfDay else { continue } // 忽略出生前的记录
+                
+                let daysFromBirth = calendar.dateComponents([.day], from: birthStartOfDay, to: recordDate).day ?? 0
+                let month = daysFromBirth / 30
+                
+                // 只处理有效范围内的周期
+                guard month >= 0 && month < maxMonths else { continue }
+                
+                // 获取或创建该周期的数据
+                var period = periodData[month] ?? PeriodLatest()
+                
+                // 根据记录类型更新对应周期的最新数据
+                switch record.subCategory {
+                case "weight":
+                    // 转换为 kg
+                    let weightInKg = UnitConverter.convertWeight(value: value, fromUnit: record.unit ?? "kg", toUnit: "kg")
+                    if period.weight == nil || record.startTimestamp > period.weight!.timestamp {
+                        period.weight = (value: weightInKg, timestamp: record.startTimestamp)
+                    }
+                case "height":
+                    // 转换为 cm
+                    let heightInCm = UnitConverter.convertLength(value: value, fromUnit: record.unit ?? "cm", toUnit: "cm")
+                    if period.height == nil || record.startTimestamp > period.height!.timestamp {
+                        period.height = (value: heightInCm, timestamp: record.startTimestamp)
+                    }
+                case "head":
+                    // 转换为 cm
+                    let headInCm = UnitConverter.convertLength(value: value, fromUnit: record.unit ?? "cm", toUnit: "cm")
+                    if period.head == nil || record.startTimestamp > period.head!.timestamp {
+                        period.head = (value: headInCm, timestamp: record.startTimestamp)
+                    }
+                default:
+                    break
+                }
+                
+                // 保存更新后的周期数据
+                periodData[month] = period
+            }
+            
+            // 构建结果数组，使用前一个周期的值填充缺失的数据
+            var result: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] = []
+            
+            // 初始化前一个月的数据（使用 Baby 模型中的初始值，已转换为标准单位）
+            var lastWeight = baby.weight // 已经是 kg
+            var lastHeight = baby.height // 已经是 cm
+            var lastHeadCircumference = baby.headCircumference // 已经是 cm
+            
+            // 按月份顺序生成结果
+            for month in 0..<maxMonths {
+                // 如果这个周期有数据，更新最新值；否则沿用前一个周期的值
+                if let period = periodData[month] {
+                    if let weight = period.weight {
+                        lastWeight = weight.value
+                    }
+                    if let height = period.height {
+                        lastHeight = height.value
+                    }
+                    if let head = period.head {
+                        lastHeadCircumference = head.value
+                    }
+                }
+                // 如果没有该周期的数据，lastWeight、lastHeight、lastHeadCircumference 保持前一个周期的值
+                
+                // 计算 BMI：BMI = weight(kg) / (height(m))^2
+                let heightInMeters = lastHeight / 100.0
+                let bmi = lastHeight > 0 ? lastWeight / (heightInMeters * heightInMeters) : 0.0
+                
+                // 添加到结果中
+                result.append((
+                    month: month,
+                    weight: lastWeight,
+                    height: lastHeight,
+                    headCircumference: lastHeadCircumference,
+                    bmi: bmi
+                ))
+            }
+            
+            return result
+        } catch {
+            Logger.error("Error fetching growth curve data: \(error)")
+            // 如果查询失败，返回空数组或使用默认数据
+            return []
+        }
     }
     
     var body: some View {
@@ -290,7 +415,8 @@ struct StatisticsView: View {
                         } else if selectedTab == "growth_statistics" {
                             GrowthStatisticsView(
                                 gender: baby.gender.isEmpty ? "boy" : (baby.gender == "male" ? "boy" : "girl"),
-                                dimension: selectedGrowthDimension
+                                dimension: selectedGrowthDimension,
+                                growthCurveData: growthCurveData
                             )
                         } 
                     }

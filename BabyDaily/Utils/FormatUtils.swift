@@ -52,13 +52,11 @@ extension Text {
 /// - Parameter date: 要格式化的日期
 /// - Returns: 格式化后的日期字符串
 func formatDate(_ date: Date) -> String {
-    let now = Date()
     let calendar = Calendar.current
-    let components = calendar.dateComponents([.year, .month, .day], from: date, to: now)
     
-    if components.day == 0 {
+    if calendar.isDateInToday(date) {
         return "today".localized
-    } else if components.day == 1 {
+    } else if calendar.isDateInYesterday(date) {
         return "yesterday".localized
     } else {
         return date.formatted(Date.FormatStyle(date: .long).locale(AppSettings.shared.currentLocale))

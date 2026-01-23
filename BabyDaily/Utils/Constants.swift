@@ -20,7 +20,7 @@ struct Constants {
     static let hasEndTimeCategories: Set<String> = [
         "sleep", 
         "nursing", 
-        // "pumping"
+        "pumping"
     ]
     
     // 所有操作分类

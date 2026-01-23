@@ -1,0 +1,2 @@
+/* Photo Library Permission */
+"NSPhotoLibraryUsageDescription" = "We need access to your photo library to select photos for recording your baby's growth moments";
