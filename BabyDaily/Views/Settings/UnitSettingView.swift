@@ -107,7 +107,7 @@ struct UnitSettingView: View {
             .navigationTitle("unit_settings".localized)
             .navigationBarTitleDisplayMode(.inline)
             .edgesIgnoringSafeArea(.bottom)
-             .animatedTabBarHidden()
+             .toolbar(.hidden, for: .tabBar)
         }
     }
 }

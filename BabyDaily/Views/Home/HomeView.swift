@@ -85,7 +85,7 @@ struct HomeView: View {
                         if !ongoingRecords.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
                                 ForEach(ongoingRecords, id: \.id) { record in
-                                    OngoingRecordCard(record: record)
+                                    OngoingRecordCard(recordId: record.id)
                                 }
                             }
                             .padding(.top, 16)
@@ -151,34 +151,34 @@ struct BabyInfoHeader: View {
         _allBabies = Query(sort: [SortDescriptor(\Baby.createdAt)])
     }
     
-    #if DEBUG
-    // 删除当前宝宝的所有记录 - 仅在debug模式下可用
-    private func deleteAllRecords() {
-        // 删除所有记录
-        for record in records {
-            modelContext.delete(record)
-        }
+    // #if DEBUG
+    // // 删除当前宝宝的所有记录 - 仅在debug模式下可用
+    // private func deleteAllRecords() {
+    //     // 删除所有记录
+    //     for record in records {
+    //         modelContext.delete(record)
+    //     }
         
-        // 删除所有UserSetting数据
-        do {
-            let fetchDescriptor = FetchDescriptor<UserSetting>()
-            let userSettings = try modelContext.fetch(fetchDescriptor)
-            for setting in userSettings {
-                modelContext.delete(setting)
-            }
-        } catch {
-            Logger.error("Failed to fetch UserSetting: \(error)")
-        }
+    //     // 删除所有UserSetting数据
+    //     do {
+    //         let fetchDescriptor = FetchDescriptor<UserSetting>()
+    //         let userSettings = try modelContext.fetch(fetchDescriptor)
+    //         for setting in userSettings {
+    //             modelContext.delete(setting)
+    //         }
+    //     } catch {
+    //         Logger.error("Failed to fetch UserSetting: \(error)")
+    //     }
         
-        do {
-            try modelContext.save()
-            Logger.debug("Successfully deleted all records for baby: \(baby.name)")
-            Logger.debug("Successfully deleted all UserSetting data")
-        } catch {
-            Logger.error("Failed to delete all records: \(error)")
-        }
-    }
-    #endif
+    //     do {
+    //         try modelContext.save()
+    //         Logger.debug("Successfully deleted all records for baby: \(baby.name)")
+    //         Logger.debug("Successfully deleted all UserSetting data")
+    //     } catch {
+    //         Logger.error("Failed to delete all records: \(error)")
+    //     }
+    // }
+    // #endif
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -296,9 +296,20 @@ struct BabyInfoHeader: View {
 
 // 进行中记录卡片组件
 struct OngoingRecordCard: View {
-    let record: Record
+    let recordId: UUID
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
+    
+    // 只查询目标 Record，避免订阅全量 records
+    @Query private var records: [Record]
+    
+    init(recordId: UUID) {
+        self.recordId = recordId
+        _records = Query(filter: #Predicate<Record> { $0.id == recordId })
+    }
+    
+    // 当前记录（理论上最多 1 条）
+    private var record: Record? { records.first }
     
     // 计时器相关状态
     @State private var timer: Timer?
@@ -338,69 +349,71 @@ struct OngoingRecordCard: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            // 左侧可点击区域
+        if let record = record {
             HStack(spacing: 12) {
-                Text(record.icon)
-                    .font(.title)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .center) {
-                        Text("\(record.subCategory.localized)")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                // 左侧可点击区域
+                HStack(spacing: 12) {
+                    Text(record.icon)
+                        .font(.title)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .center) {
+                            Text("\(record.subCategory.localized)")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        // 计时器显示
+                        Text(formattedElapsedTime)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                        
                     }
-                    // 计时器显示
-                    Text(formattedElapsedTime)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isNavigatingToDetail = true
+                }
+                
+                Spacer()
+                
+                // 右侧按钮区域
+                Button("ending".localized) {
+                    // 结束记录
+                    record.endTimestamp = Date()
+                    do {
+                    try modelContext.save()
+                } catch {
+                    Logger.error("Failed to save record: \(error)")
+                }
+                }
+                .font(.system(size: 14))
+                .buttonStyle(.borderedProminent)
+            }
+            .padding()
+            .background(Color.themeCardBackground(for: colorScheme))
+            .cornerRadius(12)
+            .padding(.horizontal, 20)
+            .navigationDestination(isPresented: $isNavigatingToDetail) {
+                RecordDetailView(recordId: record.id)
+            }
+            .onAppear {
+                // 初始化已过时间
+                elapsedTime = Date().timeIntervalSince(record.startTimestamp)
+                
+                // 启动定时器，每秒更新一次
+                timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
+                    _ in
+                    elapsedTime = Date().timeIntervalSince(record.startTimestamp)
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                isNavigatingToDetail = true
+            .onDisappear {
+                // 停止定时器
+                timer?.invalidate()
+                timer = nil
             }
-            
-            Spacer()
-            
-            // 右侧按钮区域
-            Button("ending".localized) {
-                // 结束记录
-                record.endTimestamp = Date()
-                do {
-                try modelContext.save()
-            } catch {
-                Logger.error("Failed to save record: \(error)")
-            }
-            }
-            .font(.system(size: 14))
-            .buttonStyle(.borderedProminent)
-        }
-        .padding()
-        .background(Color.themeCardBackground(for: colorScheme))
-        .cornerRadius(12)
-        .padding(.horizontal, 20)
-        .navigationDestination(isPresented: $isNavigatingToDetail) {
-            RecordDetailView(record: record)
-        }
-        .onAppear {
-            // 初始化已过时间
-            elapsedTime = Date().timeIntervalSince(record.startTimestamp)
-            
-            // 启动定时器，每秒更新一次
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
-                _ in
-                elapsedTime = Date().timeIntervalSince(record.startTimestamp)
-            }
-        }
-        .onDisappear {
-            // 停止定时器
-            timer?.invalidate()
-            timer = nil
         }
     }
 }

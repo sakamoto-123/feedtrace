@@ -169,55 +169,55 @@ struct SettingsView: View {
                             .toggleStyle(SwitchToggleStyle(tint: .accentColor))
                         }
                         
-#if DEBUG
-                        // 显示iCloud状态信息
-                        if isICloudSyncEnabled {
-                            HStack {
-                                Image(systemName: "info.circle")
-                                    .foregroundColor(.secondary)
-                                Text(cloudSyncManager.icloudStatus.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                            }
-                        }
-#endif
-                    }
+// #if DEBUG
+//                         // 显示iCloud状态信息
+//                         if isICloudSyncEnabled {
+//                             HStack {
+//                                 Image(systemName: "info.circle")
+//                                     .foregroundColor(.secondary)
+//                                 Text(cloudSyncManager.icloudStatus.description)
+//                                     .font(.caption)
+//                                     .foregroundColor(.secondary)
+//                                 Spacer()
+//                             }
+//                         }
+// #endif
+//                     }
                     
-                    // 手动同步按钮和状态显示
-#if DEBUG
-                    if isICloudSyncEnabled {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Image(systemName: "arrow.clockwise")
-                                    .foregroundColor(Color.fromHex("#6cb09e"))
-                                Text("manual_sync".localized)
-                                Spacer()
-                                Button(action: {
-                                    cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
-                                }) {
-                                    Text("sync_now".localized)
-                                        .font(.caption)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 4)
-                                        .background(Color.fromHex("#6cb09e"))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                }
-                            }
+//                     // 手动同步按钮和状态显示
+// #if DEBUG
+//                     if isICloudSyncEnabled {
+//                         VStack(alignment: .leading, spacing: 8) {
+//                             HStack {
+//                                 Image(systemName: "arrow.clockwise")
+//                                     .foregroundColor(Color.fromHex("#6cb09e"))
+//                                 Text("manual_sync".localized)
+//                                 Spacer()
+//                                 Button(action: {
+//                                     cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
+//                                 }) {
+//                                     Text("sync_now".localized)
+//                                         .font(.caption)
+//                                         .padding(.horizontal, 12)
+//                                         .padding(.vertical, 4)
+//                                         .background(Color.fromHex("#6cb09e"))
+//                                         .foregroundColor(.white)
+//                                         .cornerRadius(16)
+//                                 }
+//                             }
                             
-                            // 同步状态显示
-                            HStack {
-                                Image(systemName: "cloud")
-                                    .foregroundColor(cloudSyncManager.syncStatus.color)
-                                Text(cloudSyncManager.syncStatus.description)
-                                    .font(.caption)
-                                    .foregroundColor(cloudSyncManager.syncStatus.color)
-                                Spacer()
-                            }
-                        }
-                    }
-#endif
+//                             // 同步状态显示
+//                             HStack {
+//                                 Image(systemName: "cloud")
+//                                     .foregroundColor(cloudSyncManager.syncStatus.color)
+//                                 Text(cloudSyncManager.syncStatus.description)
+//                                     .font(.caption)
+//                                     .foregroundColor(cloudSyncManager.syncStatus.color)
+//                                 Spacer()
+//                             }
+//                         }
+//                     }
+// #endif
                 }
                 
                 // 个性化设置

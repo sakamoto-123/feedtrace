@@ -14,18 +14,16 @@ struct RecordDetailView: View {
     @State private var isShowingImagePreview = false
     @State private var selectedImageIndex = 0
     
-    // 通过 ID 查询 Record 对象，避免持有失效的引用
-    @Query private var allRecords: [Record]
+    // 只查询目标 Record，避免订阅全量 records
+    @Query private var records: [Record]
     
     init(recordId: UUID) {
         self.recordId = recordId
-        _allRecords = Query()
+        _records = Query(filter: #Predicate<Record> { $0.id == recordId })
     }
     
-    // 从当前有效的 records 数组中获取记录实例
-    private var record: Record? {
-        allRecords.first(where: { $0.id == recordId })
-    }
+    // 当前记录（理论上最多 1 条）
+    private var record: Record? { records.first }
     
     // 根据record.babyId查询对应的baby对象
     private var baby: Baby? {
@@ -68,60 +66,160 @@ struct RecordDetailView: View {
     }
     
     // 时间信息视图
+    @ViewBuilder
     private var timeInfoView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("start_time".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    HStack(alignment: .center){
-                        Text(formatDateTime(record.startTimestamp, dateStyle: .omitted, timeStyle: .shortened))
-                            .font(.title2)
-                        Spacer()
-                        Text(formatDateTime(record.startTimestamp, dateStyle: .long, timeStyle: .omitted))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                if let end = record.endTimestamp {
+        if let record = record, let baby = baby {
+            VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("end_time".localized)
+                        Text("start_time".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                         HStack(alignment: .center){
-                            Text(formatDateTime(end, dateStyle: .omitted, timeStyle: .shortened))
+                            Text(formatDateTime(record.startTimestamp, dateStyle: .omitted, timeStyle: .shortened))
                                 .font(.title2)
                             Spacer()
-                            Text(formatDateTime(end, dateStyle: .long, timeStyle: .omitted))
+                            Text(formatDateTime(record.startTimestamp, dateStyle: .long, timeStyle: .omitted))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                     }
-                }
-
-                if Constants.hasEndTimeCategories.contains(record.subCategory) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("duration_label".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        if let end = record.endTimestamp {
-                            Text(localizedDuration(from: record.startTimestamp, to: end))
-                                .font(.title2)
-                        } else {
-                            Text("ongoing".localized)
-                                .font(.title2)
+                    
+                    if let end = record.endTimestamp {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("end_time".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            HStack(alignment: .center){
+                                Text(formatDateTime(end, dateStyle: .omitted, timeStyle: .shortened))
+                                    .font(.title2)
+                                Spacer()
+                                Text(formatDateTime(end, dateStyle: .long, timeStyle: .omitted))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
+
+                    if Constants.hasEndTimeCategories.contains(record.subCategory) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("duration_label".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            if let end = record.endTimestamp {
+                                Text(localizedDuration(from: record.startTimestamp, to: end))
+                                    .font(.title2)
+                            } else {
+                                Text("ongoing".localized)
+                                    .font(.title2)
+                            }
+                        }
+                    }
+                       
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("baby_age_at_record".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(calculateBabyAge(baby, record.startTimestamp))
+                            .font(.title2)
+                    }
                 }
-                   
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("baby_age_at_record".localized)
+                .padding()
+                .background(.background)
+                .cornerRadius(Constants.cornerRadius)
+            }
+        }
+    }
+
+     // 庆祝
+    @ViewBuilder
+    private var milestoneInfoView: some View {
+        if let record = record, Constants.milestoneCategories.contains(record.subCategory) {
+            Text("🎉🎉🎉")
+                .font(.title)
+        }
+    }
+    
+    // 详细信息视图
+    @ViewBuilder
+    private var detailedInfoView: some View {
+        if let record = record, !Constants.noDetailCategories.contains(record.subCategory) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("detailed_information".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                // 根据记录类型显示不同的详细信息
+                if record.subCategory == "nursing" {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("breast_side".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text(calculateBabyAge(baby!, record.startTimestamp))
+
+                        Text(record.breastType == "BOTH" ? "both_sides".localized : record.breastType == "LEFT" ? "left_side".localized : "right_side".localized)
+                            .font(.title2)
+                    }
+                }
+
+                if let name = record.name, !name.isEmpty {
+                    Text(name)
                         .font(.title2)
+                }
+                
+                if let value = record.value, let unit = record.unit {
+                    Text("\(value.smartDecimal) \(unit.localized)")
+                        .font(.title2)
+                }
+
+                 if let dayOrNight = record.dayOrNight {
+                   VStack(alignment: .leading, spacing: 10) {
+                        Text("day_night".localized + "colon_separator".localized)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Text(dayOrNight == "DAY" ? "daytime".localized + "☀️" : "night".localized + "🌙")
+                            .font(.title2)
+                    }
+                }
+                
+                if let acceptance = record.acceptance {
+                   VStack(alignment: .leading, spacing: 10) {
+                        Text("acceptance_level".localized )
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(acceptance.lowercased().localized)
+                            .font(.title2)
+                    }
+                }
+                
+                if let excrementStatus = record.excrementStatus {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("excrement_type".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(excrementStatus.lowercased().localized)
+                           .font(.title2)
+                    }
+                }
+            } 
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.background)
+            .cornerRadius(Constants.cornerRadius)
+        }
+    }
+    
+    // 备注视图
+    @ViewBuilder
+    private var remarkView: some View {
+        if let record = record, let remark = record.remark, !remark.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("remark".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                HStack {
+                    Text(remark)
+                        .font(.subheadline)
+                    Spacer()
                 }
             }
             .padding()
@@ -129,145 +227,35 @@ struct RecordDetailView: View {
             .cornerRadius(Constants.cornerRadius)
         }
     }
-
-     // 庆祝
-    private var milestoneInfoView: some View {
-          // 使用Group来确保总是返回一个视图
-        Group {
-            if Constants.milestoneCategories.contains(record.subCategory) {
-                Text("🎉🎉🎉")
-                    .font(.title)
-            } else {
-                // 对于不需要详细信息的分类，返回一个空视图
-                EmptyView()
-            }
-        }
-    }
-    
-    // 详细信息视图
-    private var detailedInfoView: some View {
-        // 使用Group来确保总是返回一个视图
-        Group {
-            if !Constants.noDetailCategories.contains(record.subCategory) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("detailed_information".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    // 根据记录类型显示不同的详细信息
-                    if record.subCategory == "nursing" {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("breast_side".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                            Text(record.breastType == "BOTH" ? "both_sides".localized : record.breastType == "LEFT" ? "left_side".localized : "right_side".localized)
-                                .font(.title2)
-                        }
-                    }
-
-                    if let name = record.name, !name.isEmpty {
-                        Text(name)
-                            .font(.title2)
-                    }
-                    
-                    if let value = record.value, let unit = record.unit {
-                        Text("\(value.smartDecimal) \(unit.localized)")
-                            .font(.title2)
-                    }
-
-                     if let dayOrNight = record.dayOrNight {
-                       VStack(alignment: .leading, spacing: 10) {
-                            Text("day_night".localized + "colon_separator".localized)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text(dayOrNight == "DAY" ? "daytime".localized + "☀️" : "night".localized + "🌙")
-                                .font(.title2)
-                        }
-                    }
-                    
-                    if let acceptance = record.acceptance {
-                       VStack(alignment: .leading, spacing: 10) {
-                            Text("acceptance_level".localized )
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(acceptance.lowercased().localized)
-                                .font(.title2)
-                        }
-                    }
-                    
-                    if let excrementStatus = record.excrementStatus {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("excrement_type".localized)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(excrementStatus.lowercased().localized)
-                               .font(.title2)
-                        }
-                    }
-                } 
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.background)
-                .cornerRadius(Constants.cornerRadius)
-            } else {
-                // 对于不需要详细信息的分类，返回一个空视图
-                EmptyView()
-            }
-        }
-    }
-    
-    // 备注视图
-    private var remarkView: some View {
-        Group {
-            if let remark = record.remark, !remark.isEmpty {
-                  VStack(alignment: .leading, spacing: 10) {
-                    Text("remark".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    HStack {
-                        Text(remark)
-                            .font(.subheadline)
-                        Spacer()
-                    }
-                }
-                .padding()
-                .background(.background)
-                .cornerRadius(Constants.cornerRadius)
-            }
-        }
-    }
     
     // 照片视图
+    @ViewBuilder
     private var photosView: some View {
-        Group {
-            if let photos = record.photos, !photos.isEmpty {
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("photos".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], alignment: .leading, spacing: 12) {
-                        ForEach(photos.indices, id: \.self) { index in
-                            if let uiImage = UIImage(data: photos[index]) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 75, height: 75)
-                                    .clipped()
-                                    .cornerRadius(Constants.cornerRadius)
-                                    .onTapGesture {
-                                        selectedImageIndex = index
-                                        isShowingImagePreview = true
-                                    }
-                            }
+        if let record = record, let photos = record.photos, !photos.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("photos".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 75), spacing: 12)], alignment: .leading, spacing: 12) {
+                    ForEach(photos.indices, id: \.self) { index in
+                        if let uiImage = UIImage(data: photos[index]) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 75, height: 75)
+                                .clipped()
+                                .cornerRadius(Constants.cornerRadius)
+                                .onTapGesture {
+                                    selectedImageIndex = index
+                                    isShowingImagePreview = true
+                                }
                         }
                     }
-                }  
-                .padding()
-                .background(.background)
-                .cornerRadius(Constants.cornerRadius)
-            }
+                }
+            }  
+            .padding()
+            .background(.background)
+            .cornerRadius(Constants.cornerRadius)
         }
     }
     
@@ -311,7 +299,7 @@ struct RecordDetailView: View {
         .navigationTitle("record_detail".localized)
         .navigationBarTitleDisplayMode(.inline)
         // .toolbar(.hidden, for: .navigationBar)
-        .animatedTabBarHidden()
+        .toolbar(.hidden, for: .tabBar)
         .toolbar { // 右上角按钮
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 24) { // 增加间距到 24
@@ -335,7 +323,9 @@ struct RecordDetailView: View {
         }
         // 编辑页面以 sheet 形式弹出
         .sheet(isPresented: $isNavigatingToEdit) {
-            RecordEditView(baby: baby!, recordType: nil, existingRecord: record)
+            if let record = record, let baby = baby {
+                RecordEditView(baby: baby, recordType: nil, existingRecordId: record.id)
+            }
         }
         .background(Color(.systemGray6))
         // 删除确认弹窗
@@ -343,15 +333,17 @@ struct RecordDetailView: View {
             Button("cancel".localized, role: .cancel) {}
             Button("delete".localized, role: .destructive) {
                 // 删除记录
-                modelContext.delete(record)
-                dismiss()
+                if let record = record {
+                    modelContext.delete(record)
+                    dismiss()
+                }
             }
         } message: {
             Text("delete_record_warning".localized)
         }
         // 图片预览
         .fullScreenCover(isPresented: $isShowingImagePreview) {
-            if let photos = record.photos {
+            if let record = record, let photos = record.photos {
                 ImagePreview(images: photos, initialIndex: selectedImageIndex)
             }
         }

@@ -260,15 +260,13 @@ struct RecordListView: View {
                 .navigationTitle("records".localized)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationDestination(for: UUID.self) { recordId in
-                    // 根据 ID 查找记录并显示详情页
-                    if let record = records.first(where: { $0.id == recordId }) {
-                        RecordDetailView(record: record)
-                    }
+                    // 根据 ID 显示详情页
+                    RecordDetailView(recordId: recordId)
                 }
                 // 编辑页面以 sheet 形式弹出
                 .sheet(isPresented: $isNavigatingToEdit) {
-                    if let record = selectedRecord {
-                        RecordEditView(baby: baby, existingRecord: record)
+                    if let recordId = selectedRecordId {
+                        RecordEditView(baby: baby, existingRecordId: recordId)
                     }
                 }
                 // 创建页面以 sheet 形式弹出

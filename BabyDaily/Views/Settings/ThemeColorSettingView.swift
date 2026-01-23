@@ -73,7 +73,7 @@ struct ThemeColorSettingView: View {
             .navigationTitle("theme_color".localized)
             .navigationBarTitleDisplayMode(.inline)
             .edgesIgnoringSafeArea(.bottom)
-             .animatedTabBarHidden()
+             .toolbar(.hidden, for: .tabBar)
             .sheet(isPresented: $showingMembershipView) {
                 MembershipPrivilegesView()
             }

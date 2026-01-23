@@ -576,7 +576,7 @@ struct RecordAdditionalInfoSection: View {
 struct RecordEditView: View {
     let baby: Baby
     let recordType: (category: String, subCategory: String, icon: String)?
-    let existingRecord: Record?
+    let existingRecordId: UUID?
     var onSaveSuccess: ((String) -> Void)?
     
     @Environment(\.modelContext) private var modelContext
@@ -584,12 +584,32 @@ struct RecordEditView: View {
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject var appSettings: AppSettings
     
+    // 只查询目标 Record，避免订阅全量 records
+    @Query private var records: [Record]
+    
+    init(baby: Baby, recordType: (category: String, subCategory: String, icon: String)? = nil, existingRecordId: UUID? = nil, onSaveSuccess: ((String) -> Void)? = nil) {
+        self.baby = baby
+        self.recordType = recordType
+        self.existingRecordId = existingRecordId
+        self.onSaveSuccess = onSaveSuccess
+        
+        if let id = existingRecordId {
+            _records = Query(filter: #Predicate<Record> { $0.id == id })
+        } else {
+            // 新建场景不需要读取任何 Record
+            _records = Query(filter: #Predicate<Record> { _ in false })
+        }
+    }
+    
+    // 当前记录（理论上最多 1 条）
+    private var existingRecord: Record? { records.first }
+    
     // 单位管理
     @StateObject private var unitManager = UnitManager.shared
     
-    // 基本信息
-    @State private var startTimestamp: Date
-    @State private var endTimestamp: Date?
+    // 基本信息 - 使用默认值，在 onAppear 时从 existingRecord 加载
+    @State private var startTimestamp: Date = Date()
+    @State private var endTimestamp: Date? = nil
     @State private var showEndTimePicker: Bool = false
     @State private var name: String = ""
     @State private var value: String = ""
@@ -661,44 +681,39 @@ struct RecordEditView: View {
         return subCategory == "diaper"
     }
     
-    // 初始化现有记录数据
-    init(baby: Baby, recordType: (category: String, subCategory: String, icon: String)? = nil, existingRecord: Record? = nil, onSaveSuccess: ((String) -> Void)? = nil) {
-        self.baby = baby
-        self.recordType = recordType
-        self.existingRecord = existingRecord
-        self.onSaveSuccess = onSaveSuccess
-        
+    // 初始化状态变量（延迟初始化，在 onAppear 时从 existingRecord 加载）
+    private func initializeState() {
         if let record = existingRecord {
-            _startTimestamp = State(initialValue: record.startTimestamp)
-            _endTimestamp = State(initialValue: record.endTimestamp)
-            _showEndTimePicker = State(initialValue: record.endTimestamp != nil)
-            _name = State(initialValue: record.name ?? "")
-            _value = State(initialValue: record.value != nil ? String(record.value!) : "")
-            _unit = State(initialValue: record.unit ?? "ml")
-            _remark = State(initialValue: record.remark ?? "")
-            _photos = State(initialValue: record.photos ?? [])
-            _breastType = State(initialValue: record.breastType ?? "BOTH")
-            _dayOrNight = State(initialValue: record.dayOrNight ?? "DAY")
-            _acceptance = State(initialValue: record.acceptance ?? "NEUTRAL")
-            _excrementStatus = State(initialValue: record.excrementStatus ?? "URINE")
+            startTimestamp = record.startTimestamp
+            endTimestamp = record.endTimestamp
+            showEndTimePicker = record.endTimestamp != nil
+            name = record.name ?? ""
+            value = record.value != nil ? String(record.value!) : ""
+            unit = record.unit ?? "ml"
+            remark = record.remark ?? ""
+            photos = record.photos ?? []
+            breastType = record.breastType ?? "BOTH"
+            dayOrNight = record.dayOrNight ?? "DAY"
+            acceptance = record.acceptance ?? "NEUTRAL"
+            excrementStatus = record.excrementStatus ?? "URINE"
             
             // 从现有记录中提取recordType信息并设置selectedRecordType的初始值
-            _selectedRecordType = State(initialValue: (category: record.category, subCategory: record.subCategory, icon: record.icon))
+            selectedRecordType = (category: record.category, subCategory: record.subCategory, icon: record.icon)
         } else {
             // 创建新记录时，使用当前时间
-            _startTimestamp = State(initialValue: Date())
-            _endTimestamp = State(initialValue: nil)
-            _showEndTimePicker = State(initialValue: false)
-            _name = State(initialValue: "")
-            _value = State(initialValue: "")
-            _unit = State(initialValue: "ml")
-            _remark = State(initialValue: "")
-            _photos = State(initialValue: [])
-            _breastType = State(initialValue: "BOTH")
-            _dayOrNight = State(initialValue: "DAY")
-            _acceptance = State(initialValue: "NEUTRAL")
-            _excrementStatus = State(initialValue: "URINE")
-            _selectedRecordType = State(initialValue: nil)
+            startTimestamp = Date()
+            endTimestamp = nil
+            showEndTimePicker = false
+            name = ""
+            value = ""
+            unit = "ml"
+            remark = ""
+            photos = []
+            breastType = "BOTH"
+            dayOrNight = "DAY"
+            acceptance = "NEUTRAL"
+            excrementStatus = "URINE"
+            selectedRecordType = nil
         }
     }
     
@@ -801,7 +816,15 @@ struct RecordEditView: View {
                 .navigationTitle(getNavigationTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbarContent() }
-                 .animatedTabBarHidden()
+                 .toolbar(.hidden, for: .tabBar)
+                .onAppear {
+                    // 在视图出现时初始化状态
+                    initializeState()
+                }
+                .onChange(of: existingRecordId) { _, _ in
+                    // 当 existingRecordId 变化时，重新初始化状态
+                    initializeState()
+                }
                 .onChange(of: tempImageDatas) { oldValue, newValue in
                     handleImageDataChange(oldValue: oldValue, newValue: newValue)
                 }

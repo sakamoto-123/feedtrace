@@ -101,7 +101,7 @@ struct BabyCreationView: View {
             }
             .navigationTitle(isEditing ? "edit_baby_info".localized : "")
             .navigationBarTitleDisplayMode(.inline)
-             .animatedTabBarHidden()
+             .toolbar(.hidden, for: .tabBar)
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(
                     images: $photos,
