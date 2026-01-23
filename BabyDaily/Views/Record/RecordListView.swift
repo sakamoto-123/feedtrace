@@ -8,7 +8,7 @@ struct RecordItem: View {
     let onDelete: () -> Void
     
     var body: some View {
-        NavigationLink(destination: RecordDetailView(record: record)) {
+        NavigationLink(value: record.id) {
             HStack(spacing: 12) {
                 // 左侧：icon
                 Text(record.icon)
@@ -214,6 +214,8 @@ struct RecordListView: View {
     // 只存储选中的记录ID，不存储实例，避免持有失效的模型引用
     @State private var selectedRecordId: UUID?
     @State private var showConfetti = false
+    // 导航路径，用于检测是否在根页面
+    @State private var navigationPath = NavigationPath()
     
     // 计算属性：从当前有效的 records 数组中获取选中的记录实例
     private var selectedRecord: Record? {
@@ -233,7 +235,7 @@ struct RecordListView: View {
     
     var body: some View {
         ZStack {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 List {
                     ForEach(recordsByDay.sorted(by: { $0.key > $1.key }), id: \.key) { date, dayRecords in
                         Section(header: Text(formatDate(date))) {
@@ -257,6 +259,12 @@ struct RecordListView: View {
                 .padding(.top, 0)
                 .navigationTitle("records".localized)
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationDestination(for: UUID.self) { recordId in
+                    // 根据 ID 查找记录并显示详情页
+                    if let record = records.first(where: { $0.id == recordId }) {
+                        RecordDetailView(record: record)
+                    }
+                }
                 // 编辑页面以 sheet 形式弹出
                 .sheet(isPresented: $isNavigatingToEdit) {
                     if let record = selectedRecord {
@@ -291,26 +299,28 @@ struct RecordListView: View {
                 hapticFeedback: true
             )
             
-            // 固定悬浮在右下角的添加按钮
-            VStack {
-                Spacer()
-                HStack {
+            // 固定悬浮在右下角的添加按钮（只在 List 页面显示）
+            if navigationPath.isEmpty {
+                VStack {
                     Spacer()
-                    Button(action: {
-                        // 导航到创建记录页面
-                        isNavigatingToCreate = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .frame(width: 56, height: 56)
-                            .background(Color.accentColor)
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            // 导航到创建记录页面
+                            isNavigatingToCreate = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.accentColor)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
                 }
             }
         }

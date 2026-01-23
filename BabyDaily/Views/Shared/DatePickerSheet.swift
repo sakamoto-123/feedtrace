@@ -28,8 +28,13 @@ struct DatePickerSheet: View {
     // 初始化方法 - 用于可选日期
     init(title: String = "", optionalDate: Binding<Date?>, isPresented: Binding<Bool>, displayedComponents: DatePickerComponents = [.date, .hourAndMinute]) {
         self.title = title
-        self._date = Binding(get: { optionalDate.wrappedValue ?? Date() }, 
-                            set: { optionalDate.wrappedValue = $0 })
+        // 确保在可选日期为 nil 时使用当前日期，并正确更新绑定
+        self._date = Binding(
+            get: { optionalDate.wrappedValue ?? Date() }, 
+            set: { newValue in
+                optionalDate.wrappedValue = newValue
+            }
+        )
         self._optionalDate = optionalDate
         self._isPresented = isPresented
         self.isOptional = true
@@ -49,7 +54,8 @@ struct DatePickerSheet: View {
                 Spacer()
                 
                 Button("complete".localized) {
-                    // 如果是可选日期，确保更新可选日期的值
+                    // 确保值已更新（对于非可选日期，DatePicker 的绑定应该已经更新了）
+                    // 对于可选日期，确保更新可选日期的值
                     if isOptional {
                         optionalDate = date
                     }
@@ -84,6 +90,12 @@ struct DatePickerSheet: View {
                 .labelsHidden()
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
+                .onChange(of: date) { oldValue, newValue in
+                    // 确保绑定值更新时触发父视图刷新
+                    if isOptional {
+                        optionalDate = newValue
+                    }
+                }
             } else {
                 // 同时显示日期和时间 - 使用默认样式
                 DatePicker(

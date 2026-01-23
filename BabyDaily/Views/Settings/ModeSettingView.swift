@@ -43,7 +43,7 @@ struct ModeSettingView: View {
             .navigationTitle("mode_setting".localized)
             .navigationBarTitleDisplayMode(.inline)
             .edgesIgnoringSafeArea(.bottom)
-            .toolbar(.hidden, for: .tabBar)
+             .animatedTabBarHidden()
             .onAppear {
                 // 视图出现时同步AppSettings的状态
                 selectedMode = appSettings.themeMode

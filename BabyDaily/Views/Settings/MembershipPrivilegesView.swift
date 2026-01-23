@@ -70,7 +70,7 @@ struct MembershipPrivilegesView: View {
             }
             .navigationTitle("membership_subscription".localized)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(.hidden, for: .tabBar)
+             .animatedTabBarHidden()
             .background(Color.themeBackground(for: colorScheme))
             .onAppear {
                 Task {

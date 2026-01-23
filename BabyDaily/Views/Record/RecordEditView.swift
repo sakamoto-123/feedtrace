@@ -125,6 +125,8 @@ struct RecordTypeSelector: View {
 
 // MARK: - 时间选择组件
 struct RecordTimeSelector: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     @Binding var startTimestamp: Date
     @Binding var endTimestamp: Date?
     @Binding var showEndTimePicker: Bool
@@ -192,7 +194,7 @@ struct RecordTimeSelector: View {
                             .foregroundColor(.gray)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color(.systemGray6))
+                            .background(Color.themeBackground(for: colorScheme))
                             .cornerRadius(6)
                     }
                     
@@ -212,8 +214,8 @@ struct RecordTimeSelector: View {
                         showStartTimeSheet.toggle()
                     }) {
                         Text(formatDateTime(startTimestamp, dateStyle: .omitted, timeStyle: .shortened))
-                            .font(.system(size: 36))
-                            .foregroundColor(.primary)
+                            .font(.system(size: 30))
+                            .foregroundColor(.accentColor)
                     }
                                     
                     Text(getTimePeriod(startTimestamp))
@@ -221,7 +223,7 @@ struct RecordTimeSelector: View {
                         .foregroundColor(.gray)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color(.systemGray6))
+                        .background(Color.themeBackground(for: colorScheme))
                         .cornerRadius(6)
 
                     Spacer()
@@ -250,7 +252,7 @@ struct RecordTimeSelector: View {
                                 .foregroundColor(.gray)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(.systemGray6))
+                                .background(Color.themeBackground(for: colorScheme))
                                 .cornerRadius(4)
                         }
                         // 具体日期
@@ -269,17 +271,17 @@ struct RecordTimeSelector: View {
                             showEndTimeSheet.toggle()
                         }) {
                             Text(formatDateTime(endTimestamp!, dateStyle: .omitted, timeStyle: .shortened))
-                                .font(.system(size: 36))
-                                .foregroundColor(.primary)
+                                .font(.system(size: 30))
+                                .foregroundColor(.accentColor)
                         }
                       
                         Text(getTimePeriod(endTimestamp!))
-                            .font(.system(size: 2))
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 4)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(4)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.themeBackground(for: colorScheme))
+                            .cornerRadius(6)
                     }
                 }
                 .padding(.vertical, 8)
@@ -306,7 +308,7 @@ struct RecordTimeSelector: View {
                 Spacer()
             }
             .font(.system(size: 14))
-            .padding(.vertical, 8)
+            .padding(.vertical, 4)
            
         }
         // 开始日期选择 - 使用 sheet + presentation detents 控制高度
@@ -355,6 +357,8 @@ struct RecordTimeSelector: View {
 
 // MARK: - 信息模块组件
 struct RecordInfoSection: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     // 绑定参数
     let subCategory: String?
     @Binding var name: String
@@ -405,7 +409,7 @@ struct RecordInfoSection: View {
             if needsName {
                 TextField((subCategory?.localized ?? "") + "name".localized, text: $name)
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.themeBackground(for: colorScheme))
                     .cornerRadius(Constants.cornerRadius)
                     .submitLabel(.done)
             }
@@ -435,12 +439,12 @@ struct RecordInfoSection: View {
                         showUnitSettingSheet.toggle()
                     }) {
                         Text(defaultUnit.localized ?? "")
-                            .font(.title)
+                            .font(.headline)
                             .foregroundColor(.accentColor)
                     }
                 }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.themeBackground(for: colorScheme))
                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                 // 确保单位正确设置
                 .onAppear {
@@ -514,10 +518,10 @@ struct RecordAdditionalInfoSection: View {
         MultilineTextView(
             text: $remark,
             placeholder: "remark".localized,
-            minHeight: 120,
+            minHeight: 50,
             maxLines: 10
         )
-        .background(Color(.systemGray6))
+        .background(Color.themeBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
         
     //     Divider()
@@ -584,8 +588,8 @@ struct RecordEditView: View {
     @StateObject private var unitManager = UnitManager.shared
     
     // 基本信息
-    @State private var startTimestamp: Date = Date()
-    @State private var endTimestamp: Date? = nil
+    @State private var startTimestamp: Date
+    @State private var endTimestamp: Date?
     @State private var showEndTimePicker: Bool = false
     @State private var name: String = ""
     @State private var value: String = ""
@@ -680,6 +684,21 @@ struct RecordEditView: View {
             
             // 从现有记录中提取recordType信息并设置selectedRecordType的初始值
             _selectedRecordType = State(initialValue: (category: record.category, subCategory: record.subCategory, icon: record.icon))
+        } else {
+            // 创建新记录时，使用当前时间
+            _startTimestamp = State(initialValue: Date())
+            _endTimestamp = State(initialValue: nil)
+            _showEndTimePicker = State(initialValue: false)
+            _name = State(initialValue: "")
+            _value = State(initialValue: "")
+            _unit = State(initialValue: "ml")
+            _remark = State(initialValue: "")
+            _photos = State(initialValue: [])
+            _breastType = State(initialValue: "BOTH")
+            _dayOrNight = State(initialValue: "DAY")
+            _acceptance = State(initialValue: "NEUTRAL")
+            _excrementStatus = State(initialValue: "URINE")
+            _selectedRecordType = State(initialValue: nil)
         }
     }
     
@@ -782,7 +801,7 @@ struct RecordEditView: View {
                 .navigationTitle(getNavigationTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbarContent() }
-                .toolbar(.hidden, for: .tabBar)
+                 .animatedTabBarHidden()
                 .onChange(of: tempImageDatas) { oldValue, newValue in
                     handleImageDataChange(oldValue: oldValue, newValue: newValue)
                 }
@@ -801,6 +820,7 @@ struct RecordEditView: View {
                 infoSection
                 additionalInfoSection
                 Spacer()
+                bottomSaveButton
             }
             .padding()
             .padding(.top, 0)
@@ -841,9 +861,54 @@ struct RecordEditView: View {
         .disabled(isSaveButtonDisabled())
     }
     
+    // 底部保存按钮
+    private var bottomSaveButton: some View {
+        Button {
+            saveRecord()
+        } label: {
+            Text("save".localized)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(isSaveButtonDisabled() ? Color.gray.opacity(0.3) : Color.accentColor)
+                .cornerRadius(Constants.cornerRadius)
+        }
+        .disabled(isSaveButtonDisabled())
+        .padding(.horizontal)
+        .padding(.bottom, 16)
+    }
+    
     // 检查保存按钮是否应该禁用
     private func isSaveButtonDisabled() -> Bool {
-        return existingRecord == nil && currentRecordType == nil
+        // 如果是编辑现有记录，不需要禁用（允许保存）
+        if existingRecord != nil {
+            return false
+        }
+        
+        // 创建新记录时，必须选择记录类型
+        if currentRecordType == nil {
+            return true
+        }
+        
+        // 检查必填字段
+        // 如果需要名称但名称为空，禁用按钮
+        if needsName && name.isEmpty {
+            return true
+        }
+        
+        // 如果需要用量但用量为空或无效，禁用按钮
+        if needsValue {
+            if value.isEmpty {
+                return true
+            }
+            // 检查是否为有效数字
+            if Double(value) == nil {
+                return true
+            }
+        }
+        
+        return false
     }
     
     // 处理图片数据变化

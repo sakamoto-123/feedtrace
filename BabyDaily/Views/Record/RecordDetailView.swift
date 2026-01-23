@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct RecordDetailView: View {
-    let record: Record
+    let recordId: UUID
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
@@ -14,8 +14,22 @@ struct RecordDetailView: View {
     @State private var isShowingImagePreview = false
     @State private var selectedImageIndex = 0
     
+    // 通过 ID 查询 Record 对象，避免持有失效的引用
+    @Query private var allRecords: [Record]
+    
+    init(recordId: UUID) {
+        self.recordId = recordId
+        _allRecords = Query()
+    }
+    
+    // 从当前有效的 records 数组中获取记录实例
+    private var record: Record? {
+        allRecords.first(where: { $0.id == recordId })
+    }
+    
     // 根据record.babyId查询对应的baby对象
     private var baby: Baby? {
+        guard let record = record else { return nil }
         do {
             let fetchDescriptor = FetchDescriptor<Baby>()
             let babies = try modelContext.fetch(fetchDescriptor)
@@ -27,27 +41,30 @@ struct RecordDetailView: View {
     }
     
     // 记录基本信息视图
+    @ViewBuilder
     private var recordHeaderView: some View {
-        HStack(spacing: 16) {
-            Text(record.icon)
-                .font(.title)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(record.subCategory.localized)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    
-                Text("\(record.category.localized) · \(formatRelativeTime(record.startTimestamp))")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+        if let record = record {
+            HStack(spacing: 16) {
+                Text(record.icon)
+                    .font(.title)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(record.subCategory.localized)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        
+                    Text("\(record.category.localized) · \(formatRelativeTime(record.startTimestamp))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                milestoneInfoView
             }
-            
-            Spacer()
-            milestoneInfoView
+            .padding()
+            .background(.background)
+            .cornerRadius(Constants.cornerRadius)
         }
-        .padding()
-        .background(.background)
-        .cornerRadius(Constants.cornerRadius)
     }
     
     // 时间信息视图
@@ -294,7 +311,7 @@ struct RecordDetailView: View {
         .navigationTitle("record_detail".localized)
         .navigationBarTitleDisplayMode(.inline)
         // .toolbar(.hidden, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
+        .animatedTabBarHidden()
         .toolbar { // 右上角按钮
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 24) { // 增加间距到 24
