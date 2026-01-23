@@ -151,34 +151,34 @@ struct BabyInfoHeader: View {
         _allBabies = Query(sort: [SortDescriptor(\Baby.createdAt)])
     }
     
-    // #if DEBUG
-    // // 删除当前宝宝的所有记录 - 仅在debug模式下可用
-    // private func deleteAllRecords() {
-    //     // 删除所有记录
-    //     for record in records {
-    //         modelContext.delete(record)
-    //     }
+    #if DEBUG
+    // 删除当前宝宝的所有记录 - 仅在debug模式下可用
+    private func deleteAllRecords() {
+        // 删除所有记录
+        for record in records {
+            modelContext.delete(record)
+        }
         
-    //     // 删除所有UserSetting数据
-    //     do {
-    //         let fetchDescriptor = FetchDescriptor<UserSetting>()
-    //         let userSettings = try modelContext.fetch(fetchDescriptor)
-    //         for setting in userSettings {
-    //             modelContext.delete(setting)
-    //         }
-    //     } catch {
-    //         Logger.error("Failed to fetch UserSetting: \(error)")
-    //     }
+        // 删除所有UserSetting数据
+        do {
+            let fetchDescriptor = FetchDescriptor<UserSetting>()
+            let userSettings = try modelContext.fetch(fetchDescriptor)
+            for setting in userSettings {
+                modelContext.delete(setting)
+            }
+        } catch {
+            Logger.error("Failed to fetch UserSetting: \(error)")
+        }
         
-    //     do {
-    //         try modelContext.save()
-    //         Logger.debug("Successfully deleted all records for baby: \(baby.name)")
-    //         Logger.debug("Successfully deleted all UserSetting data")
-    //     } catch {
-    //         Logger.error("Failed to delete all records: \(error)")
-    //     }
-    // }
-    // #endif
+        do {
+            try modelContext.save()
+            Logger.debug("Successfully deleted all records for baby: \(baby.name)")
+            Logger.debug("Successfully deleted all UserSetting data")
+        } catch {
+            Logger.error("Failed to delete all records: \(error)")
+        }
+    }
+    #endif
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -225,23 +225,23 @@ struct BabyInfoHeader: View {
                 Spacer()
                 
                 // 一键删除所有记录按钮 - 仅在debug模式下显示
-                #if DEBUG
-                Button(action: {
-                    showingDeleteConfirm = true
-                }) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 16))
-                        .foregroundColor(.red)
-                }
-                .confirmationDialog("delete_all_records_confirm".localized, isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
-                    Button("delete".localized, role: .destructive) {
-                        deleteAllRecords()
-                    }
-                    Button("cancel".localized, role: .cancel) {}
-                } message: {
-                    Text("delete_all_records_message".localized)
-                }
-                #endif
+                // #if DEBUG
+                // Button(action: {
+                //     showingDeleteConfirm = true
+                // }) {
+                //     Image(systemName: "trash")
+                //         .font(.system(size: 16))
+                //         .foregroundColor(.red)
+                // }
+                // .confirmationDialog("delete_all_records_confirm".localized, isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+                //     Button("delete".localized, role: .destructive) {
+                //         deleteAllRecords()
+                //     }
+                //     Button("cancel".localized, role: .cancel) {}
+                // } message: {
+                //     Text("delete_all_records_message".localized)
+                // }
+                // #endif
             }
             .padding(.leading, 20)
             .padding(.bottom, 12)

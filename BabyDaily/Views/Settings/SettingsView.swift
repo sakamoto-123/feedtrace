@@ -182,7 +182,7 @@ struct SettingsView: View {
 //                             }
 //                         }
 // #endif
-//                     }
+                    }
                     
 //                     // 手动同步按钮和状态显示
 // #if DEBUG
