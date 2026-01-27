@@ -437,14 +437,14 @@ struct MembershipPrivilegesView: View {
     
     private func openPrivacyPolicy() {
         // TODO: 替换为实际的隐私政策URL
-        if let url = URL(string: "https://example.com/privacy") {
+        if let url = URL(string: "https://my.feishu.cn/wiki/N6xkwhXXPikVDrk075tcsNpgn2q") {
             UIApplication.shared.open(url)
         }
     }
     
     private func openTermsOfService() {
         // TODO: 替换为实际的使用条款URL
-        if let url = URL(string: "https://example.com/terms") {
+        if let url = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/") {
             UIApplication.shared.open(url)
         }
     }

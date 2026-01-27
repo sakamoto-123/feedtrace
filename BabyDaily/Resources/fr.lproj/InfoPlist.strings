@@ -1,2 +1,5 @@
+/* Nom d'affichage de l'application */
+"CFBundleDisplayName" = "FeedTrace";
+
 /* Permission de Bibliothèque Photo */
 "NSPhotoLibraryUsageDescription" = "Nous avons besoin d'accéder à votre bibliothèque de photos pour sélectionner des photos afin d'enregistrer les moments de croissance de votre bébé";

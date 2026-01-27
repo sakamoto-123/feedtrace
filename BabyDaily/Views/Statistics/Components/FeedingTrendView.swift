@@ -48,7 +48,7 @@ struct FeedingStackItem: Identifiable {
 private struct ChartLegend: View {
     var body: some View {
         // 图例
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             HStack(spacing: 4) {
                 Circle()
                     .fill(FeedingType.breastMilk.color)
@@ -56,6 +56,8 @@ private struct ChartLegend: View {
                 Text(FeedingType.breastMilk.title)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             HStack(spacing: 4) {
                 Circle()
@@ -64,6 +66,8 @@ private struct ChartLegend: View {
                 Text(FeedingType.formula.title)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             HStack(spacing: 4) {
                 Circle()
@@ -72,9 +76,11 @@ private struct ChartLegend: View {
                 Text(FeedingType.water.title)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 8)
     }
 }
 

@@ -1,2 +1,5 @@
+/* APP显示名称 */
+"CFBundleDisplayName" = "芋丸·宝宝日志";
+
 /* 相册权限 */
 "NSPhotoLibraryUsageDescription" = "我们需要访问您的相册以选择照片来记录宝宝的成长时刻";

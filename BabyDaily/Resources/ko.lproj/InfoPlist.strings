@@ -1,2 +1,5 @@
+/* 앱 표시 이름 */
+"CFBundleDisplayName" = "FeedTrace";
+
 /* 사진 라이브러리 권한 */
 "NSPhotoLibraryUsageDescription" = "아기의 성장 순간을 기록하기 위해 사진을 선택하려면 사진 라이브러리에 대한 액세스가 필요합니다";

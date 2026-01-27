@@ -1,2 +1,5 @@
+/* アプリ表示名 */
+"CFBundleDisplayName" = "FeedTrace";
+
 /* フォトライブラリ権限 */
 "NSPhotoLibraryUsageDescription" = "赤ちゃんの成長の瞬間を記録するために、写真を選択するためにフォトライブラリへのアクセスが必要です";

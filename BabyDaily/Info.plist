@@ -2,11 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
-	<!-- iCloud配置 -->
 	<key>CKContainerIdentifiers</key>
 	<array>
 		<string>iCloud.cn.iizhi.BabyDaily</string>
@@ -23,8 +18,9 @@
 			<string>Any</string>
 		</dict>
 	</dict>
-	<!-- Photo Library Permission: For selecting photos to record baby's growth -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library to select photos for recording your baby's growth moments</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

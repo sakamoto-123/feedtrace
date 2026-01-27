@@ -25,7 +25,7 @@ struct SettingsView: View {
     
     private func shareApp() {
         let shareText = "share_app_text".localized
-        if let url = URL(string: "https://apps.apple.com") {
+        if let url = URL(string: "https://apps.apple.com/cn/app/id6758009379") {
             let activityVC = UIActivityViewController(activityItems: [shareText, url], applicationActivities: nil)
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootVC = windowScene.windows.first?.rootViewController {
@@ -34,8 +34,8 @@ struct SettingsView: View {
         }
     }
     
-    private let privacyPolicyURL = URL(string: "https://example.com/privacy")!
-    private let userAgreementURL = URL(string: "https://example.com/terms")!
+    private let privacyPolicyURL = URL(string: "https://my.feishu.cn/wiki/N6xkwhXXPikVDrk075tcsNpgn2q")!
+    private let userAgreementURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     
     private func openPrivacyPolicy() {
         UIApplication.shared.open(privacyPolicyURL)
@@ -47,7 +47,7 @@ struct SettingsView: View {
     
     private func openAppStoreReview() {
         // 替换为你的App ID
-        let urlString = "itms-apps://apps.apple.com/app/id6757728747?action=write-review"
+        let urlString = "itms-apps://apps.apple.com/app/id6758009379?action=write-review"
         if let url = URL(string: urlString) {
             UIApplication.shared.open(url)
         }
@@ -286,23 +286,23 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                 }
                 
-                // HStack(alignment: .center, spacing: 12) {
-                //     Spacer()
-                //      Button(action: openPrivacyPolicy) {
-                //         Text("privacy_policy".localized)
-                //             .font(.caption)
-                //             .foregroundColor(.secondary)
-                //     }
-                //     .buttonStyle(.plain)
+                HStack(alignment: .center, spacing: 12) {
+                    Spacer()
+                     Button(action: openPrivacyPolicy) {
+                        Text("privacy_policy".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 
-                //     Button(action: openUserAgreement) {
-                //         Text("user_agreement".localized)
-                //             .font(.caption)
-                //             .foregroundColor(.secondary)
-                //     }
-                //     .buttonStyle(.plain)
-                //     Spacer()
-                // }.listRowBackground(Color.clear)
+                    Button(action: openUserAgreement) {
+                        Text("user_agreement".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    Spacer()
+                }.listRowBackground(Color.clear)
             }
             .listStyle(.insetGrouped)
             .padding(.top, -20)
