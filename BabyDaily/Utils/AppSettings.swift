@@ -8,7 +8,6 @@
 
 import SwiftUI
 import Combine
-import SwiftData
 
 // MARK: - 主题模式枚举
 enum ThemeMode: String, CaseIterable, Codable {
@@ -43,18 +42,18 @@ enum ThemeMode: String, CaseIterable, Codable {
 
 // MARK: - 主题颜色枚举
 enum ThemeColor: String, CaseIterable, Identifiable, Codable {
-    case blue = "blue"
-    case green = "green"
-    case purple = "purple"
-    case pink = "pink"
-    case orange = "orange"
-    case red = "red"
     case lightYellow = "lightYellow"
     case lightPurple = "lightPurple"
     case skyBlue = "skyBlue"
     case paleBlue = "paleBlue"
     case grayBlue = "grayBlue"
     case brown = "brown"
+    case blue = "blue"
+    case green = "green"
+    case purple = "purple"
+    case pink = "pink"
+    case orange = "orange"
+    case red = "red"
     case deepBlue = "deepBlue"
     case lavender = "lavender"
     case teal = "teal"
@@ -190,7 +189,7 @@ class AppSettings: ObservableObject {
     
     // MARK: - Published Properties
     @Published var themeMode: ThemeMode
-    @Published var themeColor: ThemeColor = .blue
+    @Published var themeColor: ThemeColor = .lightPurple
     @Published var language: AppLanguage
     
     // MARK: - UserDefaults Keys
@@ -221,17 +220,17 @@ class AppSettings: ObservableObject {
         self.themeMode = ThemeMode(rawValue: themeModeValue) ?? .system
         
         let savedThemeColor = UserDefaults.standard.string(forKey: Keys.themeColor)
-            ?? ThemeColor.blue.rawValue
+            ?? ThemeColor.lightPurple.rawValue
         
         // 处理旧格式（中文）到新格式（英文）的转换
         let themeColorValue: String
-        if let color = ThemeColor(rawValue: savedThemeColor) {
+        if ThemeColor(rawValue: savedThemeColor) != nil {
             themeColorValue = savedThemeColor
         } else {
             // 尝试从中文名称映射到英文键
-            themeColorValue = Self.mapChineseColorToKey(savedThemeColor) ?? ThemeColor.blue.rawValue
+            themeColorValue = Self.mapChineseColorToKey(savedThemeColor) ?? ThemeColor.lightPurple.rawValue
         }
-        self.themeColor = ThemeColor(rawValue: themeColorValue) ?? .blue
+        self.themeColor = ThemeColor(rawValue: themeColorValue) ?? .lightPurple
         
         let savedLanguage = UserDefaults.standard.string(forKey: Keys.language)
             ?? ""

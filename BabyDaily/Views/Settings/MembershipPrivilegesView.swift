@@ -98,7 +98,7 @@ struct MembershipPrivilegesView: View {
         VStack(spacing: 12) {
             HStack {
                 Image(systemName: "crown.fill")
-                    .foregroundColor(.yellow)
+                    .foregroundColor(.accentColor)
                     .font(.system(size: 24))
                 
                 Text("current_membership_status".localized)
@@ -121,7 +121,10 @@ struct MembershipPrivilegesView: View {
                 if let membershipType = membershipManager.membershipType {
                     Text(membershipType.localizedName)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.primary)
+                        .foregroundColor(.accentColor)
+                        .onTapGesture {
+                            presentManageSubscriptions()
+                        }
                 } else {
                     Text("unknown".localized)
                         .font(.system(size: 14))
@@ -192,17 +195,17 @@ struct MembershipPrivilegesView: View {
                 
                 Text("regular_user".localized)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.primary)
                     .frame(width: 80, alignment: .center)
                 
                 Text("premium_member".localized)
                     .font(.system(size: 14, weight: .semibold))
-                    .premiumGradient()
+                    .foregroundColor(.primary)
                     .frame(width: 80, alignment: .center)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color(.systemGray3))
+            .background(Color.accentColor.opacity(0.5))
             
             // 功能列表
             ForEach(Array(features.enumerated()), id: \.element) { index, feature in
@@ -301,7 +304,7 @@ struct MembershipPrivilegesView: View {
                 // 标题
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(isDisabled ? .white.opacity(0.6) : .white)
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // 价格或加载状态
@@ -312,7 +315,7 @@ struct MembershipPrivilegesView: View {
                 } else if let product = product {
                     Text(product.displayPrice)
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(isDisabled ? .white.opacity(0.6) : .white)
+                        .foregroundColor(.white)
                 } else {
                     // 产品未加载时显示占位符
                     Text("—")
@@ -322,9 +325,9 @@ struct MembershipPrivilegesView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .buttonGradientBackground()
+            .background(Color.accentColor)
             .cornerRadius(12)
-            .opacity(isDisabled ? 0.6 : 1.0)
+            .opacity(isDisabled ? 0.8 : 1.0)
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
@@ -366,9 +369,9 @@ struct MembershipPrivilegesView: View {
                     openPrivacyPolicy()
                 }
                 
-                // legalLink(title: "terms_of_service".localized) {
-                //     openTermsOfService()
-                // }
+                legalLink(title: "terms_of_service".localized) {
+                    openTermsOfService()
+                }
                 
                 legalLink(title: "redeem_code".localized) {
                     presentCodeRedemption()
@@ -472,6 +475,24 @@ struct MembershipPrivilegesView: View {
             } catch {
                 Logger.error("Failed to present code redemption sheet: \(error.localizedDescription)")
                 showAlert(title: "error".localized, message: "failed_to_present_code_redemption".localized)
+            }
+        }
+    }
+
+    /// 显示管理订阅界面
+    private func presentManageSubscriptions() {
+        Task { @MainActor in
+            guard let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+                Logger.error("Failed to get current window scene")
+                return
+            }
+            
+            do {
+                try await AppStore.showManageSubscriptions(in: windowScene)
+                Logger.info("Manage subscriptions sheet presented successfully")
+            } catch {
+                Logger.error("Failed to present manage subscriptions sheet: \(error.localizedDescription)")
             }
         }
     }

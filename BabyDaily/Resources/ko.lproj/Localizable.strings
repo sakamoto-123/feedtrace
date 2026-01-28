@@ -13,15 +13,11 @@
 "select_volume_unit" = "부피 측정 단위 선택";
 
 // HomeView
-"baby_diary" = "아기 일기";
 "today_statistics" = "오늘의 통계";
 "feeding" = "수유";
-"activity" = "활동";
 "ongoing" = "진행 중";
 "ending" = "종료";
 "quick_actions" = "빠른 작업";
-"more_records" = "더 많은 기록";
-"edit" = "편집";
 "all_actions" = "모든 작업";
 "weight" = "체중";
 "height" = "키";
@@ -39,7 +35,6 @@
 
 // Quick Actions
 "solid_food" = "이유식";
-"water" = "물";
 "sleep" = "수면";
 "diaper" = "기저귀";
 "bath" = "목욕";
@@ -80,15 +75,12 @@
 "first_word" = "첫 번째 말";
 
 // Language Setting
-"select_language" = "언어 선택";
 "language_setting" = "언어 설정";
 
 // Today Stats
 "breast_milk" = "모유";
 "stool" = "대변";
 "urine" = "소변";
-"sleep_duration" = "수면 시간";
-"sleep_count" = "수면 횟수";
 "hours" = "시간";
 "times" = "회";
 
@@ -98,8 +90,6 @@
 "day" = "일";
 
 // SettingsView
-"tap_to_edit_baby_info" = "아기 정보 편집";
-"personalization_settings" = "개인화";
 "theme_color" = "테마 색상";
 "language_setting" = "언어 설정";
 "mode_setting" = "모드 설정";
@@ -107,24 +97,13 @@
 "light_theme" = "라이트 모드";
 "dark_theme" = "다크 모드";
 "membership_privileges" = "회원 특권";
-"free" = "무료";
-"about" = "소개";
-"about_us" = "회사 소개";
 "help_and_feedback" = "도움말 및 피드백";
 "privacy_policy" = "개인정보 정책";
-"user_agreement" = "이용 약관";
+"user_agreement" = "사용자 계약";
 "settings" = "설정";
 
 // AppLanguage Names
 "system_language" = "시스템 따르기";
-"simplified_chinese" = "간체 중국어";
-"traditional_chinese" = "번체 중국어";
-"english" = "영어";
-"japanese" = "일본어";
-"korean" = "한국어";
-"french" = "프랑스어";
-"portuguese" = "포르투갈어";
-"spanish" = "스페인어";
 
 // MainTabView
 "home" = "홈";
@@ -141,19 +120,15 @@
 "in_progress" = "진행 중";
 "hours" = "시간";
 "records" = "기록";
-"edit" = "편집";
 "delete" = "삭제";
 
 // RecordEditView
 "create_record" = "기록 만들기";
 "edit_record" = "기록 편집";
-"start" = "시작";
-"end" = "종료";
 "save" = "저장";
 "cancel" = "취소";
 
 // BabyCreationView
-"baby_name" = "아기 이름";
 "enter_baby_name" = "아기 이름을 입력하세요";
 "birthday" = "생일";
 "gender" = "성별";
@@ -162,7 +137,6 @@
 "prefer_not_to_say" = "공개하지 않음";
 "add_baby" = "아기 추가";
 "complete" = "완료";
-"partner_device_tip" = "또는 파트너의 기기에서 아기의 소중한 데이터를 가져오세요";
 
 // StatisticsView
 "feeding_trend" = "수유 추세";
@@ -184,29 +158,19 @@
 
 // GrowthStatisticsView
 "bmi" = "BMI";
-"month_age_format" = "연령: %d개월";
-"weight_format" = "체중: %.1f kg";
-"height_format" = "키: %.1f cm";
-"head_format" = "머리 둘레: %.1f cm";
 
 // SleepTrendView
-"sleep_duration_title" = "수면 시간";
 "hours_unit" = "시간(시간)";
-"sleep_duration_format" = "수면 시간: %.1f 시간";
 "sleep_count_title" = "수면 횟수";
 "times_unit" = "횟수";
-"sleep_count_format" = "수면 횟수: %d 회";
 
 // FeedingTrendView
-"feeding_trend_title" = "젖량 추세";
-"milk_volume_unit" = "젖량(ml)";
 
 // Units
 "ml" = "ml";
 "g" = "g";
 "kg" = "kg";
 "cm" = "cm";
-"degree" = "℃";
 "tablet" = "정";
 "piece" = "조각";
 
@@ -218,53 +182,17 @@
 
 // Family Collaboration
 "family_collaboration" = "가족 협력";
-"collaboration_title" = "가족과 함께 아기의 성장을 기록";
-"collaboration_subtitle" = "iCloud 협력 기능을 통해 다음을 수행할 수 있습니다:";
-"invite_family" = "가족 초대";
-"record_together" = "일상을 함께 기록";
-"real_time_sync" = "실시간 데이터 동기화";
 "select_baby_to_collaborate" = "협력할 아기 선택";
 "no_collaborators_yet" = "아직 협력자가 추가되지 않았습니다";
 "manage_collaboration" = "협력 관리";
-"collaboration_invite_guide" = "협력 초대 가이드";
 "three_steps_to_share" = "공유를 완료하는 3단계";
-"step1_invite" = "먼저 '가족 초대'를 클릭한 다음 메시지 앱을 선택";
-"step2_contact" = "초대하고 싶은 연락처 정보를 입력";
-"step3_send" = "즉시 초대 전송";
 "ensure_icloud_setup" = "iCloud가 설정되어 있는지 확인";
-"ensure_icloud_setup_desc" = "초대하는 가족이 iCloud에 로그인하고 충분한 여유 공간을 확보했는지 확인하세요. BabyMemos 동기화가 공간 부족으로 중단되지 않도록 합니다";
-"must_use_sms" = "메시지 앱을 사용하여 전송해야 합니다";
-"must_use_sms_desc" = "메시지 앱을 사용하여 협력 초대를 전송하세요. 그러면 가족이 성공적으로 참여할 수 있습니다";
-"remind_install_app" = "가족에게 먼저 Baby Memos를 설치하도록 알리기";
-"remind_install_app_desc" = "가족에게 최신 버전의 Baby Memos를 설치한 후 초대 링크를 열도록 알려주세요. 그러면 성공적으로 동기화할 수 있습니다";
+"ensure_icloud_setup_desc" = "초대하는 가족이 iCloud에 로그인하고 충분한 여유 공간을 확보했는지 확인하세요. FeedTrace 동기화가 공간 부족으로 중단되지 않도록 합니다";
+"remind_install_app" = "가족에게 먼저 FeedTrace를 설치하도록 알리기";
+"remind_install_app_desc" = "가족에게 최신 버전의 FeedTrace를 설치한 후 초대 링크를 열도록 알려주세요. 그러면 성공적으로 동기화할 수 있습니다";
 "owner" = "소유자";
-"read_only" = "읽기 전용";
-"read_write" = "편집 가능";
-"only_invited_can_edit" = "초대된 사용자만 편집 가능";
-"stop_sharing" = "공유 중지";
-"collaborators_count" = "%d명의 협력자";
-"not_shared" = "공유되지 않음";
-"shared" = "공유됨";
-"sharing" = "공유 중";
-"collaboration_error" = "협력 오류";
 "close" = "닫기";
 "error" = "오류";
-"stop_sharing_confirm_message" = "공유를 중지하시겠습니까? 중지 후 모든 협력자가 아기의 기록에 액세스할 수 없게 됩니다.";
-"permission_setting" = "권한 설정";
-"read_only_desc" = "협력자는 기록을 볼 수만 있고 편집할 수 없습니다";
-"read_write_desc" = "협력자는 기록을 보고 편집할 수 있습니다";
-"sharing_all_data" = "모든 데이터 공유";
-"sharing_all_data_desc" = "공유 후 협력자는 모든 아기와 그 기록을 보고 편집할 수 있습니다";
-"read_only_user_cannot_edit" = "읽기 전용 사용자는 기록을 편집할 수 없습니다";
-"read_only_user_cannot_delete" = "읽기 전용 사용자는 기록을 삭제할 수 없습니다";
-"loading_share_data" = "공유 데이터 로드 중...";
-"loading_share_data_title" = "공유 데이터 로드 중";
-"accepting_share_invitation" = "공유 초대 수락 중...";
-"loading_shared_babies" = "공유된 아기 정보 로드 중...";
-"loading_shared_records" = "공유된 기록 로드 중...";
-"loading_complete" = "로드 완료!";
-"loading_failed" = "로드 실패";
-"retry" = "다시 시도";
 
 // BabySwitcherView
 "select_baby" = "아기 선택";
@@ -278,17 +206,12 @@
 "icloud_sync_backup" = "iCloud 동기화/백업";
 "icloud_not_logged_in_title" = "iCloud에 로그인하지 않음";
 "icloud_not_logged_in_message" = "iCloud에 로그인하지 않았습니다. 동기화 기능을 활성화하기 전에 iCloud에 로그인하세요.";
-"icloud_insufficient_space_title" = "iCloud 저장 공간 부족";
-"icloud_insufficient_space_message" = "iCloud 저장 공간이 부족합니다. iCloud 공간을 확보한 후 다시 시도하세요.";
 "manual_sync" = "수동 동기화";
 "sync_now" = "지금 동기화";
 "share_app" = "앱 공유";
-"share_app_text" = "BabyDaily - 아기 성장 기록 도우미를 추천합니다";
+"share_app_text" = "FeedTrace - 아기 성장 기록 도우미를 추천합니다";
 
 // MembershipPrivilegesView
-"current_free_user" = "현재 무료 사용자";
-"upgrade_membership_prompt" = "회원으로 업그레이드하여 더 많은 특권을 누리세요";
-"upgrade_now" = "지금 업그레이드";
 "current_membership_status" = "현재 회원 상태";
 "membership_type" = "회원 유형";
 "membership_status" = "회원 상태";
@@ -298,14 +221,58 @@
 "membership_active" = "활성";
 "membership_expired" = "만료됨";
 "membership_not_subscribed" = "구독하지 않음";
-"icloud_sync_feature" = "iCloud 동기화";
-"multi_device_sync" = "다중 기기 동기화";
-"data_stored_in_icloud" = "데이터가 iCloud에 저장됩니다";
-"multi_device_sync_description" = "다중 기기 데이터 동기화 지원";
-"more_themes" = "더 많은 테마";
-"unlock_more_themes_description" = "더 많은 테마 색상과 스타일 잠금 해제";
-"no_ads" = "광고 없음";
-"no_ads_description" = "사용 중 광고가 전혀 표시되지 않습니다";
+"membership_subscription" = "멤버십 구독";
+"app_name" = "FeedTrace";
+"feature_comparison" = "기능 비교";
+"regular_user" = "일반 사용자";
+"premium_member" = "프리미엄 회원";
+"remove_ads" = "광고 제거";
+"basic_records" = "기본 기록";
+"quick_action_records" = "빠른 작업 기록";
+"chart_trends" = "차트 추세";
+"family_sharing" = "가족 공유";
+"multiple_babies" = "여러 아기";
+"unlimited_widgets" = "무제한 위젯";
+"unlimited_custom_records" = "무제한 사용자 정의 기록";
+"apple_watch_feature" = "Apple Watch (개발 중)";
+"future_more_features" = "향후 프리미엄 기능";
+"premium_membership_monthly" = "프리미엄 멤버십 (월간)";
+"premium_membership_lifetime" = "프리미엄 멤버십 (평생)";
+"subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
+"terms_of_service" = "서비스 약관";
+"redeem_code" = "코드 사용";
+"restore_purchases" = "구매 복원";
+"purchase_success" = "구매 성공";
+"purchase_failed" = "구매 실패";
+"restore_success" = "복원 성공";
+"restore_failed" = "복원 실패";
+"no_products_available" = "사용 가능한 제품 없음";
+"failed_to_load_products" = "제품 로드 실패";
+"purchase_pending" = "구매 승인 대기 중";
+"unknown_purchase_status" = "알 수 없는 구매 상태";
+"no_purchases_to_restore" = "복원할 구매 내역 없음";
+"transaction_verification_failed" = "거래 확인 실패";
+"purchase_cancelled" = "구매 취소됨";
+
+// Missing keys from code
+"invite_family_to_join" = "가족 초대하기";
+"collaboration_invitation_tip" = "협업 초대 팁";
+"step_1_invite_text" = "먼저 '가족 초대'를 탭한 다음 메시지 앱을 선택하세요";
+"step_2_contact_info" = "초대할 사람의 연락처 정보를 입력하세요";
+"step_3_send_invite" = "즉시 초대 보내기";
+"must_use_imessage" = "메시지 앱을 사용해야 합니다";
+"must_use_imessage_desc" = "성공적인 참여를 위해 메시지 앱을 사용하여 초대를 보내주세요";
+"not_supported" = "지원되지 않음";
+"icloud_share_not_supported_description" = "현재 저장 모드에서는 직접 iCloud 공유 생성을 지원하지 않습니다. 향후 업데이트를 기다려주세요.";
+"year_unit" = "세";
+"month_unit" = "개월";
+"day_unit" = "일";
+
+// CloudKit Error Handling
+"icloud_quota_exceeded_title" = "iCloud 저장 공간 가득 참";
+"icloud_quota_exceeded_message" = "iCloud 저장 공간이 가득 찼습니다. 공간을 확보할 때까지 FeedTrace가 데이터를 동기화할 수 없습니다.";
+"network_error" = "네트워크 오류";
+"network_unavailable_message" = "네트워크를 사용할 수 없습니다. 연결을 확인해 주세요.";
 
 // SleepTrendView
 "sleep_duration_title_with_unit" = "수면 시간(시간)";
@@ -347,15 +314,8 @@
 "edit_baby_info" = "정보 수정";
 
 // CloudSyncManager
-"icloud_not_logged_in" = "iCloud에 로그인하지 않음";
-"icloud_insufficient_space" = "iCloud 저장 공간 부족";
-"icloud_available" = "iCloud 사용 가능";
 
 // iCloud Sync Status
-"icloud_sync_idle" = "대기 중";
-"icloud_sync_syncing" = "동기화 중";
-"icloud_sync_completed" = "동기화 완료";
-"icloud_sync_error" = "동기화 오류";
 
 // Punctuation
 "comma_separator" = ", ";
@@ -363,7 +323,6 @@
 
 // RecordEditView - Additional
 "time" = "시간 정보";
-"information" = "정보";
 "additional_information" = "추가 정보";
 "14_days" = "14일";
 "first_walk" = "첫 걸음";
@@ -412,5 +371,4 @@
 
 // RecordDetailView
 "record_detail" = "기록 상세";
-"duration" = "지속 시간";
 "detailed_information" = "상세 정보";

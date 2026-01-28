@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct SettingsView: View {
     let baby: Baby
@@ -10,8 +10,6 @@ struct SettingsView: View {
     @State private var showAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
-    // 同步管理器
-    @StateObject private var cloudSyncManager = CloudSyncManager.shared
     // 会员管理器
     @StateObject private var membershipManager = MembershipManager.shared
     // 导航到会员特权页面
@@ -21,7 +19,7 @@ struct SettingsView: View {
     // 导航到新增宝宝页面
     @State private var showAddBaby = false
     // 获取ModelContext
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     
     private func shareApp() {
         let shareText = "share_app_text".localized
@@ -106,6 +104,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    .padding(.vertical, 12)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         // 点击行的其他区域（非按钮区域）跳转到编辑页面
@@ -142,21 +141,15 @@ struct SettingsView: View {
                                         }
                                         
                                         // 会员用户，检查iCloud状态
-                                        let status = cloudSyncManager.checkiCloudStatus()
-                                        switch status {
-                                        case .available:
-                                            // iCloud可用，开启同步
-                                            isICloudSyncEnabled = true
-                                        case .notLoggedIn:
-                                            // 未登录iCloud，显示提示
-                                            alertTitle = "icloud_not_logged_in_title".localized
-                                            alertMessage = "icloud_not_logged_in_message".localized
-                                            showAlert = true
-                                        case .insufficientSpace:
-                                            // 空间不足，显示提示
-                                            alertTitle = "icloud_insufficient_space_title".localized
-                                            alertMessage = "icloud_insufficient_space_message".localized
-                                            showAlert = true
+                                        Task {
+                                            let isAvailable = await ShareManager.shared.checkiCloudAvailability()
+                                            if isAvailable {
+                                                isICloudSyncEnabled = true
+                                            } else {
+                                                alertTitle = "icloud_not_logged_in_title".localized
+                                                alertMessage = "icloud_not_logged_in_message".localized
+                                                showAlert = true
+                                            }
                                         }
                                     } else {
                                         // 关闭时直接执行
@@ -168,20 +161,17 @@ struct SettingsView: View {
                             }
                             .toggleStyle(SwitchToggleStyle(tint: .accentColor))
                         }
-                        
-// #if DEBUG
-//                         // 显示iCloud状态信息
-//                         if isICloudSyncEnabled {
-//                             HStack {
-//                                 Image(systemName: "info.circle")
-//                                     .foregroundColor(.secondary)
-//                                 Text(cloudSyncManager.icloudStatus.description)
-//                                     .font(.caption)
-//                                     .foregroundColor(.secondary)
-//                                 Spacer()
-//                             }
-//                         }
-// #endif
+                    }
+                        // 家庭协作入口 (仅在 iCloud 开启时显示)
+                    if isICloudSyncEnabled {
+                        NavigationLink(destination: FamilyCollaborationView()) {
+                            HStack {
+                                Image(systemName: "person.2.fill")
+                                    .foregroundColor(.accentColor)
+                                Text("family_collaboration".localized)
+                                Spacer()
+                            }
+                        }
                     }
                     
 //                     // 手动同步按钮和状态显示
@@ -302,9 +292,12 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     Spacer()
-                }.listRowBackground(Color.clear)
+                }
+                .listRowBackground(Color.clear)
+                .offset(y: -10)
             }
             .listStyle(.insetGrouped)
+            .listSectionSpacing(24)
             .padding(.top, -20)
             .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)

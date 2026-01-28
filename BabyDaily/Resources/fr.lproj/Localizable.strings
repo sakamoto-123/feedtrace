@@ -13,15 +13,11 @@
 "select_volume_unit" = "Sélectionner l'unité de mesure du volume";
 
 // HomeView
-"baby_diary" = "Carnet de bébé";
 "today_statistics" = "Statistiques d'aujourd'hui";
 "feeding" = "Alimentation";
-"activity" = "Activité";
 "ongoing" = "En cours";
 "ending" = "Terminer";
 "quick_actions" = "Actions rapides";
-"more_records" = "Plus d'enregistrements";
-"edit" = "Modifier";
 "all_actions" = "Toutes les actions";
 "weight" = "Poids";
 "height" = "Taille";
@@ -40,11 +36,9 @@
 // Quick Actions
 "breast_milk" = "Lait";
 "solid_food" = "Aliments solides";
-"water" = "Eau";
 "sleep" = "Sommeil";
 "diaper" = "Couche";
 "bath" = "Bain";
-"note" = "Note";
 
 // All Actions Categories
 "feeding_category" = "Alimentation";
@@ -82,15 +76,12 @@
 "first_word" = "Premier mot";
 
 // Language Setting
-"select_language" = "Sélectionner la langue";
 "language_setting" = "Paramètres linguistiques";
 
 // Today Stats
 "breast_milk" = "Lait";
 "stool" = "Selles";
 "urine" = "Urine";
-"sleep_duration" = "Durée du sommeil";
-"sleep_count" = "Nombre de sommeils";
 "hours" = "heures";
 "times" = "fois";
 
@@ -100,8 +91,6 @@
 "day" = "jour";
 
 // SettingsView
-"tap_to_edit_baby_info" = "Cliquez pour modifier les informations du bébé";
-"personalization_settings" = "Personnalisation";
 "theme_color" = "Couleur du thème";
 "language_setting" = "Paramètres de langue";
 "mode_setting" = "Paramètres de mode";
@@ -109,24 +98,13 @@
 "light_theme" = "Mode clair";
 "dark_theme" = "Mode sombre";
 "membership_privileges" = "Privilèges de membre";
-"free" = "Gratuit";
-"about" = "À propos";
-"about_us" = "À propos de nous";
 "help_and_feedback" = "Aide et retour";
 "privacy_policy" = "Politique de confidentialité";
-"user_agreement" = "Contrat utilisateur";
+"user_agreement" = "Contrat Utilisateur";
 "settings" = "Paramètres";
 
 // AppLanguage Names
 "system_language" = "Suivre le système";
-"simplified_chinese" = "Chinois simplifié";
-"traditional_chinese" = "Chinois traditionnel";
-"english" = "Anglais";
-"japanese" = "Japonais";
-"korean" = "Coréen";
-"french" = "Français";
-"portuguese" = "Portugais";
-"spanish" = "Espagnol";
 
 // MainTabView
 "home" = "Accueil";
@@ -143,19 +121,15 @@
 "in_progress" = "En cours";
 "hours" = "heures";
 "records" = "Enregistrements";
-"edit" = "Modifier";
 "delete" = "Supprimer";
 
 // RecordEditView
 "create_record" = "Créer un enregistrement";
 "edit_record" = "Modifier l'enregistrement";
-"start" = "Démarrer";
-"end" = "Terminer";
 "save" = "Enregistrer";
 "cancel" = "Annuler";
 
 // BabyCreationView
-"baby_name" = "Nom du bébé";
 "enter_baby_name" = "Veuillez entrer le nom du bébé";
 "birthday" = "Anniversaire";
 "gender" = "Genre";
@@ -164,7 +138,6 @@
 "prefer_not_to_say" = "Ne pas préciser";
 "add_baby" = "Ajouter un bébé";
 "complete" = "Terminer";
-"partner_device_tip" = "Ou obtenez plus de données précieuses sur le bébé depuis l'appareil de votre partenaire";
 
 // StatisticsView
 "feeding_trend" = "Tendance alimentaire";
@@ -186,29 +159,19 @@
 
 // GrowthStatisticsView
 "bmi" = "IMC";
-"month_age_format" = "Âge: %d mois";
-"weight_format" = "Poids: %.1f kg";
-"height_format" = "Taille: %.1f cm";
-"head_format" = "Circonférence de la tête: %.1f cm";
 
 // SleepTrendView
-"sleep_duration_title" = "Durée du sommeil";
 "hours_unit" = "Durée (heures)";
-"sleep_duration_format" = "Durée du sommeil: %.1f heures";
 "sleep_count_title" = "Nombre de sommeils";
 "times_unit" = "Fois";
-"sleep_count_format" = "Nombre de sommeils: %d fois";
 
 // FeedingTrendView
-"feeding_trend_title" = "Tendance du volume de lait";
-"milk_volume_unit" = "Volume de lait (ml)";
 
 // Units
 "ml" = "ml";
 "g" = "g";
 "kg" = "kg";
 "cm" = "cm";
-"degree" = "℃";
 "tablet" = "comprimé";
 "piece" = "pièce";
 
@@ -220,53 +183,17 @@
 
 // Family Collaboration
 "family_collaboration" = "Collaboration familiale";
-"collaboration_title" = "Enregistrez le parcours de croissance de votre bébé avec la famille";
-"collaboration_subtitle" = "Avec la collaboration iCloud, vous pouvez :";
-"invite_family" = "Inviter des membres de la famille";
-"record_together" = "Enregistrer les activités quotidiennes ensemble";
-"real_time_sync" = "Synchronisation des données en temps réel";
 "select_baby_to_collaborate" = "Sélectionner le bébé pour collaborer";
 "no_collaborators_yet" = "Aucun collaborateur ajouté pour le moment";
 "manage_collaboration" = "Gérer la collaboration";
-"collaboration_invite_guide" = "Guide d'invitation à la collaboration";
 "three_steps_to_share" = "Trois étapes pour terminer le partage";
-"step1_invite" = "Cliquez d'abord sur \"Inviter des membres de la famille\", puis sélectionnez l'application Messages";
-"step2_contact" = "Remplissez les informations de contact de la personne que vous souhaitez inviter";
-"step3_send" = "Envoyer l'invitation immédiatement";
 "ensure_icloud_setup" = "Assurez-vous que iCloud est configuré";
-"ensure_icloud_setup_desc" = "Veuillez confirmer que les membres de la famille invités ont connecté iCloud et réservé suffisamment d'espace disponible pour éviter que la synchronisation de BabyMemos ne soit interrompue en raison d'un espace insuffisant";
-"must_use_sms" = "Doit utiliser l'application Messages pour envoyer";
-"must_use_sms_desc" = "Veuillez utiliser l'application Messages pour envoyer les invitations à la collaboration afin que les membres de la famille puissent rejoindre avec succès";
-"remind_install_app" = "Rappeler à la famille d'installer Baby Memos d'abord";
-"remind_install_app_desc" = "Veuillez rappeler aux membres de la famille d'installer la dernière version de Baby Memos d'abord, puis d'ouvrir le lien d'invitation pour synchroniser avec succès";
+"ensure_icloud_setup_desc" = "Veuillez confirmer que les membres de la famille invités ont connecté iCloud et réservé suffisamment d'espace disponible pour éviter que la synchronisation de FeedTrace ne soit interrompue en raison d'un espace insuffisant";
+"remind_install_app" = "Rappeler à la famille d'installer FeedTrace d'abord";
+"remind_install_app_desc" = "Veuillez rappeler aux membres de la famille d'installer la dernière version de FeedTrace d'abord, puis d'ouvrir le lien d'invitation pour synchroniser avec succès";
 "owner" = "Propriétaire";
-"read_only" = "Lecture seule";
-"read_write" = "Peut modifier";
-"only_invited_can_edit" = "Seuls les utilisateurs invités peuvent modifier";
-"stop_sharing" = "Arrêter le partage";
-"collaborators_count" = "%d collaborateurs";
-"not_shared" = "Non partagé";
-"shared" = "Partagé";
-"sharing" = "Partage en cours";
-"collaboration_error" = "Erreur de collaboration";
 "close" = "Fermer";
 "error" = "Erreur";
-"stop_sharing_confirm_message" = "Êtes-vous sûr de vouloir arrêter le partage ? Après l'arrêt, tous les collaborateurs ne pourront plus accéder aux enregistrements du bébé.";
-"permission_setting" = "Paramètre de permission";
-"read_only_desc" = "Les collaborateurs ne peuvent que consulter les enregistrements, pas les modifier";
-"read_write_desc" = "Les collaborateurs peuvent consulter et modifier les enregistrements";
-"sharing_all_data" = "Partage de toutes les données";
-"sharing_all_data_desc" = "Après le partage, les collaborateurs peuvent consulter et modifier tous les bébés et leurs enregistrements";
-"read_only_user_cannot_edit" = "Les utilisateurs en lecture seule ne peuvent pas modifier les enregistrements";
-"read_only_user_cannot_delete" = "Les utilisateurs en lecture seule ne peuvent pas supprimer les enregistrements";
-"loading_share_data" = "Chargement des données partagées...";
-"loading_share_data_title" = "Chargement des données partagées";
-"accepting_share_invitation" = "Acceptation de l'invitation de partage...";
-"loading_shared_babies" = "Chargement des informations sur les bébés partagés...";
-"loading_shared_records" = "Chargement des enregistrements partagés...";
-"loading_complete" = "Chargement terminé !";
-"loading_failed" = "Échec du chargement";
-"retry" = "Réessayer";
 
 // BabySwitcherView
 "select_baby" = "Sélectionner un bébé";
@@ -280,17 +207,12 @@
 "icloud_sync_backup" = "Synchronisation/Sauvegarde iCloud";
 "icloud_not_logged_in_title" = "iCloud non connecté";
 "icloud_not_logged_in_message" = "Vous n'êtes pas connecté à iCloud. Veuillez vous connecter à iCloud avant d'activer la synchronisation.";
-"icloud_insufficient_space_title" = "Espace de stockage iCloud insuffisant";
-"icloud_insufficient_space_message" = "Votre espace de stockage iCloud est insuffisant. Veuillez libérer de l'espace iCloud et réessayer.";
 "manual_sync" = "Synchronisation manuelle";
 "sync_now" = "Synchroniser maintenant";
 "share_app" = "Partager l'application";
-"share_app_text" = "Je recommande d'utiliser BabyDaily - Assistant de suivi de croissance du bébé";
+"share_app_text" = "Je recommande d'utiliser FeedTrace - Assistant de suivi de croissance du bébé";
 
 // MembershipPrivilegesView
-"current_free_user" = "Utilisateur gratuit actuel";
-"upgrade_membership_prompt" = "Passez à l'abonnement pour profiter de plus de privilèges";
-"upgrade_now" = "Passer à l'abonnement maintenant";
 "current_membership_status" = "Statut d'adhésion actuel";
 "membership_type" = "Type d'adhésion";
 "membership_status" = "Statut d'adhésion";
@@ -300,14 +222,58 @@
 "membership_active" = "Actif";
 "membership_expired" = "Expiré";
 "membership_not_subscribed" = "Non abonné";
-"icloud_sync_feature" = "Synchronisation iCloud";
-"multi_device_sync" = "Synchronisation multi-appareils";
-"data_stored_in_icloud" = "Données stockées dans iCloud";
-"multi_device_sync_description" = "Prise en charge de la synchronisation des données multi-appareils";
-"more_themes" = "Plus de thèmes";
-"unlock_more_themes_description" = "Débloquer plus de couleurs et styles de thème";
-"no_ads" = "Sans publicité";
-"no_ads_description" = "Aucune publicité pendant l'utilisation";
+"membership_subscription" = "Membership Subscription";
+"app_name" = "FeedTrace";
+"feature_comparison" = "Feature Comparison";
+"regular_user" = "Regular User";
+"premium_member" = "Premium Member";
+"remove_ads" = "Remove Ads";
+"basic_records" = "Basic Records";
+"quick_action_records" = "Quick Action Records";
+"chart_trends" = "Chart Trends";
+"family_sharing" = "Family Sharing";
+"multiple_babies" = "Multiple Babies";
+"unlimited_widgets" = "Unlimited Widgets";
+"unlimited_custom_records" = "Unlimited Custom Records";
+"apple_watch_feature" = "Apple Watch (In Development)";
+"future_more_features" = "Future Premium Features";
+"premium_membership_monthly" = "Abonnement Premium (Mensuel)";
+"premium_membership_lifetime" = "Abonnement Premium (À vie)";
+"subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
+"terms_of_service" = "Conditions de Service";
+"redeem_code" = "Utiliser un Code";
+"restore_purchases" = "Restaurer les Achats";
+"purchase_success" = "Achat réussi";
+"purchase_failed" = "Échec de l'achat";
+"restore_success" = "Restauration réussie";
+"restore_failed" = "Échec de la restauration";
+"no_products_available" = "Aucun produit disponible";
+"failed_to_load_products" = "Échec du chargement des produits";
+"purchase_pending" = "Achat en attente d'approbation";
+"unknown_purchase_status" = "Statut d'achat inconnu";
+"no_purchases_to_restore" = "Aucun achat à restaurer";
+"transaction_verification_failed" = "Échec de la vérification de la transaction";
+"purchase_cancelled" = "Achat annulé";
+
+// Missing keys from code
+"invite_family_to_join" = "Inviter la famille à rejoindre";
+"collaboration_invitation_tip" = "Conseil d'invitation à la collaboration";
+"step_1_invite_text" = "Appuyez d'abord sur 'Inviter la famille', puis sélectionnez l'app Messages";
+"step_2_contact_info" = "Entrez les coordonnées de l'invité";
+"step_3_send_invite" = "Envoyer l'invitation immédiatement";
+"must_use_imessage" = "Doit utiliser l'app Messages";
+"must_use_imessage_desc" = "Veuillez utiliser l'app Messages pour envoyer l'invitation pour rejoindre avec succès";
+"not_supported" = "Non pris en charge";
+"icloud_share_not_supported_description" = "La création directe de partage iCloud n'est pas prise en charge dans le mode de stockage actuel. Veuillez attendre les futures mises à jour.";
+"year_unit" = "a";
+"month_unit" = "m";
+"day_unit" = "j";
+
+// CloudKit Error Handling
+"icloud_quota_exceeded_title" = "Stockage iCloud saturé";
+"icloud_quota_exceeded_message" = "Votre stockage iCloud est plein. FeedTrace ne peut pas synchroniser les données tant que vous ne libérez pas d'espace.";
+"network_error" = "Erreur réseau";
+"network_unavailable_message" = "Réseau indisponible. Veuillez vérifier votre connexion.";
 
 // SleepTrendView
 "sleep_duration_title_with_unit" = "Durée du sommeil (heures)";
@@ -349,15 +315,8 @@
 "edit_baby_info" = "Modifier les informations";
 
 // CloudSyncManager
-"icloud_not_logged_in" = "iCloud non connecté";
-"icloud_insufficient_space" = "Espace de stockage iCloud insuffisant";
-"icloud_available" = "iCloud disponible";
 
 // iCloud Sync Status
-"icloud_sync_idle" = "En attente";
-"icloud_sync_syncing" = "Synchronisation";
-"icloud_sync_completed" = "Terminé";
-"icloud_sync_error" = "Erreur de synchronisation";
 
 // Punctuation
 "comma_separator" = ", ";
@@ -365,7 +324,6 @@
 
 // RecordEditView - Additional
 "time" = "Informations temporelles";
-"information" = "Informations";
 "additional_information" = "Informations supplémentaires";
 "14_days" = "14 jours";
 "first_walk" = "Premiers pas";
@@ -414,5 +372,4 @@
 
 // RecordDetailView
 "record_detail" = "Détails de l'enregistrement";
-"duration" = "Durée";
 "detailed_information" = "Informations détaillées";

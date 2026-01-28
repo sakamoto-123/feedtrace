@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    // 优化@Query：添加排序和限制，减少初始加载的数据量
-    @Query(sort: [SortDescriptor(\Baby.createdAt)]) private var babies: [Baby]
+    @Environment(\.managedObjectContext) private var viewContext
+    // 优化@FetchRequest：添加排序和限制，减少初始加载的数据量
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Baby.createdAt, ascending: true)],
+        animation: .default)
+    private var babies: FetchedResults<Baby>
+    
     @StateObject private var userSettingManager = UserSettingManager.shared
     
     // 只存储选中的宝宝ID，不存储实例，避免持有失效的模型引用
@@ -38,7 +42,7 @@ struct ContentView: View {
                 .onAppear {
                     // 初始化UserSettingManager
                     if !hasInitialized {
-                        userSettingManager.setup(modelContext: modelContext)
+                        userSettingManager.setup(modelContext: viewContext)
                         hasInitialized = true
                     }
                 }
@@ -48,23 +52,23 @@ struct ContentView: View {
                 .onAppear {
                     // 初始化UserSettingManager，避免重复调用
                     if !hasInitialized {
-                        userSettingManager.setup(modelContext: modelContext)
+                        userSettingManager.setup(modelContext: viewContext)
                         hasInitialized = true
                         // 直接从UserDefaults加载选中的宝宝，减少延迟
                         loadSelectedBaby()
                     }
                 }
-                .onChange(of: babies) { newBabies in
+                .onChange(of: Array(babies)) { _, newBabies in
                     // 当宝宝列表变化时（包括容器切换），确保选中的宝宝ID仍然有效
                     // 如果当前选中的ID对应的宝宝不在新数组中，重新选择
                     if let currentId = selectedBabyId {
                         if !newBabies.contains(where: { $0.id == currentId }) {
                             // 当前选中的宝宝不在新数组中，重新选择
-                            selectBabyFromList(newBabies)
+                            selectBabyFromList(Array(newBabies))
                         }
                     } else {
                         // 如果没有选中的ID，尝试加载
-                        selectBabyFromList(newBabies)
+                        selectBabyFromList(Array(newBabies))
                     }
                 }
         }
@@ -78,15 +82,7 @@ struct ContentView: View {
             guard let baby = selectedBaby else {
                 // 如果计算属性返回 nil，说明 babies 为空，这不应该发生
                 // 但为了安全，返回第一个（如果存在）
-                return babies.first ?? Baby(
-                    id: UUID(),
-                    name: "",
-                    birthday: Date(),
-                    gender: "",
-                    weight: 0,
-                    height: 0,
-                    headCircumference: 0
-                )
+                return babies.first ?? Baby(context: viewContext)
             }
             return baby
         }, set: {
@@ -116,6 +112,6 @@ struct ContentView: View {
     // 从本地缓存加载选中的宝宝ID
     private func loadSelectedBaby() {
         guard !babies.isEmpty else { return }
-        selectBabyFromList(babies)
+        selectBabyFromList(Array(babies))
     }
 }

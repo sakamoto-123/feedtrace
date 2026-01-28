@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+import CoreData
 import Charts
 
 // 导入所有子组件
@@ -15,16 +15,16 @@ struct StatisticsView: View {
     @State private var timeRange: String = "7_days"
     
     // 获取模型上下文
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.colorScheme) private var colorScheme
     
     // 成长统计维度选择
     @State private var selectedGrowthDimension: String = "weight"
     
-    // 喂养数据缓存
-    @State private var feedingDataCache: [(date: Date, breastMilk: Int, formula: Int, water: Int, breastMilkCount: Int, formulaCount: Int, waterCount: Int)]?
-    // 最后一次查询的timeRange，用于判断是否需要刷新缓存
-    @State private var lastTimeRange: String?
+    // 数据状态
+    @State private var feedingData: [(date: Date, breastMilk: Int, formula: Int, water: Int, breastMilkCount: Int, formulaCount: Int, waterCount: Int)] = []
+    @State private var sleepData: [(date: Date, duration: Int, count: Int)] = []
+    @State private var growthData: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] = []
     
     // 数据生成
     private var daysCount: Int {
@@ -38,20 +38,15 @@ struct StatisticsView: View {
     }
     
     private var feedingVolumeData: [(date: Date, breastMilk: Int, formula: Int, water: Int)] {
-        fetchFeedingData().map { (date: $0.date, breastMilk: $0.breastMilk, formula: $0.formula, water: $0.water) }
+        feedingData.map { (date: $0.date, breastMilk: $0.breastMilk, formula: $0.formula, water: $0.water) }
     }
     
     private var feedingCountData: [(date: Date, breastMilkCount: Int, formulaCount: Int, waterCount: Int)] {
-        fetchFeedingData().map { (date: $0.date, breastMilkCount: $0.breastMilkCount, formulaCount: $0.formulaCount, waterCount: $0.waterCount) }
+        feedingData.map { (date: $0.date, breastMilkCount: $0.breastMilkCount, formulaCount: $0.formulaCount, waterCount: $0.waterCount) }
     }
     
-    // 从SwiftData查询真实喂养数据（包含喂养量和次数）
-    private func fetchFeedingData() -> [(date: Date, breastMilk: Int, formula: Int, water: Int, breastMilkCount: Int, formulaCount: Int, waterCount: Int)] {
-        // 检查缓存是否存在且timeRange没有变化
-        if let cache = feedingDataCache, lastTimeRange == timeRange {
-            return cache
-        }
-        
+    // 从CoreData查询真实喂养数据（包含喂养量和次数）
+    private func loadFeedingData() {
         let calendar = Calendar.current
         let now = Date()
         let today = calendar.startOfDay(for: now)
@@ -59,7 +54,8 @@ struct StatisticsView: View {
         // 计算查询开始日期：daysCount天前的00:00:00
         guard let startDate = calendar.date(byAdding: .day, value: -daysCount + 1, to: today) else {
             Logger.error("Failed to calculate start date")
-            return []
+            feedingData = []
+            return
         }
         
         // 计算查询结束日期：今天的23:59:59
@@ -69,25 +65,20 @@ struct StatisticsView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateFormatter.timeZone = TimeZone.current
-        let localStartDateStr = dateFormatter.string(from: startDate)
-        let localEndDateStr = dateFormatter.string(from: endDate)
+        // let localStartDateStr = dateFormatter.string(from: startDate)
+        // let localEndDateStr = dateFormatter.string(from: endDate)
         // 将外部变量提取为常量
         let babyId = baby.id
         
-        // 创建查询描述符（只做一次查询）
-        let fetchDescriptor: FetchDescriptor<Record> = FetchDescriptor(
-            predicate: #Predicate { record in
-                record.babyId == babyId &&
-                record.category == "feeding_category" &&
-                record.startTimestamp >= startDate &&
-                record.startTimestamp <= endDate
-            },
-            sortBy: [SortDescriptor(\Record.startTimestamp)]
-        )
+        // 创建查询请求
+        let request: NSFetchRequest<Record> = Record.fetchRequest()
+        request.predicate = NSPredicate(format: "baby.id == %@ AND category == %@ AND startTimestamp >= %@ AND startTimestamp <= %@",
+                                      babyId as CVarArg, "feeding_category", startDate as CVarArg, endDate as CVarArg)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Record.startTimestamp, ascending: true)]
         
         do {
             // 执行查询（只做一次查询）
-            let records: [Record] = try modelContext.fetch(fetchDescriptor)
+            let records = try viewContext.fetch(request)
             
             // 按日期分组计算数据
             var groupedData: [Date: (breastMilk: Int, formula: Int, water: Int, breastMilkCount: Int, formulaCount: Int, waterCount: Int)] = [:]
@@ -98,10 +89,10 @@ struct StatisticsView: View {
                     let startOfDay = calendar.startOfDay(for: date)
                     groupedData[startOfDay] = (breastMilk: 0, formula: 0, water: 0, breastMilkCount: 0, formulaCount: 0, waterCount: 0)
                     // 使用本地时间格式输出日志
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd"
-                    dateFormatter.timeZone = TimeZone.current
-                    let localDateStr = dateFormatter.string(from: startOfDay)
+                    // let dateFormatter = DateFormatter()
+                    // dateFormatter.dateFormat = "yyyy-MM-dd"
+                    // dateFormatter.timeZone = TimeZone.current
+                    // let localDateStr = dateFormatter.string(from: startOfDay)
                 } else {
                     Logger.warning("FeedingData: Failed to calculate date for index \(i)")
                 }
@@ -111,23 +102,23 @@ struct StatisticsView: View {
             for record in records {
                 let startOfDay = calendar.startOfDay(for: record.startTimestamp)
                 // 将容量单位转换为 ml
-                let valueInMl = UnitConverter.convertVolumeToMl(value: record.value ?? 0, unit: record.unit)
+                let valueInMl = UnitConverter.convertVolumeToMl(value: record.value, unit: record.unit)
                 
                 // 使用本地时间格式输出日志
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                dateFormatter.timeZone = TimeZone.current
-                let localDateStr = dateFormatter.string(from: startOfDay)
+                // let dateFormatter = DateFormatter()
+                // dateFormatter.dateFormat = "yyyy-MM-dd"
+                // dateFormatter.timeZone = TimeZone.current
+                // let localDateStr = dateFormatter.string(from: startOfDay)
                 
                 // 根据子分类累加数据
                 if record.subCategory == "breast_bottle" {
-                    groupedData[startOfDay]?.breastMilk += valueInMl
+                    groupedData[startOfDay]?.breastMilk += Int(valueInMl)
                     groupedData[startOfDay]?.breastMilkCount += 1
                 } else if record.subCategory == "formula" {
-                    groupedData[startOfDay]?.formula += valueInMl
+                    groupedData[startOfDay]?.formula += Int(valueInMl)
                     groupedData[startOfDay]?.formulaCount += 1
                 } else if record.subCategory == "water_intake" {
-                    groupedData[startOfDay]?.water += valueInMl
+                    groupedData[startOfDay]?.water += Int(valueInMl)
                     groupedData[startOfDay]?.waterCount += 1
                 }
             }
@@ -137,27 +128,24 @@ struct StatisticsView: View {
                 .sorted { $0.date < $1.date }
             
             // 记录最终返回数据
-            for item in result {
-                // 使用本地时间格式输出日志
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                dateFormatter.timeZone = TimeZone.current
-                let localDateStr = dateFormatter.string(from: item.date)
-            }
+            // for item in result {
+            //     // 使用本地时间格式输出日志
+            //     let dateFormatter = DateFormatter()
+            //     dateFormatter.dateFormat = "yyyy-MM-dd"
+            //     dateFormatter.timeZone = TimeZone.current
+            //     let localDateStr = dateFormatter.string(from: item.date)
+            // }
             
-            // 更新缓存
-            feedingDataCache = result
-            lastTimeRange = timeRange
-            
-            return result
+            // 更新数据
+            feedingData = result
         } catch {
             Logger.error("Error fetching feeding data: \(error)")
-            return []
+            feedingData = []
         }
     }
     
-    // 从SwiftData查询真实睡眠数据
-    private func fetchSleepData() -> [(date: Date, duration: Int, count: Int)] {
+    // 从CoreData查询真实睡眠数据
+    private func loadSleepData() {
         let calendar = Calendar.current
         let now = Date()
         let today = calendar.startOfDay(for: now)
@@ -165,37 +153,33 @@ struct StatisticsView: View {
         // 计算查询开始日期：daysCount天前的00:00:00
         guard let startDate = calendar.date(byAdding: .day, value: -daysCount + 1, to: today) else {
             Logger.error("Failed to calculate start date")
-            return []
+            sleepData = []
+            return
         }
         
         // 计算查询结束日期：今天的23:59:59
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? now
         
         // 记录查询时间范围（本地时间）
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-        let localStartDateStr = dateFormatter.string(from: startDate)
-        let localEndDateStr = dateFormatter.string(from: endDate)
-        Logger.debug("SleepData: Querying from \(localStartDateStr) to \(localEndDateStr) for baby ID: \(baby.id)")
+        // let dateFormatter = DateFormatter()
+        // dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        // dateFormatter.timeZone = TimeZone.current
+        // let localStartDateStr = dateFormatter.string(from: startDate)
+        // let localEndDateStr = dateFormatter.string(from: endDate)
+        // Logger.debug("SleepData: Querying from \(localStartDateStr) to \(localEndDateStr) for baby ID: \(baby.id)")
         
         // 将外部变量提取为常量
         let babyId = baby.id
         
-        // 创建查询描述符
-        let fetchDescriptor: FetchDescriptor<Record> = FetchDescriptor(
-            predicate: #Predicate { record in
-                record.babyId == babyId && 
-                record.subCategory == "sleep" &&
-                record.startTimestamp >= startDate &&
-                record.startTimestamp <= endDate
-            },
-            sortBy: [SortDescriptor(\Record.startTimestamp)]
-        )
+        // 创建查询请求
+        let request: NSFetchRequest<Record> = Record.fetchRequest()
+        request.predicate = NSPredicate(format: "baby.id == %@ AND subCategory == %@ AND startTimestamp >= %@ AND startTimestamp <= %@",
+                                      babyId as CVarArg, "sleep", startDate as CVarArg, endDate as CVarArg)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Record.startTimestamp, ascending: true)]
         
         do {
             // 执行查询
-            let records: [Record] = try modelContext.fetch(fetchDescriptor)
+            let records = try viewContext.fetch(request)
             
             // 记录查询到的记录数量
             Logger.debug("SleepData: Found \(records.count) sleep records")
@@ -209,11 +193,11 @@ struct StatisticsView: View {
                     let startOfDay = calendar.startOfDay(for: date)
                     groupedData[startOfDay] = (duration: 0, count: 0)
                     // 使用本地时间格式输出日志
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd"
-                    dateFormatter.timeZone = TimeZone.current
-                    let localDateStr = dateFormatter.string(from: startOfDay)
-                    Logger.debug("SleepData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
+                    // let dateFormatter = DateFormatter()
+                    // dateFormatter.dateFormat = "yyyy-MM-dd"
+                    // dateFormatter.timeZone = TimeZone.current
+                    // let localDateStr = dateFormatter.string(from: startOfDay)
+                    // Logger.debug("SleepData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
                 } else {
                     Logger.warning("SleepData: Failed to calculate date for index \(i)")
                 }
@@ -242,49 +226,56 @@ struct StatisticsView: View {
             
             // 记录最终返回数据
             Logger.debug("SleepData: Returning \(result.count) days of data:")
-            for item in result {
-                // 使用本地时间格式输出日志
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                dateFormatter.timeZone = TimeZone.current
-                let localDateStr = dateFormatter.string(from: item.date)
-                Logger.debug("SleepData: \(localDateStr): duration=\(item.duration) hours, count=\(item.count)")
-            }
+            // for item in result {
+            //     // 使用本地时间格式输出日志
+            //     let dateFormatter = DateFormatter()
+            //     dateFormatter.dateFormat = "yyyy-MM-dd"
+            //     dateFormatter.timeZone = TimeZone.current
+            //     let localDateStr = dateFormatter.string(from: item.date)
+            //     Logger.debug("SleepData: \(localDateStr): duration=\(item.duration) hours, count=\(item.count)")
+            // }
             
-            return result
+            sleepData = result
         } catch {
             Logger.error("Error fetching sleep data: \(error)")
-            return []
+            sleepData = []
         }
     }
     
     private var sleepTrendData: [(date: Date, duration: Int, count: Int)] {
-        fetchSleepData()
+        sleepData
     }
     
     private var growthCurveData: [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] {
-        fetchGrowthCurveData()
+        growthData
     }
     
-    // 从SwiftData查询真实成长曲线数据
-    private func fetchGrowthCurveData() -> [(month: Int, weight: Double, height: Double, headCircumference: Double, bmi: Double)] {
+    // 加载数据的方法
+    private func loadData() {
+        if selectedTab == "feeding_trend" {
+            loadFeedingData()
+        } else if selectedTab == "sleep_trend" {
+            loadSleepData()
+        } else if selectedTab == "growth_statistics" {
+            loadGrowthData()
+        }
+    }
+    
+    // 从CoreData查询真实成长曲线数据
+    private func loadGrowthData() {
         let calendar = Calendar.current
         let babyId = baby.id
         let birthday = baby.birthday
         let birthStartOfDay = calendar.startOfDay(for: birthday)
         
-        // 创建查询描述符：获取所有 growth_category 的记录
-        let fetchDescriptor: FetchDescriptor<Record> = FetchDescriptor(
-            predicate: #Predicate { record in
-                record.babyId == babyId &&
-                record.category == "growth_category"
-            },
-            sortBy: [SortDescriptor(\Record.startTimestamp)]
-        )
+        // 创建查询请求：获取所有 growth_category 的记录
+        let request: NSFetchRequest<Record> = Record.fetchRequest()
+        request.predicate = NSPredicate(format: "baby.id == %@ AND category == %@", babyId as CVarArg, "growth_category")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Record.startTimestamp, ascending: true)]
         
         do {
             // 执行查询
-            let records: [Record] = try modelContext.fetch(fetchDescriptor)
+            let records = try viewContext.fetch(request)
             
             // 计算从出生到现在有多少个30天周期（最多24个月，即720天）
             let now = Date()
@@ -302,7 +293,7 @@ struct StatisticsView: View {
             
             // 只遍历一次记录，根据日期计算属于哪个周期
             for record in records {
-                guard let value = record.value else { continue }
+                let value = record.value
                 
                 // 计算记录属于哪个周期（30天周期）
                 let recordDate = calendar.startOfDay(for: record.startTimestamp)
@@ -383,11 +374,11 @@ struct StatisticsView: View {
                 ))
             }
             
-            return result
+            growthData = result
         } catch {
             Logger.error("Error fetching growth curve data: \(error)")
             // 如果查询失败，返回空数组或使用默认数据
-            return []
+            growthData = []
         }
     }
     
@@ -399,6 +390,7 @@ struct StatisticsView: View {
                 
                 // 底部：图表区域
                 ScrollView {
+                    HStack{}.frame(height: 5)
                     VStack(spacing: 20) {
                         // 根据选项卡显示不同的图表
                         if selectedTab == "feeding_trend" {
@@ -420,17 +412,24 @@ struct StatisticsView: View {
                             )
                         } 
                     }
-                }.padding(.top, 15)
+                }
             }
             .navigationTitle("statistics".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
             .background(Color.themeListBackground(for: colorScheme))
-            // 监听timeRange变化，清理缓存
-            .onChange(of: timeRange) {
-                feedingDataCache = nil
-                lastTimeRange = nil
-                Logger.debug("FeedingData: Cleared cache due to timeRange change to \($0)")
+            // 监听变化，更新数据
+            .onAppear {
+                loadData()
+            }
+            .onChange(of: selectedTab) { _, _ in
+                loadData()
+            }
+            .onChange(of: timeRange) { _, _ in
+                loadData()
+            }
+            .onChange(of: selectedGrowthDimension) { _, _ in
+                loadData()
             }
         }
     } // 结束body

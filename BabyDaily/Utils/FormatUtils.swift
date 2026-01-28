@@ -124,7 +124,7 @@ func localizedDuration(from start: Date, to end: Date) -> String {
     
     let formatter = DateComponentsFormatter()
     formatter.allowedUnits = [.year, .month, .day, .hour, .minute]   // 允许显示的单位
-    formatter.unitsStyle = .full                          // full/short/abbreviated
+    formatter.unitsStyle = .abbreviated                          // full/short/abbreviated
     formatter.zeroFormattingBehavior = .dropAll          // 不显示0单位
     
     // 设置日历和本地化
@@ -161,19 +161,22 @@ func formatRecordContent(_ record: Record) -> String {
             return ""
         }
     case "medication", "supplement":
-        if let name = record.name, let value = record.value, let unit = record.unit {
+        if let name = record.name, let unit = record.unit {
+            let value = record.value
             return "\(name) \(value.smartDecimal)\(unit.localized)"
         } else {
             return ""
         }
     case "solid_food":
-        if let name = record.name, let value = record.value, let unit = record.unit {
+        if let name = record.name, let unit = record.unit {
+            let value = record.value
             return "\(name) \(value.smartDecimal)\(unit.localized)"
         } else {
             return ""
         }
     case "formula", "water_intake", "breast_milk", "weight", "height", "head":
-        if let value = record.value, let unit = record.unit {
+        if let unit = record.unit {
+            let value = record.value
             return "\(value.smartDecimal)\(unit.localized)"
         } else {
             return ""

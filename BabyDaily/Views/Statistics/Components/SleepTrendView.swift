@@ -84,6 +84,7 @@ private struct SleepCountChart: View {
                 AxisValueLabel(format: .dateTime.month(.defaultDigits).day(.defaultDigits))
                     .font(.system(size: 10))
                     .foregroundStyle(Color.secondary)
+                    .offset(x: -14)
             }
         }
       
@@ -94,7 +95,6 @@ private struct SleepCountChart: View {
                 AxisValueLabel()
                     .font(.system(size: 11))
                     .foregroundStyle(Color.secondary)
-                    .offset(x: -14)
             }
         }
     }

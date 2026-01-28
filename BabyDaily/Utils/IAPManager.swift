@@ -516,16 +516,6 @@ class IAPManager: NSObject, ObservableObject {
             
             // 验证当前授权状态（与Apple服务器通信）
             await verifyCurrentEntitlements()
-        } catch {
-            Logger.error("Error checking membership status: \(error.localizedDescription)")
-            // 即使检查失败，也尝试从Keychain恢复状态
-            if let savedInfo = keychainManager.loadMembershipInfo() {
-                self.membershipInfo = savedInfo
-                self.isPremiumMember = savedInfo.isActive
-                self.membershipStatus = savedInfo.status
-                self.expirationDate = savedInfo.expirationDate
-                Logger.info("Restored membership status from Keychain after error")
-            }
         }
     }
     
@@ -603,9 +593,12 @@ class IAPManager: NSObject, ObservableObject {
             }
             
             Logger.info("Finished iterating entitlements. Total: \(entitlementCount), Valid membership: \(hasValidPurchase)")
-        } catch {
-            Logger.error("Error iterating entitlements: \(error.localizedDescription)")
-            verificationErrors.append(error)
+        }
+        
+        // 如果发生错误且未找到有效购买，中断处理，避免错误清除会员状态
+        if !verificationErrors.isEmpty && !hasValidPurchase {
+            Logger.warning("Entitlements verification failed with errors. Aborting to preserve current state.")
+            return
         }
         
         // 如果有验证错误但找到了有效购买，记录警告但继续处理

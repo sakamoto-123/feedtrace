@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 import Combine
 
 // 用户设置管理器，用于处理UserSetting的创建、访问和迁移
@@ -14,8 +14,8 @@ class UserSettingManager: ObservableObject {
     // 单例模式
     static let shared = UserSettingManager()
     
-    // 共享的ModelContext
-    private var modelContext: ModelContext?
+    // 共享的 ManagedObjectContext
+    private var viewContext: NSManagedObjectContext?
     
     // UserSetting实例
     @Published var userSetting: UserSetting?
@@ -23,49 +23,57 @@ class UserSettingManager: ObservableObject {
     // 初始化
     private init() {}
     
-    // 设置ModelContext
-    func setup(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    // 设置 ManagedObjectContext
+    func setup(modelContext: NSManagedObjectContext) {
+        self.viewContext = modelContext
         loadOrCreateUserSetting()
     }
     
     // 加载或创建UserSetting实例
     private func loadOrCreateUserSetting() {
-        guard let modelContext = modelContext else { return }
+        guard let context = viewContext else { return }
         
-        do {
-            // 尝试获取现有的UserSetting
-            let fetchDescriptor = FetchDescriptor<UserSetting>()
-            let settings = try modelContext.fetch(fetchDescriptor)
-            
-            if let existingSetting = settings.first {
-                // 使用现有设置
-                userSetting = existingSetting
-                // 同步到管理类
-                syncToManagers(existingSetting)
-            } else {
-                // 创建新的UserSetting，从UserDefaults迁移数据
-                let newSetting = createUserSettingFromDefaults()
-                modelContext.insert(newSetting)
-                try modelContext.save()
-                userSetting = newSetting
-            }
-        } catch {
-            Logger.error("Failed to load or create UserSetting: \(error)")
-            // 从UserDefaults获取最新设置，而不是使用默认值
-            let newSetting = createUserSettingFromDefaults()
-            modelContext.insert(newSetting)
+        context.perform {
             do {
-                try modelContext.save()
-                userSetting = newSetting
+                // 尝试获取现有的UserSetting
+                let request: NSFetchRequest<UserSetting> = UserSetting.fetchRequest()
+                request.fetchLimit = 1
+                let settings = try context.fetch(request)
+                
+                if let existingSetting = settings.first {
+                    // 使用现有设置
+                    DispatchQueue.main.async {
+                        self.userSetting = existingSetting
+                        // 同步到管理类
+                        self.syncToManagers(existingSetting)
+                    }
+                } else {
+                    // 创建新的UserSetting，从UserDefaults迁移数据
+                    let newSetting = self.createUserSettingFromDefaults(context: context)
+                    try context.save()
+                    
+                    DispatchQueue.main.async {
+                        self.userSetting = newSetting
+                    }
+                }
             } catch {
-                Logger.error("Failed to save UserSetting from defaults: \(error)")
+                Logger.error("Failed to load or create UserSetting: \(error)")
+                // 从UserDefaults获取最新设置，而不是使用默认值
+                let newSetting = self.createUserSettingFromDefaults(context: context)
+                do {
+                    try context.save()
+                    DispatchQueue.main.async {
+                        self.userSetting = newSetting
+                    }
+                } catch {
+                    Logger.error("Failed to save UserSetting from defaults: \(error)")
+                }
             }
         }
     }
     
     // 从UserDefaults创建UserSetting
-    private func createUserSettingFromDefaults() -> UserSetting {
+    private func createUserSettingFromDefaults(context: NSManagedObjectContext) -> UserSetting {
         // 单位设置
         let temperatureUnit = UserDefaults.standard.string(forKey: "temperatureUnit") ?? "°C"
         let weightUnit = UserDefaults.standard.string(forKey: "weightUnit") ?? "kg"
@@ -73,12 +81,16 @@ class UserSettingManager: ObservableObject {
         let volumeUnit = UserDefaults.standard.string(forKey: "volumeUnit") ?? "ml"
         
         // 创建并返回UserSetting
-        return UserSetting(
-            temperatureUnit: temperatureUnit,
-            weightUnit: weightUnit,
-            lengthUnit: lengthUnit,
-            volumeUnit: volumeUnit
-        )
+        let setting = UserSetting(context: context)
+        setting.id = UUID()
+        setting.createdAt = Date()
+        setting.updatedAt = Date()
+        setting.temperatureUnit = temperatureUnit
+        setting.weightUnit = weightUnit
+        setting.lengthUnit = lengthUnit
+        setting.volumeUnit = volumeUnit
+        
+        return setting
     }
     
     // 同步UserSetting到各个管理类
@@ -100,16 +112,20 @@ class UserSettingManager: ObservableObject {
     
     // 更新UserSetting
     func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) {
-        guard let modelContext = modelContext, var userSetting = userSetting else { return }
+        guard let context = viewContext, let userSetting = userSetting else { return }
         
-        do {
+        context.perform {
             updateBlock(userSetting)
             userSetting.updatedAt = Date()
             
-            try modelContext.save()
-            self.userSetting = userSetting
-        } catch {
-            Logger.error("Failed to update UserSetting: \(error)")
+            do {
+                try context.save()
+                DispatchQueue.main.async {
+                    self.userSetting = userSetting
+                }
+            } catch {
+                Logger.error("Failed to update UserSetting: \(error)")
+            }
         }
     }
     
@@ -134,13 +150,5 @@ class UserSettingManager: ObservableObject {
         } else {
             UserDefaults.standard.removeObject(forKey: "selectedBabyId")
         }
-    }
-}
-
-// 扩展UnitManager，使用UserSettingManager
-fileprivate extension UnitManager {
-    // 更新UserSetting实例
-    private func updateUserSetting(_ updateBlock: @escaping (UserSetting) -> Void) async {
-        await UserSettingManager.shared.updateUserSetting(updateBlock)
     }
 }

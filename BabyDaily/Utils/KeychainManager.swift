@@ -53,7 +53,7 @@ class KeychainManager {
             let data = try encoder.encode(info)
             
             // 先尝试删除旧数据
-            deleteMembershipInfo()
+            _ = deleteMembershipInfo()
             
             // 添加新数据
             let query: [String: Any] = [

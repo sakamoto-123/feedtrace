@@ -1,10 +1,10 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct HomeView: View {
     @Binding var baby: Baby
-    @Environment(\.modelContext) private var modelContext
-    @Query private var records: [Record]
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest private var records: FetchedResults<Record>
     @Environment(\.colorScheme) private var colorScheme
 
     @StateObject private var unitManager = UnitManager.shared
@@ -14,7 +14,11 @@ struct HomeView: View {
     init(baby: Binding<Baby>) {
         self._baby = baby
         let babyId = baby.wrappedValue.id
-        _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
+        // Core Data Fetch Request
+        _records = FetchRequest<Record>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Record.startTimestamp, ascending: false)],
+            predicate: NSPredicate(format: "baby.id == %@", babyId as CVarArg),
+            animation: .default)
     }
     
     /// 仍在进行的记录（仅保留未结束且为指定子类的记录）
@@ -23,13 +27,13 @@ struct HomeView: View {
         let ongoingSubCategories: Set<String> = ["nursing", "pumping", "sleep"]
         
         return records.filter { record in
-            record.endTimestamp == nil && ongoingSubCategories.contains(record.subCategory)
+            record.endTimestamp == nil && ongoingSubCategories.contains(record.subCategory ?? "")
         }
     }
     
     // 今天的统计数据
     private var todayStats: DailyStats {
-        return StatsCalculator.getDailyStats(from: records)
+        return StatsCalculator.getDailyStats(from: Array(records))
     }
     
     // 快速操作列表（根据原型：母乳、瓶喂、睡眠、纸尿裤、辅食、笔记、体重、身高）
@@ -69,7 +73,7 @@ struct HomeView: View {
     
     // 最新生长数据
     private var latestGrowthData: GrowthData {
-        baby.getLatestGrowthData(from: records)
+        baby.getLatestGrowthData(from: Array(records))
     }
     
     var body: some View {
@@ -132,10 +136,10 @@ struct BabyInfoHeader: View {
     let latestGrowthData: GrowthData
     @Binding var showingBabySwitcher: Bool
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var showingDeleteConfirm = false
-    @Query private var records: [Record]
-    @Query private var allBabies: [Baby]
+    @FetchRequest private var records: FetchedResults<Record>
+    @FetchRequest private var allBabies: FetchedResults<Baby>
     
     // 判断是否有多个宝宝
     private var hasMultipleBabies: Bool {
@@ -147,8 +151,11 @@ struct BabyInfoHeader: View {
         self.latestGrowthData = latestGrowthData
         self._showingBabySwitcher = showingBabySwitcher
         let babyId = baby.id
-        _records = Query(filter: #Predicate { $0.babyId == babyId })
-        _allBabies = Query(sort: [SortDescriptor(\Baby.createdAt)])
+        _records = FetchRequest<Record>(
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "baby.id == %@", babyId as CVarArg))
+        _allBabies = FetchRequest<Baby>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Baby.createdAt, ascending: true)])
     }
     
     #if DEBUG
@@ -156,22 +163,22 @@ struct BabyInfoHeader: View {
     private func deleteAllRecords() {
         // 删除所有记录
         for record in records {
-            modelContext.delete(record)
+            viewContext.delete(record)
         }
         
         // 删除所有UserSetting数据
+        let fetchRequest: NSFetchRequest<UserSetting> = UserSetting.fetchRequest()
         do {
-            let fetchDescriptor = FetchDescriptor<UserSetting>()
-            let userSettings = try modelContext.fetch(fetchDescriptor)
+            let userSettings = try viewContext.fetch(fetchRequest)
             for setting in userSettings {
-                modelContext.delete(setting)
+                viewContext.delete(setting)
             }
         } catch {
             Logger.error("Failed to fetch UserSetting: \(error)")
         }
         
         do {
-            try modelContext.save()
+            try viewContext.save()
             Logger.debug("Successfully deleted all records for baby: \(baby.name)")
             Logger.debug("Successfully deleted all UserSetting data")
         } catch {
@@ -298,14 +305,16 @@ struct BabyInfoHeader: View {
 struct OngoingRecordCard: View {
     let recordId: UUID
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     
     // 只查询目标 Record，避免订阅全量 records
-    @Query private var records: [Record]
+    @FetchRequest private var records: FetchedResults<Record>
     
     init(recordId: UUID) {
         self.recordId = recordId
-        _records = Query(filter: #Predicate<Record> { $0.id == recordId })
+        _records = FetchRequest<Record>(
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "id == %@", recordId as CVarArg))
     }
     
     // 当前记录（理论上最多 1 条）
@@ -358,7 +367,7 @@ struct OngoingRecordCard: View {
                     
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(alignment: .center) {
-                            Text("\(record.subCategory.localized)")
+                            Text("\(record.subCategory?.localized ?? "")")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                             Text(String(format: "started_at".localized, record.startTimestamp.formatted(Date.FormatStyle(time: .shortened))))
@@ -384,7 +393,7 @@ struct OngoingRecordCard: View {
                     // 结束记录
                     record.endTimestamp = Date()
                     do {
-                    try modelContext.save()
+                    try viewContext.save()
                 } catch {
                     Logger.error("Failed to save record: \(error)")
                 }
@@ -423,72 +432,85 @@ struct TodayStatistics: View {
     let todayStats: DailyStats
     let unitManager: UnitManager
     @Environment(\.colorScheme) private var colorScheme
+
+    private func recordValueText(_ record: Record) -> String {
+        return " \(record.value.smartDecimal) \(record.unit ?? "")"
+    }
+
+    private var feedingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("feeding".localized)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text("formula".localized + "colon_separator".localized + "\(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+            Text("breast_milk".localized + "colon_separator".localized + "\(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private var sleepSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("sleep".localized)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text("duration_label".localized + "colon_separator".localized + "\(todayStats.sleepDurationInHours.smartDecimal) " + "hour_unit".localized)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+            Text("count_label".localized + "colon_separator".localized + "\(todayStats.sleepCount) " + "times".localized)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private var supplementSection: some View {
+        if !todayStats.supplementRecords.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("supplement".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                ForEach(todayStats.supplementRecords, id: \.id) { record in
+                    Text("\(record.name ?? "")\(recordValueText(record))")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var solidFoodSection: some View {
+        if !todayStats.solidFoodRecords.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("solid_food".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                ForEach(todayStats.solidFoodRecords, id: \.id) { record in
+                    Text("\(record.name ?? "")\(recordValueText(record))")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("today_statistics".localized)
                 .font(.headline)
+
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], alignment: .leading, spacing: 24) {
-                
-                // 喂养信息
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("feeding".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text("formula".localized + "colon_separator".localized + "\(todayStats.formulaAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Text("breast_milk".localized + "colon_separator".localized + "\(todayStats.breastMilkAmount.smartDecimal) \(unitManager.volumeUnit.rawValue)")
-                        .font(.system(size: 14, weight: .medium))       
-                        .foregroundColor(.secondary)
-                }
-
-                // 睡眠信息
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("sleep".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text("duration_label".localized + "colon_separator".localized + "\(todayStats.sleepDurationInHours.smartDecimal) " + "hour_unit".localized)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Text("count_label".localized + "colon_separator".localized + "\(todayStats.sleepCount) " + "times".localized)
-                        .font(.system(size: 14, weight: .medium))       
-                        .foregroundColor(.secondary)
-                }
-
-                // 补剂信息
-               if !todayStats.supplementRecords.isEmpty {
-                   VStack(alignment: .leading, spacing: 8) {
-                        Text("supplement".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        ForEach(todayStats.supplementRecords, id: \.self) { record in
-                            let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
-                            Text("\(record.name!)\(valueText)")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.secondary)
-                        }   
-                    }
-               }
-
-                // 辅食信息
-               if !todayStats.solidFoodRecords.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("solid_food".localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                        ForEach(todayStats.solidFoodRecords, id: \.self) { record in
-                            let valueText = record.value != nil ? " \(record.value!.smartDecimal) \(record.unit ?? "")" : ""
-                            Text("\(record.name!)\(valueText)")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.secondary)
-                        } 
-                    }
-               }
+                feedingSection
+                sleepSection
+                supplementSection
+                solidFoodSection
             }
         }
         .padding()

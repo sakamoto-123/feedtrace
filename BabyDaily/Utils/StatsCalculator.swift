@@ -1,4 +1,4 @@
-import SwiftData
+import CoreData
 import SwiftUI
 
 // 每日统计信息结构体
@@ -71,7 +71,7 @@ public class StatsCalculator {
             switch record.category {
             case "feeding_category":
                 // 喂养记录处理
-                let originalValue = record.value ?? 0.0
+                let originalValue = record.value 
                 let convertedValue = convertToTargetUnit(value: originalValue, fromUnit: record.unit)
                 
                 switch record.subCategory {

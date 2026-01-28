@@ -48,7 +48,7 @@ struct ModeSettingView: View {
                 // 视图出现时同步AppSettings的状态
                 selectedMode = appSettings.themeMode
             }
-            .onChange(of: appSettings.themeMode) { newMode in
+            .onChange(of: appSettings.themeMode) { _, newMode in
                 // 当AppSettings变化时（比如从其他地方修改），同步本地状态
                 if selectedMode != newMode {
                     selectedMode = newMode

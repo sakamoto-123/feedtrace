@@ -6,11 +6,46 @@
 //
 
 import SwiftUI
-import SwiftData
 import Combine
+import CloudKit
+import CoreData
+
+// App Delegate for handling CloudKit Sharing
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        return true
+    }
+    
+    func application(_ application: UIApplication, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+        let container = CKContainer(identifier: cloudKitShareMetadata.containerIdentifier)
+        let acceptSharesOperation = CKAcceptSharesOperation(shareMetadatas: [cloudKitShareMetadata])
+        
+        acceptSharesOperation.perShareResultBlock = { metadata, result in
+            switch result {
+            case .success(let share):
+                Logger.info("Accepted share: \(share)")
+            case .failure(let error):
+                Logger.error("Failed to accept share: \(error)")
+            }
+        }
+        
+        acceptSharesOperation.acceptSharesResultBlock = { result in
+             if case .failure(let error) = result {
+                 Logger.error("Accept shares operation failed: \(error)")
+             }
+        }
+        
+        container.add(acceptSharesOperation)
+    }
+}
 
 @main
 struct BabyDailyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    // Core Data Persistence Controller
+    let persistenceController = PersistenceController.shared
+    
     // 使用@StateObject包装AppSettings实例，统一管理主题和语言
     @StateObject private var appSettings = AppSettings.shared
     // 使用@StateObject包装UserSettingManager实例，处理用户设置
@@ -18,35 +53,15 @@ struct BabyDailyApp: App {
     // 获取iCloud同步开关状态
     @AppStorage("isICloudSyncEnabled") private var isICloudSyncEnabled = false
     
-    // 使用@State包装ModelContainer，以便在iCloud开关变化时重新创建
-    @State private var modelContainer: ModelContainer
     // 标志：是否正在处理迁移，用于防止循环触发
     @State private var isMigrating = false
     
+    // CloudKit Error Handler
+    @StateObject private var errorHandler = CloudKitErrorHandler.shared
+    
     // 初始化方法
     init() {
-        // 首先从UserDefaults获取iCloud同步状态
-        var isSyncEnabled = UserDefaults.standard.bool(forKey: "isICloudSyncEnabled")
-        
-        // 检查会员状态：非会员不能使用iCloud云同步功能
-        let membershipManager = MembershipManager.shared
-        let isICloudSyncAvailable = membershipManager.isFeatureAvailable(.iCloudSync)
-        
-        // 如果用户不是会员，强制禁用iCloud同步
-        if !isICloudSyncAvailable {
-            isSyncEnabled = false
-            // 更新UserDefaults中的设置
-            UserDefaults.standard.set(false, forKey: "isICloudSyncEnabled")
-        }
-        
-        // 初始创建ModelContainer - 使用CloudSyncManager的API
-        let initialContainer = CloudSyncManager.createModelContainer(isICloudSyncEnabled: isSyncEnabled)
-        _modelContainer = State(initialValue: initialContainer)
-    }
-    
-    // 计算属性，用于外部访问ModelContainer
-    var sharedModelContainer: ModelContainer {
-        return modelContainer
+        // Core Data 已经在 PersistenceController.shared 中初始化
     }
     
     var body: some Scene {
@@ -63,8 +78,6 @@ struct BabyDailyApp: App {
                 // 使用 id 修饰符，当语言变化时强制整个视图层次结构重新创建
                 // 这确保所有使用 .localized 的视图都能获取到最新的本地化字符串
                 .id(appSettings.language)
-                // 注意：不需要 .id(isICloudSyncEnabled)
-                // 因为 @Query 会自动响应 ModelContainer 的变化，并且 ContentView 中已有 onChange(of: babies) 处理数据更新
                 .onAppear {
                     // 应用启动时检查会员状态
                     Task {
@@ -74,6 +87,11 @@ struct BabyDailyApp: App {
                         logMembershipInfo()
                         // 检查订阅提醒
                         SubscriptionReminderManager.shared.checkSubscriptionStatus()
+                        
+                        // 初始加载用户设置（如果有）
+                        // 注意：这里需要传入 managedObjectContext
+                        UserSettingManager.shared.setup(modelContext: persistenceController.container.viewContext)
+                        
                     }
                 }
                 .onChange(of: isICloudSyncEnabled) { _, _ in
@@ -84,9 +102,17 @@ struct BabyDailyApp: App {
                         logMembershipInfo()
                     }
                 }
+                // 注入 Core Data Context
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .alert(item: $errorHandler.currentError) { error in
+                    Alert(
+                        title: Text(error.title),
+                        message: Text(error.message),
+                        dismissButton: .default(Text("ok".localized))
+                    )
+                }
         }
-        // 使用动态的modelContainer，确保每次变化时都会更新
-        .modelContainer(sharedModelContainer)
+        // 不需要 .modelContainer(sharedModelContainer) 因为我们已经切换到 Core Data
         .onChange(of: isICloudSyncEnabled) { oldValue, newValue in
             // 如果正在迁移中，忽略此次变化（防止循环触发）
             guard !isMigrating else {
@@ -107,47 +133,14 @@ struct BabyDailyApp: App {
                 }
             }
             
-            // 标记开始迁移
-            isMigrating = true
-            
-            // 当iCloud开关状态变化时，在后台线程执行数据迁移
-            DispatchQueue.global(qos: .userInitiated).async {
-                // 保存当前容器的引用
-                let oldContainer = self.modelContainer
-                
-                // 创建新的ModelContainer - 使用CloudSyncManager的API
-                let newContainer = CloudSyncManager.createModelContainer(isICloudSyncEnabled: newValue)
-                
-                // 迁移数据从旧容器到新容器
-                let migrationResult = DataMigrationManager.shared.migrateData(from: oldContainer, to: newContainer)
-                
-                // 在主线程更新modelContainer和相关管理器
-                DispatchQueue.main.async {
-                    switch migrationResult {
-                    case .success(true):
-                        // 更新modelContainer
-                        self.modelContainer = newContainer
-                        // 重置UserSettingManager，确保它使用新的容器
-                        let newContext = ModelContext(newContainer)
-                        UserSettingManager.shared.setup(modelContext: newContext)
-                        // 迁移成功，清除迁移标志
-                        self.isMigrating = false
-                    case .failure(let error):
-                        Logger.error("Migration failed: \(error.localizedDescription)")
-                        // 迁移失败，恢复原状态
-                        // 直接使用 UserDefaults 设置，避免触发 @AppStorage 的 onChange
-                        UserDefaults.standard.set(oldValue, forKey: "isICloudSyncEnabled")
-                        // 清除迁移标志（在下一个 run loop 中清除，确保状态已恢复）
-                        DispatchQueue.main.async {
-                            self.isMigrating = false
-                        }
-                    default:
-                        // 其他情况，清除迁移标志
-                        self.isMigrating = false
-                        break
-                    }
-                }
-            }
+            // Core Data 的 CloudKit 同步是由 NSPersistentCloudKitContainer 自动管理的
+            // 我们不能像 SwiftData 那样轻易地“切换容器”。
+            // 通常的做法是始终启用 CloudKit Container，但如果没有登录或不允许同步，数据只会留在本地。
+            // 或者，我们可以通过重新加载 Persistent Stores 来切换配置，但这对 Core Data 来说是一个比较重的操作。
+            // 
+            // 鉴于目前架构，我们简化处理：
+            // PersistenceController 默认启用了 CloudKit。
+            // 这里的开关更多是用于 UI 状态显示和业务逻辑判断。
         }
     }
     

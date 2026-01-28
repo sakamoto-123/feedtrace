@@ -152,6 +152,13 @@ struct GrowthStatisticsCard: View {
             
             // 图例
             makeLegend()
+            
+            Link(destination: URL(string: "http://who.int/tools/child-growth-standards/standards")!) {
+                Text("who_growth_standards")
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.bottom, 16)
         }
         .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
@@ -169,7 +176,7 @@ struct GrowthStatisticsCard: View {
         
         // 定义线型样式
         let dashedStyle = StrokeStyle(lineWidth: 0.5, dash: [8, 4])
-        let solidStyle = StrokeStyle(lineWidth: 0.5)
+        _ = StrokeStyle(lineWidth: 0.5)
         
         // 先创建基础图表内容
         let chart = Chart {
@@ -265,7 +272,7 @@ struct GrowthStatisticsCard: View {
             .chartYScale(domain: defaultDomain)
             .chartScrollableAxes(.horizontal)
             .chartXVisibleDomain(length: 7)
-            .frame(height: 540)
+            .frame(height: 500)
             .padding()
     }
     
@@ -286,7 +293,6 @@ struct GrowthStatisticsCard: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.bottom, 20)
     }
 }
 

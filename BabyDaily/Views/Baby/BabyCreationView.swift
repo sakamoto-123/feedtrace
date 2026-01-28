@@ -1,8 +1,8 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct BabyCreationView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject var appSettings: AppSettings
@@ -69,13 +69,6 @@ struct BabyCreationView: View {
                         
                         // 保存按钮
                         saveButton
-                        
-                        // // 辅助文字
-                        // Text("partner_device_tip".localized)
-                        //     .font(.system(size: 12))
-                        //     .foregroundColor(.secondary)
-                        //     .multilineTextAlignment(.center)
-                        //     .padding(.horizontal, 32)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 50)
@@ -289,7 +282,7 @@ struct BabyCreationView: View {
     }
     
     // 前6个颜色是免费的（索引0-5）
-    private let freeColorCount = 6
+    private let freeColorCount = 12
     
     // 判断颜色是否需要会员
     private func isColorPremium(_ color: ThemeColor) -> Bool {
@@ -431,12 +424,12 @@ struct BabyCreationView: View {
             saveBaby()
         }) {
             Text(!isEditing ? "add_baby".localized : "save".localized)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white)
-                .padding(.horizontal, 48)
-                .padding(.vertical, 14)
-                .background(appSettings.currentThemeColor)
-                .cornerRadius(24)
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(.white)
+            .padding(.horizontal, 48)
+            .padding(.vertical, 14)
+            .background(appSettings.currentThemeColor)
+            .cornerRadius(24)
         }
         .disabled(name.isEmpty)
         .opacity(name.isEmpty ? 0.6 : 1.0)
@@ -464,78 +457,93 @@ struct BabyCreationView: View {
             baby.gender = gender
             baby.weight = weightInKg
             baby.height = heightInCm
+            baby.updatedAt = Date()
             
             // 如果身高改变了，创建新的身高记录（使用用户输入的值和单位）
             if abs(oldHeight - heightInCm) > 0.01 { // 使用小的容差值来比较浮点数
-                let heightRecord = Record(
-                    babyId: baby.id,
-                    icon: "📏",
-                    category: "growth_category",
-                    subCategory: "height",
-                    startTimestamp: Date(),
-                    value: heightInputValue,
-                    unit: unitManager.lengthUnit.rawValue
-                )
-                modelContext.insert(heightRecord)
+                let heightRecord = Record(context: viewContext)
+                heightRecord.id = UUID()
+                heightRecord.createdAt = Date()
+                heightRecord.updatedAt = Date()
+                heightRecord.baby = baby
+                heightRecord.icon = "📏"
+                heightRecord.category = "growth_category"
+                heightRecord.subCategory = "height"
+                heightRecord.startTimestamp = Date()
+                heightRecord.value = heightInputValue
+                heightRecord.unit = unitManager.lengthUnit.rawValue
+                
+                viewContext.insert(heightRecord)
             }
             
             // 如果体重改变了，创建新的体重记录（使用用户输入的值和单位）
             if abs(oldWeight - weightInKg) > 0.01 { // 使用小的容差值来比较浮点数
-                let weightRecord = Record(
-                    babyId: baby.id,
-                    icon: "⚖️",
-                    category: "growth_category",
-                    subCategory: "weight",
-                    startTimestamp: Date(),
-                    value: weightInputValue,
-                    unit: unitManager.weightUnit.rawValue
-                )
-                modelContext.insert(weightRecord)
+                let weightRecord = Record(context: viewContext)
+                weightRecord.id = UUID()
+                weightRecord.createdAt = Date()
+                weightRecord.updatedAt = Date()
+                weightRecord.baby = baby
+                weightRecord.icon = "⚖️"
+                weightRecord.category = "growth_category"
+                weightRecord.subCategory = "weight"
+                weightRecord.startTimestamp = Date()
+                weightRecord.value = weightInputValue
+                weightRecord.unit = unitManager.weightUnit.rawValue
+                
+                viewContext.insert(weightRecord)
             }
         } else {
             // 创建新宝宝（存储标准单位）
-            let newBaby = Baby(
-                name: name,
-                photo: photoDatas.first,
-                birthday: birthday,
-                gender: gender,
-                weight: weightInKg,
-                height: heightInCm,
-                headCircumference: 0.0
-            )
+            let newBaby = Baby(context: viewContext)
+            newBaby.id = UUID()
+            newBaby.createdAt = Date()
+            newBaby.updatedAt = Date()
+            newBaby.name = name
+            newBaby.photo = photoDatas.first
+            newBaby.birthday = birthday
+            newBaby.gender = gender
+            newBaby.weight = weightInKg
+            newBaby.height = heightInCm
+            newBaby.headCircumference = 0.0
             
-            modelContext.insert(newBaby)
+            viewContext.insert(newBaby)
             
             // 保存宝宝以便获取 ID
-            try? modelContext.save()
+            try? viewContext.save()
             
             // 创建身高记录（使用用户输入的值和单位）
-            let heightRecord = Record(
-                babyId: newBaby.id,
-                icon: "📏",
-                category: "growth_category",
-                subCategory: "height",
-                startTimestamp: Date(),
-                value: heightInputValue,
-                unit: unitManager.lengthUnit.rawValue
-            )
-            modelContext.insert(heightRecord)
+            let heightRecord = Record(context: viewContext)
+            heightRecord.id = UUID()
+            heightRecord.createdAt = Date()
+            heightRecord.updatedAt = Date()
+            heightRecord.baby = newBaby
+            heightRecord.icon = "📏"
+            heightRecord.category = "growth_category"
+            heightRecord.subCategory = "height"
+            heightRecord.startTimestamp = Date()
+            heightRecord.value = heightInputValue
+            heightRecord.unit = unitManager.lengthUnit.rawValue
+            
+            viewContext.insert(heightRecord)
             
             // 创建体重记录（使用用户输入的值和单位）
-            let weightRecord = Record(
-                babyId: newBaby.id,
-                icon: "⚖️",
-                category: "growth_category",
-                subCategory: "weight",
-                startTimestamp: Date(),
-                value: weightInputValue,
-                unit: unitManager.weightUnit.rawValue
-            )
-            modelContext.insert(weightRecord)
+            let weightRecord = Record(context: viewContext)
+            weightRecord.id = UUID()
+            weightRecord.createdAt = Date()
+            weightRecord.updatedAt = Date()
+            weightRecord.baby = newBaby
+            weightRecord.icon = "⚖️"
+            weightRecord.category = "growth_category"
+            weightRecord.subCategory = "weight"
+            weightRecord.startTimestamp = Date()
+            weightRecord.value = weightInputValue
+            weightRecord.unit = unitManager.weightUnit.rawValue
+            
+            viewContext.insert(weightRecord)
         }
         
         // 保存更改到存储中
-        try? modelContext.save()
+        try? viewContext.save()
         
         dismiss()
     }

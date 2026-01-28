@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "52B274AB2F19295500A665C8"
-               BuildableName = "BabyDaily.app"
-               BlueprintName = "BabyDaily"
+               BuildableName = "FeedTrace.app"
+               BlueprintName = "FeedTrace"
                ReferencedContainer = "container:BabyDaily.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "52B274AB2F19295500A665C8"
-            BuildableName = "BabyDaily.app"
-            BlueprintName = "BabyDaily"
+            BuildableName = "FeedTrace.app"
+            BlueprintName = "FeedTrace"
             ReferencedContainer = "container:BabyDaily.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "52B274AB2F19295500A665C8"
-            BuildableName = "BabyDaily.app"
-            BlueprintName = "BabyDaily"
+            BuildableName = "FeedTrace.app"
+            BlueprintName = "FeedTrace"
             ReferencedContainer = "container:BabyDaily.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

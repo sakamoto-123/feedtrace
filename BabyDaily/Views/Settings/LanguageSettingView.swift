@@ -48,7 +48,7 @@ struct LanguageSettingView: View {
                 // 视图出现时同步AppSettings的状态
                 selectedLanguage = appSettings.language
             }
-            .onChange(of: appSettings.language) { newLanguage in
+            .onChange(of: appSettings.language) { _, newLanguage in
                 // 当AppSettings变化时（比如从其他地方修改），同步本地状态
                 if selectedLanguage != newLanguage {
                     selectedLanguage = newLanguage

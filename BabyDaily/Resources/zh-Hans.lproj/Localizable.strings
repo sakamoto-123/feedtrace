@@ -12,15 +12,11 @@
 "volume_unit" = "体积单位";
 "select_volume_unit" = "选择体积测量的单位";
 // HomeView
-"baby_diary" = "宝宝日记";
 "today_statistics" = "今日统计";
 "feeding" = "喂养";
-"activity" = "活动";
 "ongoing" = "进行中";
 "ending" = "结束";
 "quick_actions" = "快速操作";
-"more_records" = "更多记录";
-"edit" = "编辑";
 "all_actions" = "所有操作";
 "kg" = "kg";
 "cm" = "cm";
@@ -40,11 +36,9 @@
 "milestone_category" = "重要节点";
 
 "solid_food" = "辅食";
-"water" = "水";
 "sleep" = "睡觉";
 "diaper" = "纸尿裤";
 "bath" = "洗澡";
-"note" = "笔记";
 "weight" = "体重";
 "height" = "身高";
 "head" = "头";
@@ -71,14 +65,11 @@
 "first_walk" = "第一次走路";
 
 // Language Setting
-"select_language" = "选择语言";
 "language_setting" = "语言设置";
 
 // Today Stats
 "stool" = "大便";
 "urine" = "小便";
-"sleep_duration" = "睡觉时长";
-"sleep_count" = "睡觉次数";
 "hours" = "小时";
 "times" = "次";
 
@@ -88,8 +79,6 @@
 "day" = "天";
 
 // SettingsView
-"tap_to_edit_baby_info" = "点击编辑宝宝信息";
-"personalization_settings" = "个性化设置";
 "theme_color" = "主题颜色";
 "language_setting" = "语言设置";
 "mode_setting" = "模式设置";
@@ -97,9 +86,6 @@
 "light_theme" = "浅色模式";
 "dark_theme" = "深色模式";
 "membership_privileges" = "会员特权";
-"free" = "免费";
-"about" = "关于";
-"about_us" = "关于我们";
 "help_and_feedback" = "帮助与反馈";
 "privacy_policy" = "隐私政策";
 "user_agreement" = "用户协议";
@@ -107,14 +93,6 @@
 
 // AppLanguage Names
 "system_language" = "跟随系统";
-"simplified_chinese" = "简体中文";
-"traditional_chinese" = "繁体中文";
-"english" = "English";
-"japanese" = "日本語";
-"korean" = "한국어";
-"french" = "Français";
-"portuguese" = "Português";
-"spanish" = "Español";
 
 // MainTabView
 "home" = "首页";
@@ -132,8 +110,6 @@
 // RecordEditView
 "create_record" = "创建记录";
 "edit_record" = "编辑记录";
-"start" = "开始";
-"end" = "结束";
 "save" = "保存";
 "cancel" = "取消";
 
@@ -141,7 +117,6 @@
 "record_detail" = "记录详情";
 
 // BabyCreationView
-"baby_name" = "宝宝名字";
 "enter_baby_name" = "请输入宝宝名字";
 "birthday" = "生日";
 "gender" = "性别";
@@ -150,7 +125,6 @@
 "prefer_not_to_say" = "不透露";
 "add_baby" = "添加宝宝";
 "complete" = "完成";
-"partner_device_tip" = "或从伴侣的设备上获取更多宝宝宝贵数据";
 
 // StatisticsView
 "feeding_trend" = "喂养趋势";
@@ -173,26 +147,16 @@
 
 // GrowthStatisticsView
 "bmi" = "BMI";
-"month_age_format" = "月龄: %d 个月";
-"weight_format" = "体重: %.1f kg";
-"height_format" = "身高: %.1f cm";
-"head_format" = "头围: %.1f cm";
 
 // SleepTrendView
-"sleep_duration_title" = "睡眠时间";
 "hours_unit" = "时长(小时)";
-"sleep_duration_format" = "睡眠时间: %.1f 小时";
 "sleep_count_title" = "睡眠次数";
 "times_unit" = "次数";
-"sleep_count_format" = "睡眠次数: %d 次";
 
 // FeedingTrendView
-"feeding_trend_title" = "奶量趋势";
-"milk_volume_unit" = "奶量(ml)";
 
 // RecordEditView - Sections
 "time" = "时间信息";
-"information" = "信息";
 "additional_information" = "补充信息";
 
 // RecordEditView - Time
@@ -249,11 +213,9 @@
 
 // RecordListView - Navigation
 "records" = "记录";
-"edit" = "编辑";
 "delete" = "删除";
 
 // RecordDetailView
-"duration" = "持续时间";
 "detailed_information" = "详细信息";
 
 // Units
@@ -261,7 +223,6 @@
 "g" = "g";
 "kg" = "kg";
 "cm" = "cm";
-"degree" = "度";
 "tablet" = "片";
 "piece" = "块";
 
@@ -283,17 +244,12 @@
 "icloud_sync_backup" = "iCloud云同步/备份";
 "icloud_not_logged_in_title" = "未登录iCloud";
 "icloud_not_logged_in_message" = "您尚未登录iCloud，请先登录iCloud后再开启同步功能。";
-"icloud_insufficient_space_title" = "iCloud空间不足";
-"icloud_insufficient_space_message" = "您的iCloud存储空间不足，无法开启同步功能。请清理iCloud空间后再尝试。";
 "manual_sync" = "手动同步";
 "sync_now" = "立即同步";
 "share_app" = "分享应用";
-"share_app_text" = "推荐你使用 BabyDaily - 宝宝成长记录助手";
+"share_app_text" = "推荐你使用芋丸·宝宝日志 - 宝宝成长记录助手";
 
 // MembershipPrivilegesView
-"current_free_user" = "当前为免费用户";
-"upgrade_membership_prompt" = "升级会员享受更多特权";
-"upgrade_now" = "立即升级";
 "current_membership_status" = "当前会员状态";
 "membership_type" = "会员类型";
 "membership_status" = "会员状态";
@@ -303,16 +259,8 @@
 "membership_active" = "有效";
 "membership_expired" = "已过期";
 "membership_not_subscribed" = "未订阅";
-"icloud_sync_feature" = "iCloud云同步";
-"multi_device_sync" = "多设备同步";
-"data_stored_in_icloud" = "数据存储在 iCloud";
-"multi_device_sync_description" = "支持多设备数据同步";
-"more_themes" = "更多主题";
-"unlock_more_themes_description" = "解锁更多主题颜色和样式";
-"no_ads" = "无广告";
-"no_ads_description" = "使用过程中无任何广告干扰";
 "membership_subscription" = "会员订阅";
-"app_name" = "宝宝记";
+"app_name" = "芋丸·宝宝日志";
 "feature_comparison" = "会员功能对比";
 "regular_user" = "普通用户";
 "premium_member" = "高级会员";
@@ -329,12 +277,10 @@
 "future_more_features" = "未来更多高级功能";
 "premium_membership_monthly" = "高级会员(月订阅)";
 "premium_membership_lifetime" = "高级会员(永久)";
-"original_price" = "原价";
 "subscribe_accept_terms" = "订阅会员则表示您接受我们的隐私政策和使用条款。";
 "terms_of_service" = "使用条款";
 "redeem_code" = "兑换会员码";
 "restore_purchases" = "恢复购买";
-"purchasing" = "购买中...";
 "purchase_success" = "购买成功";
 "purchase_failed" = "购买失败";
 "restore_success" = "恢复购买成功";
@@ -387,15 +333,8 @@
 "edit_baby_info" = "修改信息";
 
 // CloudSyncManager
-"icloud_not_logged_in" = "未登录iCloud";
-"icloud_insufficient_space" = "iCloud存储空间不足";
-"icloud_available" = "iCloud可用";
 
 // iCloud Sync Status
-"icloud_sync_idle" = "待同步";
-"icloud_sync_syncing" = "同步中";
-"icloud_sync_completed" = "同步完成";
-"icloud_sync_error" = "同步错误";
 
 // Punctuation
 "comma_separator" = "，";
@@ -403,50 +342,42 @@
 
 // Family Collaboration
 "family_collaboration" = "家庭协作";
-"collaboration_title" = "与家人共同记录宝宝的成长历程";
-"collaboration_subtitle" = "通过 iCloud 协作功能，您可以:";
-"invite_family" = "邀请家人加入";
-"record_together" = "共同记录日常";
-"real_time_sync" = "实时同步数据";
 "select_baby_to_collaborate" = "选择要协作的宝宝";
 "no_collaborators_yet" = "尚未添加协作者";
 "manage_collaboration" = "管理协作";
-"collaboration_invite_guide" = "协作邀请提示";
 "three_steps_to_share" = "三步完成分享";
-"step1_invite" = "先点击`邀请家人加入`，再选择短信 App";
-"step2_contact" = "填写想邀请的联系人信息";
-"step3_send" = "立即发送邀请";
 "ensure_icloud_setup" = "确保 iCloud 已设置";
-"ensure_icloud_setup_desc" = "请确认邀请的家人已经登录 iCloud，并预留足够的可用空间，以免 BabyMemos 的同步因空间不足而中断";
-"must_use_sms" = "必须使用短信 App 发送";
-"must_use_sms_desc" = "请使用短信 App 发送协作邀请，家人才能顺利加入";
-"remind_install_app" = "提醒家人先安装 Baby Memos";
-"remind_install_app_desc" = "请先提醒家人安装最新版本的 Baby Memos，再打开邀请链接，才能顺利同步";
+"ensure_icloud_setup_desc" = "请确认邀请的家人已经登录 iCloud，并预留足够的可用空间，以免芋丸·宝宝日志的同步因空间不足而中断";
+"remind_install_app" = "提醒家人先安装芋丸";
+"remind_install_app_desc" = "请先提醒家人安装最新版本的芋丸，再打开邀请链接，才能顺利同步";
 "owner" = "所有者";
-"read_only" = "只读";
-"read_write" = "可编辑";
-"only_invited_can_edit" = "仅受邀用户可编辑";
-"stop_sharing" = "停止共享";
-"collaborators_count" = "%d 位协作者";
-"not_shared" = "未共享";
-"shared" = "已共享";
-"sharing" = "共享中";
-"collaboration_error" = "协作错误";
 "close" = "关闭";
 "error" = "错误";
-"stop_sharing_confirm_message" = "确定要停止共享吗？停止后，所有协作者将无法继续访问宝宝的记录。";
-"permission_setting" = "权限设置";
-"read_only_desc" = "协作者只能查看记录，无法编辑";
-"read_write_desc" = "协作者可以查看和编辑记录";
-"sharing_all_data" = "共享所有数据";
-"sharing_all_data_desc" = "共享后，协作者可以查看和编辑所有宝宝及其记录";
-"read_only_user_cannot_edit" = "只读用户无法编辑记录";
-"read_only_user_cannot_delete" = "只读用户无法删除记录";
-"loading_share_data" = "正在加载共享数据...";
-"loading_share_data_title" = "正在加载共享数据";
-"accepting_share_invitation" = "正在接受共享邀请...";
-"loading_shared_babies" = "正在加载共享的宝宝信息...";
-"loading_shared_records" = "正在加载共享的记录...";
-"loading_complete" = "加载完成！";
-"loading_failed" = "加载失败";
-"retry" = "重试";
+
+// Missing keys from code
+"invite_family_to_join" = "邀请家人加入";
+"collaboration_invitation_tip" = "协作邀请提示";
+"step_1_invite_text" = "先点击“邀请家人加入”，再选择短信 App";
+"step_2_contact_info" = "填写想邀请的联系人信息";
+"step_3_send_invite" = "立即发送邀请";
+"must_use_imessage" = "必须使用短信 App 发送";
+"must_use_imessage_desc" = "请使用短信 App 发送协作邀请，家人才能顺利加入";
+"not_supported" = "不支持";
+"icloud_share_not_supported_description" = "当前数据存储模式暂不支持直接创建 iCloud 共享，请等待后续更新适配。";
+"year_unit" = "岁";
+"month_unit" = "个月";
+"day_unit" = "天";
+
+// CloudKit Error Handling
+"icloud_quota_exceeded_title" = "iCloud 存储空间已满";
+"icloud_quota_exceeded_message" = "您的 iCloud 存储空间已满。 芋丸无法同步数据，直到您清理出一些空间。";
+"network_error" = "网络错误";
+"network_unavailable_message" = "网络不可用，请检查您的网络连接。";
+
+// Cloud Sharing
+"share_baby_title_format" = "邀请您加入 %@ 的家庭";
+"share_baby_default_title" = "邀请您共同记录宝宝成长";
+
+// Growth Statistics
+"who_growth_standards" = "WHO儿童生长标准";
+

@@ -7,7 +7,7 @@ struct ThemeColorSettingView: View {
     @State private var showingMembershipView = false
     
     // 前6个颜色是免费的（索引0-5）
-    private let freeColorCount = 6
+    private let freeColorCount = 12
     
     // 判断颜色是否需要会员
     private func isColorPremium(_ color: ThemeColor) -> Bool {

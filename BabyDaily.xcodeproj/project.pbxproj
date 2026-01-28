@@ -11,17 +11,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		52B274AC2F19295500A665C8 /* BabyDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		52B274AC2F19295500A665C8 /* FeedTrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FeedTrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C27C6B2F208EEE003205EC /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		52B274B92F19295700A665C8 /* Exceptions for "BabyDaily" folder in "BabyDaily" target */ = {
+		52B274B92F19295700A665C8 /* Exceptions for "BabyDaily" folder in "FeedTrace" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 52B274AB2F19295500A665C8 /* BabyDaily */;
+			target = 52B274AB2F19295500A665C8 /* FeedTrace */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -29,7 +29,7 @@
 		52B274AE2F19295500A665C8 /* BabyDaily */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				52B274B92F19295700A665C8 /* Exceptions for "BabyDaily" folder in "BabyDaily" target */,
+				52B274B92F19295700A665C8 /* Exceptions for "BabyDaily" folder in "FeedTrace" target */,
 			);
 			path = BabyDaily;
 			sourceTree = "<group>";
@@ -60,7 +60,7 @@
 		52B274AD2F19295500A665C8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				52B274AC2F19295500A665C8 /* BabyDaily.app */,
+				52B274AC2F19295500A665C8 /* FeedTrace.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,9 +76,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		52B274AB2F19295500A665C8 /* BabyDaily */ = {
+		52B274AB2F19295500A665C8 /* FeedTrace */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 52B274BA2F19295700A665C8 /* Build configuration list for PBXNativeTarget "BabyDaily" */;
+			buildConfigurationList = 52B274BA2F19295700A665C8 /* Build configuration list for PBXNativeTarget "FeedTrace" */;
 			buildPhases = (
 				52B274A82F19295500A665C8 /* Sources */,
 				52B274A92F19295500A665C8 /* Frameworks */,
@@ -91,11 +91,11 @@
 			fileSystemSynchronizedGroups = (
 				52B274AE2F19295500A665C8 /* BabyDaily */,
 			);
-			name = BabyDaily;
+			name = FeedTrace;
 			packageProductDependencies = (
 			);
 			productName = BabyDaily;
-			productReference = 52B274AC2F19295500A665C8 /* BabyDaily.app */;
+			productReference = 52B274AC2F19295500A665C8 /* FeedTrace.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -134,7 +134,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				52B274AB2F19295500A665C8 /* BabyDaily */,
+				52B274AB2F19295500A665C8 /* FeedTrace */,
 			);
 		};
 /* End PBXProject section */
@@ -196,7 +196,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -236,7 +236,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -374,7 +374,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		52B274BA2F19295700A665C8 /* Build configuration list for PBXNativeTarget "BabyDaily" */ = {
+		52B274BA2F19295700A665C8 /* Build configuration list for PBXNativeTarget "FeedTrace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				52B274BB2F19295700A665C8 /* Debug */,

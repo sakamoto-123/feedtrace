@@ -1,41 +1,32 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct RecordDetailView: View {
     let recordId: UUID
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
-    // 删除确认提示
+    @FetchRequest private var records: FetchedResults<Record>
+    @FetchRequest private var babies: FetchedResults<Baby>
+    
     @State private var showingDeleteConfirmation = false
-    // 导航状态
     @State private var isNavigatingToEdit = false
-    // 图片预览状态
     @State private var isShowingImagePreview = false
     @State private var selectedImageIndex = 0
     
-    // 只查询目标 Record，避免订阅全量 records
-    @Query private var records: [Record]
-    
     init(recordId: UUID) {
         self.recordId = recordId
-        _records = Query(filter: #Predicate<Record> { $0.id == recordId })
+        _records = FetchRequest<Record>(
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "id == %@", recordId as CVarArg))
+        _babies = FetchRequest<Baby>(sortDescriptors: [])
     }
     
-    // 当前记录（理论上最多 1 条）
     private var record: Record? { records.first }
     
-    // 根据record.babyId查询对应的baby对象
     private var baby: Baby? {
-        guard let record = record else { return nil }
-        do {
-            let fetchDescriptor = FetchDescriptor<Baby>()
-            let babies = try modelContext.fetch(fetchDescriptor)
-            return babies.first(where: { $0.id == record.babyId })
-        } catch {
-            Logger.error("Failed to fetch baby: \(error)")
-            return nil
-        }
+        guard let record = record, let babyEntity = record.baby else { return nil }
+        return babyEntity
     }
     
     // 记录基本信息视图
@@ -47,7 +38,7 @@ struct RecordDetailView: View {
                     .font(.title)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(record.subCategory.localized)
+                    Text(record.subCategory?.localized ?? "")
                         .font(.title2)
                         .fontWeight(.bold)
                         
@@ -101,7 +92,7 @@ struct RecordDetailView: View {
                         }
                     }
 
-                    if Constants.hasEndTimeCategories.contains(record.subCategory) {
+                    if let subCategory = record.subCategory, Constants.hasEndTimeCategories.contains(subCategory) {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("duration_label".localized)
                                 .font(.caption)
@@ -131,19 +122,17 @@ struct RecordDetailView: View {
         }
     }
 
-     // 庆祝
     @ViewBuilder
     private var milestoneInfoView: some View {
-        if let record = record, Constants.milestoneCategories.contains(record.subCategory) {
+        if let record = record, let subCategory = record.subCategory, Constants.milestoneCategories.contains(subCategory) {
             Text("🎉🎉🎉")
                 .font(.title)
         }
     }
     
-    // 详细信息视图
     @ViewBuilder
     private var detailedInfoView: some View {
-        if let record = record, !Constants.noDetailCategories.contains(record.subCategory) {
+        if let record = record, let subCategory = record.subCategory, !Constants.noDetailCategories.contains(subCategory) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("detailed_information".localized)
                     .font(.caption)
@@ -166,8 +155,8 @@ struct RecordDetailView: View {
                         .font(.title2)
                 }
                 
-                if let value = record.value, let unit = record.unit {
-                    Text("\(value.smartDecimal) \(unit.localized)")
+                if record.value > 0, let unit = record.unit {
+                    Text("\(record.value.smartDecimal) \(unit.localized)")
                         .font(.title2)
                 }
 
@@ -231,7 +220,8 @@ struct RecordDetailView: View {
     // 照片视图
     @ViewBuilder
     private var photosView: some View {
-        if let record = record, let photos = record.photos, !photos.isEmpty {
+        let photos = record?.photosArray ?? []
+        if !photos.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text("photos".localized)
                     .font(.caption)
@@ -332,9 +322,13 @@ struct RecordDetailView: View {
         .alert("confirm_delete_record_title".localized,  isPresented: $showingDeleteConfirmation) {
             Button("cancel".localized, role: .cancel) {}
             Button("delete".localized, role: .destructive) {
-                // 删除记录
                 if let record = record {
-                    modelContext.delete(record)
+                    viewContext.delete(record)
+                    do {
+                        try viewContext.save()
+                    } catch {
+                        print("Failed to delete record: \(error)")
+                    }
                     dismiss()
                 }
             }
@@ -343,8 +337,8 @@ struct RecordDetailView: View {
         }
         // 图片预览
         .fullScreenCover(isPresented: $isShowingImagePreview) {
-            if let record = record, let photos = record.photos {
-                ImagePreview(images: photos, initialIndex: selectedImageIndex)
+            if let record = record {
+                ImagePreview(images: record.photosArray, initialIndex: selectedImageIndex)
             }
         }
     }

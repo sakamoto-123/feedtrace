@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="BabyDaily" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="26000" systemVersion="" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES">
+    <entity name="Baby" representedClassName="Baby" syncable="YES">
+        <attribute name="birthday" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="gender" optional="NO" attributeType="String" defaultValueString=""/>
+        <attribute name="headCircumference" optional="NO" attributeType="Double" usesScalarValueType="YES" defaultValueString="0"/>
+        <attribute name="height" optional="NO" attributeType="Double" usesScalarValueType="YES" defaultValueString="0"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="NO" attributeType="String" defaultValueString=""/>
+        <attribute name="photo" optional="YES" attributeType="Binary"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="weight" optional="NO" attributeType="Double" usesScalarValueType="YES" defaultValueString="0"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Record" inverseName="baby" inverseEntity="Record"/>
+    </entity>
+    <entity name="Record" representedClassName="Record" syncable="YES">
+        <attribute name="acceptance" optional="YES" attributeType="String"/>
+        <attribute name="breastType" optional="YES" attributeType="String"/>
+        <attribute name="category" optional="NO" attributeType="String" defaultValueString=""/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="dayOrNight" optional="YES" attributeType="String"/>
+        <attribute name="endTimestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="excrementStatus" optional="YES" attributeType="String"/>
+        <attribute name="icon" optional="NO" attributeType="String" defaultValueString=""/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="photos" optional="YES" attributeType="Binary"/>
+        <attribute name="remark" optional="YES" attributeType="String"/>
+        <attribute name="startTimestamp" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="subCategory" optional="YES" attributeType="String"/>
+        <attribute name="unit" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="value" optional="NO" attributeType="Double" usesScalarValueType="YES" defaultValueString="0"/>
+        <relationship name="baby" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Baby" inverseName="records" inverseEntity="Baby"/>
+    </entity>
+    <entity name="UserSetting" representedClassName="UserSetting" syncable="YES">
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lengthUnit" optional="NO" attributeType="String" defaultValueString="cm"/>
+        <attribute name="temperatureUnit" optional="NO" attributeType="String" defaultValueString="C"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO" defaultDateTimeInterval="0"/>
+        <attribute name="volumeUnit" optional="NO" attributeType="String" defaultValueString="ml"/>
+        <attribute name="weightUnit" optional="NO" attributeType="String" defaultValueString="kg"/>
+    </entity>
+</model>

@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 // MARK: - 单个记录项组件
 struct RecordItem: View {
@@ -18,7 +18,7 @@ struct RecordItem: View {
                 // 中侧：名称、内容、时间、备注
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(record.subCategory.localized)
+                        Text(record.subCategory?.localized ?? "")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                         Text("\(formatRecordContent(record))")
@@ -49,7 +49,7 @@ struct RecordItem: View {
                 Spacer()
                 
                 // 右侧：图片列表
-                RecordPhotosPreview(photos: record.photos ?? [])
+                RecordPhotosPreview(photos: record.photosArray)
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -72,7 +72,7 @@ struct RecordItem: View {
     
     // 格式化记录内容
     private func formatRecordContent(_ record: Record) -> String {
-        let subCategory = record.subCategory
+        guard let subCategory = record.subCategory else { return "" }
         
         switch subCategory {
         case "nursing", "sleep":
@@ -96,28 +96,28 @@ struct RecordItem: View {
                 label =  breastType == "BOTH" ? "both_sides".localized : breastType == "LEFT" ? "left_side".localized : "right_side".localized
             }
             
-            if let value = record.value, let unit = record.unit {
-                return label + " " + "\(value.smartDecimal) \(unit)"
+            if let unit = record.unit {
+                return label + " " + "\(record.value.smartDecimal) \(unit)"
             }
         case "breast_bottle", "formula", "water_intake":
-            if let value = record.value, let unit = record.unit {
-                return "\(value.smartDecimal) \(unit)"
+            if let unit = record.unit {
+                return "\(record.value.smartDecimal) \(unit)"
             }
         case "weight":
-            if let value = record.value, let unit = record.unit {
-                return "\(value.smartDecimal) \(unit)"
+            if let unit = record.unit {
+                return "\(record.value.smartDecimal) \(unit)"
             }
         case "height":
-            if let value = record.value, let unit = record.unit {
-                return "\(value) \(unit)"
+            if let unit = record.unit {
+                return "\(record.value) \(unit)"
             }
         case "head":
-            if let value = record.value, let unit = record.unit {
-                return "\(value.smartDecimal) \(unit)"
+            if let unit = record.unit {
+                return "\(record.value.smartDecimal) \(unit)"
             }
         case "temperature":
-            if let value = record.value, let unit = record.unit {
-                return "\(value.smartDecimal)°\(unit)"
+            if let unit = record.unit {
+                return "\(record.value.smartDecimal)°\(unit)"
             }
         case "diaper":
             if let status = record.excrementStatus {
@@ -132,11 +132,11 @@ struct RecordItem: View {
         //         return name
         //     }
         case "medication":
-            if let value = record.value, let unit = record.unit {
+            if let unit = record.unit {
                 return "(value) \(unit)"
             }
         case "supplement":
-            if let value = record.value, let unit = record.unit {
+            if let unit = record.unit {
                 return "(value) \(unit)"
             }
         // case "vaccination":
@@ -182,14 +182,17 @@ struct RecordPhotosPreview: View {
 
 struct RecordListView: View {
     let baby: Baby
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var records: [Record]
+    @FetchRequest private var records: FetchedResults<Record>
     
     init(baby: Baby) {
         self.baby = baby
         let babyId = baby.id
-        _records = Query(filter: #Predicate { $0.babyId == babyId }, sort: [SortDescriptor(\Record.startTimestamp, order: .reverse)])
+        _records = FetchRequest<Record>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Record.startTimestamp, ascending: false)],
+            predicate: NSPredicate(format: "baby.id == %@", babyId as CVarArg),
+            animation: .default)
     }
     
     // 按天分组的记录
@@ -209,19 +212,16 @@ struct RecordListView: View {
     }
     
     // 导航状态
-    @State private var isNavigatingToEdit = false
     @State private var isNavigatingToCreate = false
-    // 只存储选中的记录ID，不存储实例，避免持有失效的模型引用
-    @State private var selectedRecordId: UUID?
+    // 编辑状态配置
+    struct RecordEditConfig: Identifiable {
+        let id: UUID
+    }
+    @State private var editConfig: RecordEditConfig?
+    
     @State private var showConfetti = false
     // 导航路径，用于检测是否在根页面
     @State private var navigationPath = NavigationPath()
-    
-    // 计算属性：从当前有效的 records 数组中获取选中的记录实例
-    private var selectedRecord: Record? {
-        guard let selectedRecordId = selectedRecordId else { return nil }
-        return records.first(where: { $0.id == selectedRecordId })
-    }
     
     // 删除确认 - 只存储要删除的记录ID，不存储实例，避免持有失效的模型引用
     @State private var showingDeleteConfirmation = false
@@ -243,9 +243,8 @@ struct RecordListView: View {
                                 RecordItem(
                                     record: record,
                                     onEdit: {
-                                        // 只存储ID，不存储实例
-                                        selectedRecordId = record.id
-                                        isNavigatingToEdit = true
+                                        // 设置编辑配置，触发 sheet
+                                        editConfig = RecordEditConfig(id: record.id)
                                     },
                                     onDelete: {
                                         deleteRecord(record)
@@ -264,10 +263,8 @@ struct RecordListView: View {
                     RecordDetailView(recordId: recordId)
                 }
                 // 编辑页面以 sheet 形式弹出
-                .sheet(isPresented: $isNavigatingToEdit) {
-                    if let recordId = selectedRecordId {
-                        RecordEditView(baby: baby, existingRecordId: recordId)
-                    }
+                .sheet(item: $editConfig) { config in
+                    RecordEditView(baby: baby, existingRecordId: config.id)
                 }
                 // 创建页面以 sheet 形式弹出
                 .sheet(isPresented: $isNavigatingToCreate) {
@@ -292,7 +289,7 @@ struct RecordListView: View {
                 openingAngle: Angle(degrees: 0),
                 closingAngle: Angle(degrees: 360),
                 radius: 200.0,
-                repetitions: 3,
+                repetitions: 1,
                 repetitionInterval: 0.5,
                 hapticFeedback: true
             )
@@ -331,10 +328,10 @@ struct RecordListView: View {
             Button("delete".localized, role: .destructive) {
                 // 删除记录
                 if let record = recordToDelete {
-                    modelContext.delete(record)
+                    viewContext.delete(record)
                     // 保存更改
                     do {
-                        try modelContext.save()
+                        try viewContext.save()
                     } catch {
                         // 如果保存失败，记录错误（可以添加错误提示）
                         print("删除记录失败: \(error.localizedDescription)")
@@ -344,8 +341,8 @@ struct RecordListView: View {
                 recordToDeleteId = nil
             }
         }
-        .onChange(of: showConfetti) {
-            if $0 {
+        .onChange(of: showConfetti) { _, newValue in
+            if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     showConfetti = false
                 }

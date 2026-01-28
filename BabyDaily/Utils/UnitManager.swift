@@ -1,6 +1,5 @@
 import Foundation
 import Combine
-import SwiftData
 
 // 温度单位枚举
 enum TemperatureUnit: String, CaseIterable, Identifiable {

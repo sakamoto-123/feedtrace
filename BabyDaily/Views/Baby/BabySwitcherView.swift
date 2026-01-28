@@ -1,11 +1,13 @@
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct BabySwitcherView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var babies: [Baby]
-    @Query private var allRecords: [Record]
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Baby.createdAt, ascending: true)],
+        animation: .default)
+    private var babies: FetchedResults<Baby>
     
     let currentBaby: Baby?
     let onSelectBaby: (Baby) -> Void
@@ -18,19 +20,15 @@ struct BabySwitcherView: View {
     @State private var deleteErrorMessage = ""
     
     // 编辑相关状态
-    @State private var isNavigatingToEdit = false
-    @State private var selectedBabyId: UUID?
+    struct BabyEditConfig: Identifiable {
+        let id: UUID
+    }
+    @State private var editConfig: BabyEditConfig?
     
     // 计算属性：从当前有效的 babies 数组中获取要删除的宝宝实例
     private var babyToDelete: Baby? {
         guard let id = babyToDeleteId else { return nil }
         return babies.first(where: { $0.id == id })
-    }
-    
-    // 计算属性：从当前有效的 babies 数组中获取要编辑的宝宝实例
-    private var selectedBaby: Baby? {
-        guard let selectedBabyId = selectedBabyId else { return nil }
-        return babies.first(where: { $0.id == selectedBabyId })
     }
     
     var body: some View {
@@ -101,8 +99,7 @@ struct BabySwitcherView: View {
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button {
                             // 编辑宝宝信息
-                            selectedBabyId = baby.id
-                            isNavigatingToEdit = true
+                            editConfig = BabyEditConfig(id: baby.id)
                         } label: {
                             Image(systemName: "square.and.pencil")
                         }
@@ -164,8 +161,8 @@ struct BabySwitcherView: View {
             Text(deleteErrorMessage)
         }
         // 编辑页面以 sheet 形式弹出
-        .sheet(isPresented: $isNavigatingToEdit) {
-            if let baby = selectedBaby {
+        .sheet(item: $editConfig) { config in
+            if let baby = babies.first(where: { $0.id == config.id }) {
                 BabyCreationView(isEditing: true, existingBaby: baby, isFirstCreation: false)
             }
         }
@@ -181,16 +178,14 @@ struct BabySwitcherView: View {
             let babyId = baby.id
             
             // 1. 删除与该宝宝关联的所有记录
-            let babyRecords = allRecords.filter { $0.babyId == babyId }
-            for record in babyRecords {
-                modelContext.delete(record)
-            }
+            // Core Data 配置了 Cascade 删除规则，删除 Baby 会自动删除 Records
+            // 无需手动删除记录
             
             // 2. 删除宝宝对象
-            modelContext.delete(baby)
+            viewContext.delete(baby)
             
             // 3. 保存更改
-            try modelContext.save()
+            try viewContext.save()
             
             // 4. 如果删除的是当前选中的宝宝，关闭视图
             if babyId == currentBaby?.id {

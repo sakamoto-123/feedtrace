@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+import CoreData
 import UIKit
 import Combine
 
@@ -117,6 +117,9 @@ struct RecordTypeSelector: View {
                 recordTypeButtons
             }
             .onAppear {
+                scrollToInitialType(proxy: proxy)
+            }
+            .onChange(of: selectedRecordType?.subCategory) { _, _ in
                 scrollToInitialType(proxy: proxy)
             }
         }
@@ -388,7 +391,7 @@ struct RecordInfoSection: View {
         guard let subCategory = subCategory else { return "" }
         
         switch subCategory {
-        case "breast_bottle", "formula", "water_intake", "nursing", "pumping":
+        case "breast_bottle", "breast_milk", "formula", "water_intake", "nursing", "pumping":
             return unitManager.volumeUnit.rawValue
         case "height", "head":
             return unitManager.lengthUnit.rawValue
@@ -438,7 +441,7 @@ struct RecordInfoSection: View {
                     Button(action: {
                         showUnitSettingSheet.toggle()
                     }) {
-                        Text(defaultUnit.localized ?? "")
+                        Text(defaultUnit.localized)
                             .font(.headline)
                             .foregroundColor(.accentColor)
                     }
@@ -579,13 +582,13 @@ struct RecordEditView: View {
     let existingRecordId: UUID?
     var onSaveSuccess: ((String) -> Void)?
     
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject var appSettings: AppSettings
     
-    // 只查询目标 Record，避免订阅全量 records
-    @Query private var records: [Record]
+    // 使用 @FetchRequest 替代 @Query
+    @FetchRequest private var records: FetchedResults<Record>
     
     init(baby: Baby, recordType: (category: String, subCategory: String, icon: String)? = nil, existingRecordId: UUID? = nil, onSaveSuccess: ((String) -> Void)? = nil) {
         self.baby = baby
@@ -594,10 +597,14 @@ struct RecordEditView: View {
         self.onSaveSuccess = onSaveSuccess
         
         if let id = existingRecordId {
-            _records = Query(filter: #Predicate<Record> { $0.id == id })
+            _records = FetchRequest<Record>(
+                sortDescriptors: [],
+                predicate: NSPredicate(format: "id == %@", id as CVarArg))
         } else {
             // 新建场景不需要读取任何 Record
-            _records = Query(filter: #Predicate<Record> { _ in false })
+            _records = FetchRequest<Record>(
+                sortDescriptors: [],
+                predicate: NSPredicate(value: false))
         }
     }
     
@@ -647,7 +654,7 @@ struct RecordEditView: View {
     
     // 是否需要名称
     private var needsName: Bool {
-        let subCategory = currentSubCategory
+        guard let subCategory = currentSubCategory else { return false }
         return subCategory == "medical_visit" || subCategory == "medication" || subCategory == "supplement" || subCategory == "vaccination"  || subCategory == "solid_food" 
     }
     
@@ -688,17 +695,17 @@ struct RecordEditView: View {
             endTimestamp = record.endTimestamp
             showEndTimePicker = record.endTimestamp != nil
             name = record.name ?? ""
-            value = record.value != nil ? String(record.value!) : ""
+            value = record.value != 0 ? String(record.value) : "" // Core Data double 默认 0
             unit = record.unit ?? "ml"
             remark = record.remark ?? ""
-            photos = record.photos ?? []
+            photos = record.photosArray 
             breastType = record.breastType ?? "BOTH"
             dayOrNight = record.dayOrNight ?? "DAY"
             acceptance = record.acceptance ?? "NEUTRAL"
             excrementStatus = record.excrementStatus ?? "URINE"
             
             // 从现有记录中提取recordType信息并设置selectedRecordType的初始值
-            selectedRecordType = (category: record.category, subCategory: record.subCategory, icon: record.icon)
+            selectedRecordType = (category: record.category, subCategory: record.subCategory ?? "", icon: record.icon)
         } else {
             // 创建新记录时，使用当前时间
             startTimestamp = Date()
@@ -988,57 +995,64 @@ struct RecordEditView: View {
             return
         }
         
-        do {
-            // 开始事务
-            try modelContext.transaction {
-                if let existingRecord = self.existingRecord {
-                    // 更新现有记录
-                    existingRecord.startTimestamp = startTimestamp
-                    existingRecord.endTimestamp = endTimestamp
-                    existingRecord.name = needsName ? name : nil
-                    existingRecord.value = needsValue && !value.isEmpty ? Double(value) : nil
-                    existingRecord.unit = needsValue ? unit : nil
-                    existingRecord.remark = !remark.isEmpty ? remark : nil
-                    existingRecord.photos = !photos.isEmpty ? photos : nil
-                    existingRecord.breastType = needsBreastType ? breastType : nil
-                    existingRecord.dayOrNight = needsDayOrNight ? dayOrNight : nil
-                    existingRecord.acceptance = needsAcceptance ? acceptance : nil
-                    existingRecord.excrementStatus = needsExcrementStatus ? excrementStatus : nil
-                } else {
-                    // 创建新记录
-                    let newRecord = Record(
-                        babyId: baby.id,
-                        icon: icon,
-                        category: category,
-                        subCategory: subCategory,
-                        startTimestamp: startTimestamp
-                    )
-                    
-                    // 设置记录属性
-                    newRecord.endTimestamp = endTimestamp
-                    newRecord.name = needsName ? name : nil
-                    newRecord.value = needsValue && !value.isEmpty ? Double(value) : nil
-                    newRecord.unit = needsValue ? unit : nil
-                    newRecord.remark = !remark.isEmpty ? remark : nil
-                    newRecord.photos = !photos.isEmpty ? photos : nil
-                    newRecord.breastType = needsBreastType ? breastType : nil
-                    newRecord.dayOrNight = needsDayOrNight ? dayOrNight : nil
-                    newRecord.acceptance = needsAcceptance ? acceptance : nil
-                    newRecord.excrementStatus = needsExcrementStatus ? excrementStatus : nil
-                    
-                    // 插入新记录
-                    modelContext.insert(newRecord)
-                }
+        viewContext.performAndWait {
+            if let existingRecord = self.existingRecord {
+                // 更新现有记录
+                existingRecord.category = category
+                existingRecord.subCategory = subCategory
+                existingRecord.icon = icon
+                existingRecord.startTimestamp = startTimestamp
+                existingRecord.endTimestamp = endTimestamp
+                existingRecord.name = needsName ? name : nil
+                existingRecord.value = needsValue && !value.isEmpty ? Double(value) ?? 0 : 0
+                existingRecord.unit = needsValue ? unit : nil
+                existingRecord.remark = !remark.isEmpty ? remark : nil
+                existingRecord.photosArray = !photos.isEmpty ? photos : []
+                existingRecord.breastType = needsBreastType ? breastType : nil
+                existingRecord.dayOrNight = needsDayOrNight ? dayOrNight : nil
+                existingRecord.acceptance = needsAcceptance ? acceptance : nil
+                existingRecord.excrementStatus = needsExcrementStatus ? excrementStatus : nil
+                existingRecord.updatedAt = Date()
+            } else {
+                // 创建新记录
+                let newRecord = Record(context: viewContext)
+                newRecord.id = UUID()
+                newRecord.createdAt = Date()
+                newRecord.updatedAt = Date()
+                newRecord.baby = baby // 建立关联
+                newRecord.icon = icon
+                newRecord.category = category
+                newRecord.subCategory = subCategory
+                newRecord.startTimestamp = startTimestamp
+                
+                // 设置记录属性
+                newRecord.endTimestamp = endTimestamp
+                newRecord.name = needsName ? name : nil
+                newRecord.value = needsValue && !value.isEmpty ? Double(value) ?? 0 : 0
+                newRecord.unit = needsValue ? unit : nil
+                newRecord.remark = !remark.isEmpty ? remark : nil
+                newRecord.photosArray = !photos.isEmpty ? photos : []
+                newRecord.breastType = needsBreastType ? breastType : nil
+                newRecord.dayOrNight = needsDayOrNight ? dayOrNight : nil
+                newRecord.acceptance = needsAcceptance ? acceptance : nil
+                newRecord.excrementStatus = needsExcrementStatus ? excrementStatus : nil
             }
             
-            // 保存成功，关闭视图
-            if existingRecord == nil {
-                onSaveSuccess?(subCategory)
+            do {
+                try viewContext.save()
+                DispatchQueue.main.async {
+                    if existingRecord == nil {
+                        onSaveSuccess?(subCategory)
+                    }
+                    dismiss()
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    errorMessage = "save_failed".localized + "colon_separator".localized + "\(error.localizedDescription)"
+                    showingErrorAlert = true
+                }
             }
-            dismiss()
-        } catch {
-            errorMessage = "save_failed".localized + "colon_separator".localized + "\(error.localizedDescription)"
-            showingErrorAlert = true
         }
     }
 }
+

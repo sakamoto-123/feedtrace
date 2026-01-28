@@ -54,10 +54,10 @@ struct ImagePicker: UIViewControllerRepresentable {
             for result in results {
                 dispatchGroup.enter()
                 
-                result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+                result.itemProvider.loadObject(ofClass: UIImage.self) { object, error in
                     defer { dispatchGroup.leave() }
                     
-                    guard let self = self, let uiImage = object as? UIImage else {
+                    guard let uiImage = object as? UIImage else {
                         return
                     }
                     

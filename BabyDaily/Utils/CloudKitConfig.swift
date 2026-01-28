@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 
 /// CloudKit配置常量
 struct CloudKitConfig {
@@ -24,13 +23,4 @@ struct CloudKitConfig {
     
     /// iCloud同步等待时间（3秒）
     static let syncWaitTime: TimeInterval = 3.0
-    
-    /// 获取Schema
-    static var schema: Schema {
-        return Schema([
-            Baby.self,
-            Record.self,
-            UserSetting.self,
-        ])
-    }
 }
