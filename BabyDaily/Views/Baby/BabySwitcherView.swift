@@ -55,7 +55,7 @@ struct BabySwitcherView: View {
             
             // 宝宝列表
             List {
-                ForEach(babies) {
+                ForEach(babies, id: \.objectID) {
                     baby in
                     Button(action: {
                         onSelectBaby(baby)

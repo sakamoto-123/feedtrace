@@ -13,29 +13,26 @@ import CoreData
 // App Delegate for handling CloudKit Sharing
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        // 检查是否有 CloudKit 共享元数据 (处理冷启动)
+        if let shareMetadata = launchOptions?[.cloudKitShareMetadata] as? CKShare.Metadata {
+            Logger.info("App launched with CloudKit share metadata")
+            // 手动触发处理逻辑，ShareManager 会负责去重
+            ShareManager.shared.handleCloudKitShare(metadata: shareMetadata)
+        }
         return true
     }
     
     func application(_ application: UIApplication, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
-        let container = CKContainer(identifier: cloudKitShareMetadata.containerIdentifier)
-        let acceptSharesOperation = CKAcceptSharesOperation(shareMetadatas: [cloudKitShareMetadata])
-        
-        acceptSharesOperation.perShareResultBlock = { metadata, result in
-            switch result {
-            case .success(let share):
-                Logger.info("Accepted share: \(share)")
-            case .failure(let error):
-                Logger.error("Failed to accept share: \(error)")
-            }
-        }
-        
-        acceptSharesOperation.acceptSharesResultBlock = { result in
-             if case .failure(let error) = result {
-                 Logger.error("Accept shares operation failed: \(error)")
-             }
-        }
-        
-        container.add(acceptSharesOperation)
+        Logger.info("userDidAcceptCloudKitShareWith called")
+        // 使用 ShareManager 统一处理共享接受和数据同步
+        ShareManager.shared.handleCloudKitShare(metadata: cloudKitShareMetadata)
+    }
+    
+    // 配置 Scene 连接，指定 SceneDelegate
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
     }
 }
 
@@ -59,6 +56,9 @@ struct BabyDailyApp: App {
     // CloudKit Error Handler
     @StateObject private var errorHandler = CloudKitErrorHandler.shared
     
+    // Share Manager for Global Loading State
+    @StateObject private var shareManager = ShareManager.shared
+    
     // 初始化方法
     init() {
         // Core Data 已经在 PersistenceController.shared 中初始化
@@ -66,51 +66,86 @@ struct BabyDailyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // 检查是否已有宝宝数据，如果没有则显示宝宝信息创建页面，否则显示首页
-            ContentView()
-                // 应用主题模式设置
-                .preferredColorScheme(appSettings.currentColorScheme)
-                // 应用主题颜色设置
-                .accentColor(appSettings.currentThemeColor)
-                // 将AppSettings设置为环境对象，使所有视图都能访问和观察到它
-                .environmentObject(appSettings)
-                .withTheme(appSettings)
-                // 使用 id 修饰符，当语言变化时强制整个视图层次结构重新创建
-                // 这确保所有使用 .localized 的视图都能获取到最新的本地化字符串
-                .id(appSettings.language)
-                .onAppear {
-                    // 应用启动时检查会员状态
-                    Task {
-                        Logger.info("App launched, checking membership status...")
-                        await IAPManager.shared.checkMembershipStatus()
-                        // 输出会员信息
-                        logMembershipInfo()
-                        // 检查订阅提醒
-                        SubscriptionReminderManager.shared.checkSubscriptionStatus()
-                        
-                        // 初始加载用户设置（如果有）
-                        // 注意：这里需要传入 managedObjectContext
-                        UserSettingManager.shared.setup(modelContext: persistenceController.container.viewContext)
-                        
+            ZStack {
+                // 检查是否已有宝宝数据，如果没有则显示宝宝信息创建页面，否则显示首页
+                ContentView()
+                    // 应用主题模式设置
+                    .preferredColorScheme(appSettings.currentColorScheme)
+                    // 应用主题颜色设置
+                    .accentColor(appSettings.currentThemeColor)
+                    // 将AppSettings设置为环境对象，使所有视图都能访问和观察到它
+                    .environmentObject(appSettings)
+                    .withTheme(appSettings)
+                    // 使用 id 修饰符，当语言变化时强制整个视图层次结构重新创建
+                    // 这确保所有使用 .localized 的视图都能获取到最新的本地化字符串
+                    .id(appSettings.language)
+                    .onAppear {
+                        // 应用启动时检查会员状态
+                        Task {
+                            Logger.info("App launched, checking membership status...")
+                            await IAPManager.shared.checkMembershipStatus()
+                            // 输出会员信息
+                            logMembershipInfo()
+                            // 检查订阅提醒
+                            SubscriptionReminderManager.shared.checkSubscriptionStatus()
+                            
+                            // 初始加载用户设置（如果有）
+                            // 注意：这里需要传入 managedObjectContext
+                            UserSettingManager.shared.setup(modelContext: persistenceController.container.viewContext)
+                            
+                        }
                     }
-                }
-                .onChange(of: isICloudSyncEnabled) { _, _ in
-                    // 当iCloud状态变化时，也检查会员状态（因为可能影响数据同步）
-                    Task {
-                        await IAPManager.shared.checkMembershipStatus()
-                        // 输出会员信息
-                        logMembershipInfo()
+                    .onChange(of: isICloudSyncEnabled) { _, _ in
+                        // 当iCloud状态变化时，也检查会员状态（因为可能影响数据同步）
+                        Task {
+                            await IAPManager.shared.checkMembershipStatus()
+                            // 输出会员信息
+                            logMembershipInfo()
+                        }
                     }
+                    // 注入 Core Data Context
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .alert(item: $errorHandler.currentError) { error in
+                        Alert(
+                            title: Text(error.title),
+                            message: Text(error.message),
+                            dismissButton: .default(Text("ok".localized))
+                        )
+                    }
+                
+                // 全局 Loading 遮罩：当正在处理 CloudKit 共享接受时显示
+                if shareManager.isAcceptingShare {
+                    ZStack {
+                        // 使用系统背景色，自动适配暗黑模式
+                        // 在浅色模式下，opacity(0.4) 的黑色遮罩
+                        // 在深色模式下，增加 opacity 确保内容可见度
+                        Color.black.opacity(0.4)
+                            .edgesIgnoringSafeArea(.all)
+                        
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                // 在深色模式下 ProgressView 默认为白色，在浅色模式下为灰色
+                                // 我们强制使用 label 颜色，这样在深浅模式下都可见
+                                .progressViewStyle(CircularProgressViewStyle(tint: Color(UIColor.label)))
+                            
+                            Text("joining_family".localized)
+                                .font(.headline)
+                                // 使用系统标签颜色，自动适配
+                                .foregroundColor(Color(UIColor.label))
+                        }
+                        .padding(30)
+                        // 使用系统背景材料或颜色
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(UIColor.systemBackground))
+                                .shadow(radius: 10)
+                        )
+                    }
+                    .transition(.opacity)
+                    .zIndex(100) // 确保在最上层
                 }
-                // 注入 Core Data Context
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .alert(item: $errorHandler.currentError) { error in
-                    Alert(
-                        title: Text(error.title),
-                        message: Text(error.message),
-                        dismissButton: .default(Text("ok".localized))
-                    )
-                }
+            }
         }
         // 不需要 .modelContainer(sharedModelContainer) 因为我们已经切换到 Core Data
         .onChange(of: isICloudSyncEnabled) { oldValue, newValue in

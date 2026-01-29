@@ -7,9 +7,11 @@
 
 import SwiftUI
 import CoreData
+import CloudKit
 
 struct FamilyCollaborationView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.colorScheme) private var colorScheme
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Baby.createdAt, ascending: true)],
@@ -36,7 +38,7 @@ struct FamilyCollaborationView: View {
                     
                     // 宝宝列表
                     LazyVStack(spacing: 16) {
-                        ForEach(babies) { baby in
+                        ForEach(babies, id: \.objectID) { baby in
                             BabyCollaborationCard(
                                 baby: baby,
                                 onInvite: {
@@ -73,7 +75,7 @@ struct FamilyCollaborationView: View {
                 }
                 .padding(.vertical)
             }
-            .background(Color(UIColor.systemGroupedBackground))
+            .background(Color.themeBackground(for: colorScheme))
             .navigationTitle("family_collaboration".localized)
             .toolbar(.hidden, for: .tabBar)
             .navigationBarTitleDisplayMode(.inline)
@@ -134,6 +136,10 @@ struct FamilyCollaborationView: View {
                 CloudSharingView(baby: baby)
             }
         }
+        .onAppear {
+            // 请求 CloudKit 用户发现权限 (解决 Share Owner 名字为 nil 的问题)
+            ShareManager.shared.requestPermissions()
+        }
     }
 }
 
@@ -154,9 +160,17 @@ struct FeatureRow: View {
 }
 
 struct BabyCollaborationCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     let baby: Baby
     let onInvite: () -> Void
     let onManage: () -> Void
+    
+    // 状态管理：共享数据
+    @State private var share: CKShare?
+    @State private var isLoadingShare = true
+    @State private var participantCount = 0
+    @State private var ownerName: String?
     
     // 计算年龄
     private var ageString: String {
@@ -201,16 +215,55 @@ struct BabyCollaborationCard: View {
             
             // 协作者状态
             HStack {
-                Image(systemName: "person.2.fill")
-                    .foregroundColor(.secondary)
-                Text("no_collaborators_yet".localized)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                if isLoadingShare {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("loading".localized) // 需确保有对应的本地化字符串，如果没有则显示默认
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                } else if let share = share {
+                    // 已有共享
+                    Image(systemName: "person.2.fill")
+                        .foregroundColor(.accentColor)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        if let owner = ownerName {
+                            Text("Owner: \(owner)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        // 显示参与者数量（不包括 Owner）
+                        // CKShare.participants 包含 Owner 和其它参与者
+                        // 我们通常关心的是“有多少人一起看”
+                        let count = share.participants.count - 1 // 减去 Owner 自己（通常）
+                        if count > 0 {
+                            Text(String(format: "collaborators_count".localized, count))
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                        } else {
+                            Text("waiting_for_response".localized) // 或者 "仅自己"
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                } else {
+                    // 无共享
+                    Image(systemName: "person.2.fill")
+                        .foregroundColor(.secondary)
+                    Text("no_collaborators_yet".localized)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
                 Spacer()
             }
             .padding()
-            .background(Color(UIColor.secondarySystemBackground))
+            .background(Color.themeBackground(for: colorScheme))
             .cornerRadius(8)
+            // 当视图出现时加载共享数据
+            .task {
+                await loadShareData()
+            }
             
             // 按钮组
             VStack(spacing: 12) {
@@ -233,14 +286,41 @@ struct BabyCollaborationCard: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color(UIColor.secondarySystemBackground))
+                     .background(Color.themeBackground(for: colorScheme))
                     .foregroundColor(.primary)
                     .cornerRadius(8)
                 }
             }
         }
         .padding()
-        .background(Color.white)
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(16)
+    }
+    
+    // 加载共享数据
+    private func loadShareData() async {
+        isLoadingShare = true
+        defer { isLoadingShare = false }
+        
+        let container = PersistenceController.shared.container
+        do {
+            let shares = try container.fetchShares(matching: [baby.objectID])
+            if let share = shares[baby.objectID] {
+                self.share = share
+                self.participantCount = share.participants.count
+                
+                // 获取 Owner 名字
+                if let nameComponents = share.owner.userIdentity.nameComponents {
+                    self.ownerName = PersonNameComponentsFormatter().string(from: nameComponents)
+                } else {
+                    self.ownerName = "Unknown"
+                }
+            } else {
+                self.share = nil
+            }
+        } catch {
+            Logger.error("Failed to fetch share for baby \(baby.name): \(error)")
+            self.share = nil
+        }
     }
 }

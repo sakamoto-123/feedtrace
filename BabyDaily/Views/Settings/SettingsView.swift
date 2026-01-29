@@ -18,6 +18,8 @@ struct SettingsView: View {
     @State private var showEditBaby = false
     // 导航到新增宝宝页面
     @State private var showAddBaby = false
+    // 导航到家庭协作页面
+    @State private var showFamilyCollaboration = false
     // 获取ModelContext
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -162,17 +164,35 @@ struct SettingsView: View {
                             .toggleStyle(SwitchToggleStyle(tint: .accentColor))
                         }
                     }
-                        // 家庭协作入口 (仅在 iCloud 开启时显示)
-                    if isICloudSyncEnabled {
-                        NavigationLink(destination: FamilyCollaborationView()) {
-                            HStack {
-                                Image(systemName: "person.2.fill")
-                                    .foregroundColor(.accentColor)
-                                Text("family_collaboration".localized)
-                                Spacer()
-                            }
+                    // 家庭协作入口 (仅在 iCloud 开启时显示)
+                    Button(action: {
+                        // 1. 检查是否是会员
+                        if !membershipManager.isFeatureAvailable(.familySharing) {
+                            showMembershipPrivileges = true
+                            return
+                        }
+                        
+                        // 2. 检查 iCloud 是否开启
+                        if !isICloudSyncEnabled {
+                            alertTitle = "icloud_not_logged_in_title".localized
+                            alertMessage = "icloud_not_logged_in_message".localized
+                            showAlert = true
+                            return
+                        }
+                        
+                        // 3. 跳转
+                        showFamilyCollaboration = true
+                    }) {
+                        HStack {
+                            Image(systemName: "person.2.fill")
+                                .foregroundColor(.accentColor)
+                            Text("family_collaboration".localized)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
                         }
                     }
+                    .buttonStyle(.plain)
                     
 //                     // 手动同步按钮和状态显示
 // #if DEBUG
@@ -320,6 +340,10 @@ struct SettingsView: View {
             // 导航到新增宝宝页面
             .navigationDestination(isPresented: $showAddBaby) {
                 BabyCreationView(isEditing: false, isFirstCreation: false)
+            }
+            // 导航到家庭协作页面
+            .navigationDestination(isPresented: $showFamilyCollaboration) {
+                FamilyCollaborationView()
             }
         }
     }

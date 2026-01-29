@@ -352,6 +352,11 @@
 "owner" = "Owner";
 "close" = "Close";
 "error" = "Error";
+"joining_family" = "Joining family...";
+"creating_share_link" = "Creating Share Link...";
+"waiting_for_response" = "Waiting for response";
+"loading" = "Loading";
+"collaborators_count" = "%d Collaborators";
 
 // Missing keys from code
 "invite_family_to_join" = "Invite family to join";
@@ -379,4 +384,3 @@
 
 // Growth Statistics
 "who_growth_standards" = "WHO child growth standards";
-

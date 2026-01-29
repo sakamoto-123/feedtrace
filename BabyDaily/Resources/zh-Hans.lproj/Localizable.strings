@@ -353,6 +353,11 @@
 "owner" = "所有者";
 "close" = "关闭";
 "error" = "错误";
+"joining_family" = "正在加入家庭...";
+"creating_share_link" = "正在创建分享链接...";
+"waiting_for_response" = "等待回应";
+"loading" = "加载中";
+"collaborators_count" = "%d 位协作者";
 
 // Missing keys from code
 "invite_family_to_join" = "邀请家人加入";
@@ -380,4 +385,3 @@
 
 // Growth Statistics
 "who_growth_standards" = "WHO儿童生长标准";
-

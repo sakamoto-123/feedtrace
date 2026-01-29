@@ -10,6 +10,7 @@ import SwiftUI
 struct CollaborationGuideView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var appSettings: AppSettings
+    @Environment(\.colorScheme) private var colorScheme
     let onInvite: () -> Void
     
     var body: some View {
@@ -23,7 +24,6 @@ struct CollaborationGuideView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .foregroundColor(.primary)
-                        .background(Color.white)
                         .cornerRadius(20)
                 }
                 
@@ -39,7 +39,7 @@ struct CollaborationGuideView: View {
                     .frame(width: 60, height: 40)
             }
             .padding()
-            .background(Color(UIColor.systemGroupedBackground))
+            .background(Color.themeBackground(for: colorScheme))
             
             ScrollView {
                 VStack(spacing: 20) {
@@ -55,7 +55,7 @@ struct CollaborationGuideView: View {
                         GuideStepRow(number: 3, text: "step_3_send_invite".localized)
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(Color.themeCardBackground(for: colorScheme))
                     .cornerRadius(12)
                     
                     // iCloud 设置提示
@@ -84,7 +84,7 @@ struct CollaborationGuideView: View {
                 }
                 .padding()
             }
-            .background(Color(UIColor.systemGroupedBackground))
+            .background(Color.themeBackground(for: colorScheme))
             
             // 底部按钮
             Button(action: onInvite) {
@@ -99,7 +99,7 @@ struct CollaborationGuideView: View {
                 .cornerRadius(12)
             }
             .padding()
-            .background(Color.white)
+            .background(Color.themeBackground(for: colorScheme))
         }
     }
 }
@@ -132,6 +132,8 @@ struct GuideStepRow: View {
 }
 
 struct GuideTipCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     let icon: String
     let iconColor: Color
     let title: String
@@ -158,7 +160,7 @@ struct GuideTipCard: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(12)
     }
 }

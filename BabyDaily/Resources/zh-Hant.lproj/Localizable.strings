@@ -357,6 +357,7 @@
 "owner" = "所有者";
 "close" = "關閉";
 "error" = "錯誤";
+"creating_share_link" = "正在建立分享連結...";
 
 // Missing keys from code
 "invite_family_to_join" = "邀請家人加入";

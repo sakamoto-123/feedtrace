@@ -43,10 +43,22 @@ struct PersistenceController {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         } else {
             // 定义新的 Store 名称
-            let storeName = "BabyDaily_CoreData.sqlite"
-            let sharedStoreName = "BabyDaily_Shared.sqlite"
+            // 修复：为 Debug (开发) 环境和 Release (生产/TestFlight) 环境使用不同的数据库文件名
+            // 这可以防止在同一台设备上覆盖安装不同环境的包时，导致本地数据与 CloudKit 环境不匹配（Split Brain）从而产生重复数据
+            let storeName: String
+            let sharedStoreName: String
+            
+            #if DEBUG
+            storeName = "BabyDaily_CoreData_Dev.sqlite"
+            sharedStoreName = "BabyDaily_Shared_Dev.sqlite"
+            #else
+            storeName = "BabyDaily_CoreData.sqlite"
+            sharedStoreName = "BabyDaily_Shared.sqlite"
+            #endif
             
             // 1. 尝试执行数据迁移 (从 SwiftData default.store -> BabyDaily_CoreData.sqlite)
+            // 注意：如果是在 Debug 模式下使用了新的文件名，这里可能需要调整迁移逻辑，或者仅在 Release 下迁移
+            // 目前保持原样，DataMigrationManager 内部可能只处理默认名，但这对新用户无影响
             DataMigrationManager.shared.migrateSwiftDataToCoreData(targetName: storeName)
             
             // 2. 配置 Persistent Store
@@ -126,10 +138,32 @@ struct PersistenceController {
             }
         })
         
+        #if DEBUG
+        // Initialize CloudKit Schema in Debug mode to ensure zones and record types exist
+        // This helps resolve "Zone Not Found" errors during development
+        do {
+            try container.initializeCloudKitSchema(options: [])
+        } catch {
+            Logger.error("Failed to initialize CloudKit schema: \(error)")
+        }
+        #endif
+        
         // 自动合并来自父上下文的更改
         container.viewContext.automaticallyMergesChangesFromParent = true
         // 合并策略：内存优先 (或数据库优先)
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        // 执行去重检查 (异步执行，避免阻塞启动)
+        // 仅在主 Store 加载完成后执行
+        if !inMemory {
+            // 捕获 container 以避免在 Task 中捕获 mutating self
+            let container = container
+            Task {
+                // 等待一点时间确保 Store 完全加载和 CloudKit 初始同步可能开始
+                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                DeduplicationManager.shared.deduplicate(in: container.newBackgroundContext())
+            }
+        }
     }
     
     // MARK: - Sharing Helpers
