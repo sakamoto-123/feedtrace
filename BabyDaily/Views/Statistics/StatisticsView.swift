@@ -2,9 +2,6 @@ import SwiftUI
 import CoreData
 import Charts
 
-// 导入所有子组件
-import Charts
-
 struct StatisticsView: View {
     let baby: Baby
     
@@ -61,13 +58,6 @@ struct StatisticsView: View {
         // 计算查询结束日期：今天的23:59:59
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? now
         
-        // 记录查询时间范围（本地时间）
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-        // let localStartDateStr = dateFormatter.string(from: startDate)
-        // let localEndDateStr = dateFormatter.string(from: endDate)
-        // 将外部变量提取为常量
         let babyId = baby.id
         
         // 创建查询请求
@@ -88,13 +78,6 @@ struct StatisticsView: View {
                 if let date = calendar.date(byAdding: .day, value: i, to: startDate) {
                     let startOfDay = calendar.startOfDay(for: date)
                     groupedData[startOfDay] = (breastMilk: 0, formula: 0, water: 0, breastMilkCount: 0, formulaCount: 0, waterCount: 0)
-                    // 使用本地时间格式输出日志
-                    // let dateFormatter = DateFormatter()
-                    // dateFormatter.dateFormat = "yyyy-MM-dd"
-                    // dateFormatter.timeZone = TimeZone.current
-                    // let localDateStr = dateFormatter.string(from: startOfDay)
-                } else {
-                    Logger.warning("FeedingData: Failed to calculate date for index \(i)")
                 }
             }
             
@@ -103,12 +86,6 @@ struct StatisticsView: View {
                 let startOfDay = calendar.startOfDay(for: record.startTimestamp)
                 // 将容量单位转换为 ml
                 let valueInMl = UnitConverter.convertVolumeToMl(value: record.value, unit: record.unit)
-                
-                // 使用本地时间格式输出日志
-                // let dateFormatter = DateFormatter()
-                // dateFormatter.dateFormat = "yyyy-MM-dd"
-                // dateFormatter.timeZone = TimeZone.current
-                // let localDateStr = dateFormatter.string(from: startOfDay)
                 
                 // 根据子分类累加数据
                 if record.subCategory == "breast_bottle" {
@@ -127,16 +104,6 @@ struct StatisticsView: View {
             let result = groupedData.map { (date: $0.key, breastMilk: $0.value.breastMilk, formula: $0.value.formula, water: $0.value.water, breastMilkCount: $0.value.breastMilkCount, formulaCount: $0.value.formulaCount, waterCount: $0.value.waterCount) }
                 .sorted { $0.date < $1.date }
             
-            // 记录最终返回数据
-            // for item in result {
-            //     // 使用本地时间格式输出日志
-            //     let dateFormatter = DateFormatter()
-            //     dateFormatter.dateFormat = "yyyy-MM-dd"
-            //     dateFormatter.timeZone = TimeZone.current
-            //     let localDateStr = dateFormatter.string(from: item.date)
-            // }
-            
-            // 更新数据
             feedingData = result
         } catch {
             Logger.error("Error fetching feeding data: \(error)")
@@ -160,15 +127,6 @@ struct StatisticsView: View {
         // 计算查询结束日期：今天的23:59:59
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? now
         
-        // 记录查询时间范围（本地时间）
-        // let dateFormatter = DateFormatter()
-        // dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        // dateFormatter.timeZone = TimeZone.current
-        // let localStartDateStr = dateFormatter.string(from: startDate)
-        // let localEndDateStr = dateFormatter.string(from: endDate)
-        // Logger.debug("SleepData: Querying from \(localStartDateStr) to \(localEndDateStr) for baby ID: \(baby.id)")
-        
-        // 将外部变量提取为常量
         let babyId = baby.id
         
         // 创建查询请求
@@ -181,9 +139,6 @@ struct StatisticsView: View {
             // 执行查询
             let records = try viewContext.fetch(request)
             
-            // 记录查询到的记录数量
-            Logger.debug("SleepData: Found \(records.count) sleep records")
-            
             // 按日期分组计算数据
             var groupedData: [Date: (duration: Int, count: Int)] = [:]
             
@@ -192,14 +147,6 @@ struct StatisticsView: View {
                 if let date = calendar.date(byAdding: .day, value: i, to: startDate) {
                     let startOfDay = calendar.startOfDay(for: date)
                     groupedData[startOfDay] = (duration: 0, count: 0)
-                    // 使用本地时间格式输出日志
-                    // let dateFormatter = DateFormatter()
-                    // dateFormatter.dateFormat = "yyyy-MM-dd"
-                    // dateFormatter.timeZone = TimeZone.current
-                    // let localDateStr = dateFormatter.string(from: startOfDay)
-                    // Logger.debug("SleepData: Initialized day \(i+1)/\(daysCount): \(localDateStr)")
-                } else {
-                    Logger.warning("SleepData: Failed to calculate date for index \(i)")
                 }
             }
             
@@ -223,17 +170,6 @@ struct StatisticsView: View {
             // 转换为数组并排序
             let result = groupedData.map { (date: $0.key, duration: $0.value.duration, count: $0.value.count) }
                 .sorted { $0.date < $1.date }
-            
-            // 记录最终返回数据
-            Logger.debug("SleepData: Returning \(result.count) days of data:")
-            // for item in result {
-            //     // 使用本地时间格式输出日志
-            //     let dateFormatter = DateFormatter()
-            //     dateFormatter.dateFormat = "yyyy-MM-dd"
-            //     dateFormatter.timeZone = TimeZone.current
-            //     let localDateStr = dateFormatter.string(from: item.date)
-            //     Logger.debug("SleepData: \(localDateStr): duration=\(item.duration) hours, count=\(item.count)")
-            // }
             
             sleepData = result
         } catch {

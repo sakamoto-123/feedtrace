@@ -3,7 +3,6 @@ import CoreData
 
 struct SettingsView: View {
     let baby: Baby
-    @State private var showShareSheet = false
     // iCloud同步开关状态
     @AppStorage("isICloudSyncEnabled") private var isICloudSyncEnabled = false
     // 提示信息状态
@@ -20,8 +19,6 @@ struct SettingsView: View {
     @State private var showAddBaby = false
     // 导航到家庭协作页面
     @State private var showFamilyCollaboration = false
-    // 获取ModelContext
-    @Environment(\.managedObjectContext) private var viewContext
     
     private func shareApp() {
         let shareText = "share_app_text".localized
@@ -58,7 +55,7 @@ struct SettingsView: View {
             List {
                 // 宝宝信息
                 Section {
-                    HStack {
+                    HStack(spacing: 4)  {
                         if let photoData = baby.photo, let uiImage = UIImage(data: photoData) {
                             Image(uiImage: uiImage)
                                 .resizable()
@@ -193,41 +190,6 @@ struct SettingsView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    
-//                     // 手动同步按钮和状态显示
-// #if DEBUG
-//                     if isICloudSyncEnabled {
-//                         VStack(alignment: .leading, spacing: 8) {
-//                             HStack {
-//                                 Image(systemName: "arrow.clockwise")
-//                                     .foregroundColor(Color.fromHex("#6cb09e"))
-//                                 Text("manual_sync".localized)
-//                                 Spacer()
-//                                 Button(action: {
-//                                     cloudSyncManager.syncData(modelContext: modelContext, isICloudSyncEnabled: isICloudSyncEnabled)
-//                                 }) {
-//                                     Text("sync_now".localized)
-//                                         .font(.caption)
-//                                         .padding(.horizontal, 12)
-//                                         .padding(.vertical, 4)
-//                                         .background(Color.fromHex("#6cb09e"))
-//                                         .foregroundColor(.white)
-//                                         .cornerRadius(16)
-//                                 }
-//                             }
-                            
-//                             // 同步状态显示
-//                             HStack {
-//                                 Image(systemName: "cloud")
-//                                     .foregroundColor(cloudSyncManager.syncStatus.color)
-//                                 Text(cloudSyncManager.syncStatus.description)
-//                                     .font(.caption)
-//                                     .foregroundColor(cloudSyncManager.syncStatus.color)
-//                                 Spacer()
-//                             }
-//                         }
-//                     }
-// #endif
                 }
                 
                 // 个性化设置

@@ -1,5 +1,5 @@
 //
-//  LanguageManager.swift
+//  LocalizationManager.swift
 //  BabyDaily
 //
 //  本地化字符串管理
@@ -33,14 +33,6 @@ extension String {
             if localizedString != defaultString {
                 return localizedString
             }
-            
-            // 如果两者相同，需要进一步判断：
-            // 1. 如果指定语言bundle中的值与key相同，且默认bundle中的值也与key相同
-            //    这可能意味着两个bundle中都没有这个key，或者都有这个key但值都是key本身
-            // 2. 为了确保使用正确的语言，我们需要检查：如果指定语言bundle存在，
-            //    并且我们明确选择了这个语言，那么应该使用该bundle中的值
-            // 3. 但如果默认值来自系统语言（可能是中文），而指定语言是英语，
-            //    那么即使值相同，我们也应该使用指定语言bundle中的值
             
             // 更简单的方法：如果找到了指定语言的bundle，就使用它的值
             // 因为如果key不存在，localizedString会返回key本身，但这是该语言bundle的行为

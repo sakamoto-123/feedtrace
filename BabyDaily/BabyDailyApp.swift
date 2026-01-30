@@ -86,8 +86,8 @@ struct BabyDailyApp: App {
                             await IAPManager.shared.checkMembershipStatus()
                             // 输出会员信息
                             logMembershipInfo()
-                            // 检查订阅提醒
-                            SubscriptionReminderManager.shared.checkSubscriptionStatus()
+                            // 初始化订阅提醒管理器（单例初始化时会自动检查订阅状态）
+                            _ = SubscriptionReminderManager.shared
                             
                             // 初始加载用户设置（如果有）
                             // 注意：这里需要传入 managedObjectContext

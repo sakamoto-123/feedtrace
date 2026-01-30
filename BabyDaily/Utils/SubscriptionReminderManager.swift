@@ -43,24 +43,20 @@ class SubscriptionReminderManager: ObservableObject {
     // MARK: - Setup
     /// 设置观察者
     private func setupObservers() {
-        // 监听会员状态变化
-        membershipManager.$membershipStatus
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.checkSubscriptionStatus()
-            }
-            .store(in: &cancellables)
-        
-        // 监听过期时间变化
-        membershipManager.$expirationDate
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.checkSubscriptionStatus()
-            }
-            .store(in: &cancellables)
+        // 合并会员状态和过期时间的变化，使用 debounce 防止重复调用
+        Publishers.CombineLatest(
+            membershipManager.$membershipStatus,
+            membershipManager.$expirationDate
+        )
+        .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+        .sink { [weak self] _, _ in
+            self?.checkSubscriptionStatus()
+        }
+        .store(in: &cancellables)
         
         // 监听应用进入前台
         NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.checkSubscriptionStatus()
             }
