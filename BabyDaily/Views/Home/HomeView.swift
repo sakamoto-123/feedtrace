@@ -208,13 +208,25 @@ struct BabyInfoHeader: View {
                 
                 // 宝宝名称和年龄
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(baby.name)
-                        .font(.system(size: 15))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    Text(calculateBabyAge(baby))
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 6) {
+                        Text(baby.name)
+                            .font(.system(size: 15))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                        Text(calculateBabyAge(baby))
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack(spacing: 6){
+                        Text(String(format: "%.1f", latestGrowthData.weight) + "kg".localized)
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+
+                        Text((latestGrowthData.height > 0 ? String(format: "%.0f", latestGrowthData.height) : "---") + "cm".localized )
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                    }
                 }
 
                 // 只在有多个宝宝时显示切换按钮
@@ -254,47 +266,47 @@ struct BabyInfoHeader: View {
             .padding(.bottom, 12)
             
             // 体重、身高和头围信息（横向排列，固定在顶部）
-            VStack(alignment: .center, spacing: 6) {
-                // 体重
-                HStack(spacing: 8) {
-                    Image(systemName: "scalemass")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.2))
-                    Text(String(format: "%.1f", latestGrowthData.weight))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Text("kg".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                }
+            // VStack(alignment: .center, spacing: 6) {
+            //     // 体重
+            //     HStack(spacing: 8) {
+            //         Image(systemName: "scalemass")
+            //             .font(.system(size: 14))
+            //             .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.2))
+            //         Text(String(format: "%.1f", latestGrowthData.weight))
+            //             .font(.system(size: 14, weight: .medium))
+            //             .foregroundColor(.secondary)
+            //         Text("kg".localized)
+            //             .font(.system(size: 14))
+            //             .foregroundColor(.secondary)
+            //     }
                 
-                // 身高
-                HStack(spacing: 8) {
-                    Image(systemName: "ruler")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(red: 0.4, green: 0.6, blue: 1.0))
-                    Text(latestGrowthData.height > 0 ? String(format: "%.0f", latestGrowthData.height) : "---")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Text("cm".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
-                }
+            //     // 身高
+            //     HStack(spacing: 8) {
+            //         Image(systemName: "ruler")
+            //             .font(.system(size: 14))
+            //             .foregroundColor(Color(red: 0.4, green: 0.6, blue: 1.0))
+            //         Text(latestGrowthData.height > 0 ? String(format: "%.0f", latestGrowthData.height) : "---")
+            //             .font(.system(size: 14, weight: .medium))
+            //             .foregroundColor(.secondary)
+            //         Text("cm".localized)
+            //             .font(.system(size: 14))
+            //             .foregroundColor(.secondary)
+            //     }
                 
-                // 头围
-                // HStack(spacing: 8) {
-                //     Image(systemName: "circle.dashed")
-                //         .font(.system(size: 14))
-                //         .foregroundColor(Color(red: 0.6, green: 0.2, blue: 1.0))
-                //     Text(latestGrowthData.headCircumference > 0 ? String(format: "%.0f", latestGrowthData.headCircumference) : "---")
-                //         .font(.system(size: 14, weight: .medium))
-                //         .foregroundColor(.secondary)
-                //     Text("cm".localized)
-                //         .font(.system(size: 14))
-                //         .foregroundColor(.secondary)
-                // }
-            }
-            .padding(.horizontal, 20)
+            //     // 头围
+            //     // HStack(spacing: 8) {
+            //     //     Image(systemName: "circle.dashed")
+            //     //         .font(.system(size: 14))
+            //     //         .foregroundColor(Color(red: 0.6, green: 0.2, blue: 1.0))
+            //     //     Text(latestGrowthData.headCircumference > 0 ? String(format: "%.0f", latestGrowthData.headCircumference) : "---")
+            //     //         .font(.system(size: 14, weight: .medium))
+            //     //         .foregroundColor(.secondary)
+            //     //     Text("cm".localized)
+            //     //         .font(.system(size: 14))
+            //     //         .foregroundColor(.secondary)
+            //     // }
+            // }
+            // .padding(.horizontal, 20)
         }
         .padding(.top, 8)
         .background(Color.themeCardBackground(for: colorScheme))
