@@ -117,7 +117,7 @@ extension Color {
         
         switch colorScheme {
         case .light:
-            return Color(uiColor: .systemGray6)
+            return Color.accentColor.opacity(0.15)
         case .dark:
             return Color(uiColor: .black)
         @unknown default:

@@ -3,7 +3,7 @@ import SwiftUI
 // 项目常量结构体
 struct Constants {
     // 全局圆角半径常量
-    static let cornerRadius: CGFloat = 8
+    static let cornerRadius: CGFloat = 12
     static let smallCornerRadius: CGFloat = 8
     static let largeCornerRadius: CGFloat = 20
     static let buttonCornerRadius: CGFloat = 40
@@ -22,6 +22,23 @@ struct Constants {
         "nursing", 
         "pumping"
     ]
+
+    static let quickActionCategories: Set<String> = [
+        "breast_bottle", "formula", "diaper", "sleep"
+    ]
+    
+    /// 首页底部快速操作（顺序：breast_bottle, formula, diaper, sleep），含 category、icon、name、color
+    static var quickActions: [(category: String, icon: String, name: String, color: Color)] {
+        let order = ["breast_bottle", "formula", "diaper", "sleep"]
+        return order.compactMap { subCategory in
+            for (category, actions) in allCategorys {
+                if let action = actions.first(where: { $0.name == subCategory }) {
+                    return (category: category, icon: action.icon, name: action.name, color: action.color)
+                }
+            }
+            return nil
+        }
+    }
     
     // 所有操作分类
     static let allCategorys: [String: [(icon: String, name: String, color: Color)]] = [
@@ -34,7 +51,7 @@ struct Constants {
         ],
         "activity_category": [
             (icon: "😴", name: "sleep", color: Color.fromHex("#87a8c3")),
-            (icon: "🩲", name: "diaper", color: Color.fromHex("#955539")),
+            (icon: "🩲", name: "diaper", color: Color.fromHex("#D4C0A7")),
             (icon: "🛁", name: "bath", color: Color.fromHex("#4b9be1")),
             // (icon: "🥛", name: "pumping", color: Color.fromHex("#cea6e3"))
         ],  

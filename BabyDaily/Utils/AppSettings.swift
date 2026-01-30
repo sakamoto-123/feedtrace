@@ -42,8 +42,8 @@ enum ThemeMode: String, CaseIterable, Codable {
 
 // MARK: - 主题颜色枚举
 enum ThemeColor: String, CaseIterable, Identifiable, Codable {
-    case lightYellow = "lightYellow"
     case lightPurple = "lightPurple"
+    case lightYellow = "lightYellow"
     case skyBlue = "skyBlue"
     case paleBlue = "paleBlue"
     case grayBlue = "grayBlue"

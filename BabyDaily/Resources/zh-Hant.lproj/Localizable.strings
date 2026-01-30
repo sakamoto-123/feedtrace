@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "今日統計";
+"more_statistics" = "更多統計";
 "feeding" = "餵養";
 "ongoing" = "進行中";
 "ending" = "結束";
 "quick_actions" = "快速操作";
 "all_actions" = "所有操作";
+"more" = "更多";
 "weight" = "體重";
 "height" = "身高";
 "head" = "頭";
@@ -211,6 +213,13 @@
 "membership_status" = "會員狀態";
 "expiration_date" = "過期時間";
 "subscription_expiring_today" = "訂閱將於今日到期";
+"subscription_expired_message" = "您的訂閱已過期，請續費以繼續使用高級功能。";
+"subscription_expiring_tomorrow" = "您的訂閱將於明天（%@）到期。";
+"subscription_expiring_soon" = "您的訂閱將在 %d 天後（%@）到期，請及時續費。";
+"subscription_reminder_title" = "訂閱提醒";
+"subscription_expiring_today_notification" = "您的訂閱將於今日到期，請及時續費。";
+"subscription_expiring_tomorrow_notification" = "您的訂閱將於明天到期，請及時續費。";
+"subscription_expiring_soon_notification" = "您的訂閱將在 %d 天後到期，請及時續費。";
 "subscription_expiring_soon_reminder" = "訂閱即將到期，請及時續費";
 "membership_active" = "有效";
 "membership_expired" = "已過期";
@@ -218,6 +227,7 @@
 "membership_subscription" = "會員訂閱";
 "app_name" = "芋丸·寶寶日誌";
 "feature_comparison" = "會員功能對比";
+"membership_exclusive_privileges" = "會員專屬權益";
 "regular_user" = "普通用戶";
 "premium_member" = "高級會員";
 "remove_ads" = "去廣告";

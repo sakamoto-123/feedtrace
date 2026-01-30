@@ -83,7 +83,7 @@ private struct TextViewWrapper: UIViewRepresentable {
     func makeUIView(context: Context) -> BoundedTextView {
         let textView = UITextView()
         textView.delegate = context.coordinator
-        textView.font = .systemFont(ofSize: 17)
+        textView.font = .systemFont(ofSize: 14)
         textView.backgroundColor = .clear
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         textView.textContainer.lineFragmentPadding = 0
@@ -176,7 +176,7 @@ private struct TextViewWrapper: UIViewRepresentable {
             let newSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: .greatestFiniteMagnitude))
             
             // 计算单行高度
-            let font = textView.font ?? .systemFont(ofSize: 17)
+            let font = textView.font ?? .systemFont(ofSize: 14)
             let lineHeight = font.lineHeight
             let padding = textView.textContainerInset.top + textView.textContainerInset.bottom
             let minHeight = parent.minHeight

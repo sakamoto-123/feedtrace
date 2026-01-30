@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "Estadísticas de Hoy";
+"more_statistics" = "Más estadísticas";
 "feeding" = "Alimentación";
 "ongoing" = "En Curso";
 "ending" = "Terminar";
 "quick_actions" = "Acciones Rápidas";
 "all_actions" = "Todas las Acciones";
+"more" = "Más";
 "weight" = "Peso";
 "height" = "Altura";
 "head" = "Cabeza";
@@ -218,6 +220,13 @@
 "membership_status" = "Estado de Membresía";
 "expiration_date" = "Fecha de Expiración";
 "subscription_expiring_today" = "La suscripción expira hoy";
+"subscription_expired_message" = "Su suscripción ha expirado. Por favor, renueve para seguir disfrutando de las funciones premium.";
+"subscription_expiring_tomorrow" = "Su suscripción expira mañana (%@).";
+"subscription_expiring_soon" = "Su suscripción expira en %d días (%@). Por favor, renueve a tiempo.";
+"subscription_reminder_title" = "Recordatorio de suscripción";
+"subscription_expiring_today_notification" = "Su suscripción expira hoy. Por favor, renueve para continuar.";
+"subscription_expiring_tomorrow_notification" = "Su suscripción expira mañana. Por favor, renueve a tiempo.";
+"subscription_expiring_soon_notification" = "Su suscripción expira en %d días. Por favor, renueve a tiempo.";
 "subscription_expiring_soon_reminder" = "La suscripción expirará pronto, renueve por favor";
 "membership_active" = "Activo";
 "membership_expired" = "Expirado";
@@ -225,6 +234,7 @@
 "membership_subscription" = "Membership Subscription";
 "app_name" = "FeedTrace";
 "feature_comparison" = "Feature Comparison";
+"membership_exclusive_privileges" = "Beneficios exclusivos para miembros";
 "regular_user" = "Regular User";
 "premium_member" = "Premium Member";
 "remove_ads" = "Remove Ads";
@@ -237,8 +247,8 @@
 "unlimited_custom_records" = "Unlimited Custom Records";
 "apple_watch_feature" = "Apple Watch (In Development)";
 "future_more_features" = "Future Premium Features";
-"premium_membership_monthly" = "Membresía Premium (Mensual)";
-"premium_membership_lifetime" = "Membresía Premium (Vitalicia)";
+"premium_membership_monthly" = "Membresía(Mensual)";
+"premium_membership_lifetime" = "Membresía(Vitalicia)";
 "subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
 "terms_of_service" = "Términos de Servicio";
 "redeem_code" = "Canjear Código";

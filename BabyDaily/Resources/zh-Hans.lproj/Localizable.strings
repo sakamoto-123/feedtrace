@@ -13,11 +13,13 @@
 "select_volume_unit" = "选择体积测量的单位";
 // HomeView
 "today_statistics" = "今日统计";
+"more_statistics" = "更多统计";
 "feeding" = "喂养";
 "ongoing" = "进行中";
 "ending" = "结束";
 "quick_actions" = "快速操作";
 "all_actions" = "所有操作";
+"more" = "更多操作";
 "kg" = "kg";
 "cm" = "cm";
 "in" = "in";
@@ -255,6 +257,13 @@
 "membership_status" = "会员状态";
 "expiration_date" = "过期时间";
 "subscription_expiring_today" = "订阅将于今日到期";
+"subscription_expired_message" = "您的订阅已过期，请续费以继续使用高级功能。";
+"subscription_expiring_tomorrow" = "您的订阅将于明天（%@）到期。";
+"subscription_expiring_soon" = "您的订阅将在 %d 天后（%@）到期，请及时续费。";
+"subscription_reminder_title" = "订阅提醒";
+"subscription_expiring_today_notification" = "您的订阅将于今日到期，请及时续费。";
+"subscription_expiring_tomorrow_notification" = "您的订阅将于明天到期，请及时续费。";
+"subscription_expiring_soon_notification" = "您的订阅将在 %d 天后到期，请及时续费。";
 "subscription_expiring_soon_reminder" = "订阅即将到期，请及时续费";
 "membership_active" = "有效";
 "membership_expired" = "已过期";
@@ -262,6 +271,7 @@
 "membership_subscription" = "会员订阅";
 "app_name" = "芋丸·宝宝日志";
 "feature_comparison" = "会员功能对比";
+"membership_exclusive_privileges" = "会员专属权益";
 "regular_user" = "普通用户";
 "premium_member" = "高级会员";
 "remove_ads" = "去广告";

@@ -5,6 +5,7 @@ struct RecordDetailView: View {
     let recordId: UUID
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     
     @FetchRequest private var records: FetchedResults<Record>
     @FetchRequest private var babies: FetchedResults<Baby>
@@ -317,7 +318,7 @@ struct RecordDetailView: View {
                 RecordEditView(baby: baby, recordType: nil, existingRecordId: record.id)
             }
         }
-        .background(Color(.systemGray6))
+        .background(Color.themeBackground(for: colorScheme))
         // 删除确认弹窗
         .alert("confirm_delete_record_title".localized,  isPresented: $showingDeleteConfirmation) {
             Button("cancel".localized, role: .cancel) {}

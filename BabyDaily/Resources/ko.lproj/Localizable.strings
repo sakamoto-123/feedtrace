@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "오늘의 통계";
+"more_statistics" = "더 많은 통계";
 "feeding" = "수유";
 "ongoing" = "진행 중";
 "ending" = "종료";
 "quick_actions" = "빠른 작업";
 "all_actions" = "모든 작업";
+"more" = "더보기";
 "weight" = "체중";
 "height" = "키";
 "head" = "머리";
@@ -217,6 +219,13 @@
 "membership_status" = "회원 상태";
 "expiration_date" = "만료 날짜";
 "subscription_expiring_today" = "구독이 오늘 만료됩니다";
+"subscription_expired_message" = "구독이 만료되었습니다. 프리미엄 기능을 계속 이용하려면 갱신해 주세요.";
+"subscription_expiring_tomorrow" = "구독이 내일(%@) 만료됩니다.";
+"subscription_expiring_soon" = "구독이 %d일 후(%@) 만료됩니다. 갱신해 주세요.";
+"subscription_reminder_title" = "구독 알림";
+"subscription_expiring_today_notification" = "구독이 오늘 만료됩니다. 갱신해 주세요.";
+"subscription_expiring_tomorrow_notification" = "구독이 내일 만료됩니다. 갱신해 주세요.";
+"subscription_expiring_soon_notification" = "구독이 %d일 후 만료됩니다. 갱신해 주세요.";
 "subscription_expiring_soon_reminder" = "구독이 곧 만료됩니다. 갱신해 주세요";
 "membership_active" = "활성";
 "membership_expired" = "만료됨";
@@ -224,6 +233,7 @@
 "membership_subscription" = "멤버십 구독";
 "app_name" = "FeedTrace";
 "feature_comparison" = "기능 비교";
+"membership_exclusive_privileges" = "회원 전용 혜택";
 "regular_user" = "일반 사용자";
 "premium_member" = "프리미엄 회원";
 "remove_ads" = "광고 제거";

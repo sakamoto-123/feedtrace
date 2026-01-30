@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "Statistiques d'aujourd'hui";
+"more_statistics" = "Plus de statistiques";
 "feeding" = "Alimentation";
 "ongoing" = "En cours";
 "ending" = "Terminer";
 "quick_actions" = "Actions rapides";
 "all_actions" = "Toutes les actions";
+"more" = "Plus";
 "weight" = "Poids";
 "height" = "Taille";
 "head" = "Tête";
@@ -218,6 +220,13 @@
 "membership_status" = "Statut d'adhésion";
 "expiration_date" = "Date d'expiration";
 "subscription_expiring_today" = "L'abonnement expire aujourd'hui";
+"subscription_expired_message" = "Votre abonnement a expiré. Veuillez renouveler pour continuer à profiter des fonctionnalités premium.";
+"subscription_expiring_tomorrow" = "Votre abonnement expire demain (%@).";
+"subscription_expiring_soon" = "Votre abonnement expire dans %d jours (%@). Veuillez renouveler à temps.";
+"subscription_reminder_title" = "Rappel d'abonnement";
+"subscription_expiring_today_notification" = "Votre abonnement expire aujourd'hui. Veuillez renouveler pour continuer.";
+"subscription_expiring_tomorrow_notification" = "Votre abonnement expire demain. Veuillez renouveler à temps.";
+"subscription_expiring_soon_notification" = "Votre abonnement expire dans %d jours. Veuillez renouveler à temps.";
 "subscription_expiring_soon_reminder" = "L'abonnement expire bientôt, veuillez renouveler";
 "membership_active" = "Actif";
 "membership_expired" = "Expiré";
@@ -225,6 +234,7 @@
 "membership_subscription" = "Membership Subscription";
 "app_name" = "FeedTrace";
 "feature_comparison" = "Feature Comparison";
+"membership_exclusive_privileges" = "Avantages exclusifs aux membres";
 "regular_user" = "Regular User";
 "premium_member" = "Premium Member";
 "remove_ads" = "Remove Ads";
@@ -237,8 +247,8 @@
 "unlimited_custom_records" = "Unlimited Custom Records";
 "apple_watch_feature" = "Apple Watch (In Development)";
 "future_more_features" = "Future Premium Features";
-"premium_membership_monthly" = "Abonnement Premium (Mensuel)";
-"premium_membership_lifetime" = "Abonnement Premium (À vie)";
+"premium_membership_monthly" = "Abonnement(Mensuel)";
+"premium_membership_lifetime" = "Abonnement(À vie)";
 "subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
 "terms_of_service" = "Conditions de Service";
 "redeem_code" = "Utiliser un Code";

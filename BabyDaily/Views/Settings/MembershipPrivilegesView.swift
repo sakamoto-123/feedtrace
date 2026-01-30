@@ -9,6 +9,13 @@
 import SwiftUI
 import StoreKit
 
+// MARK: - 会员权益行数据（图标 + 文案）
+private struct PrivilegeRowItem {
+    let feature: MembershipFeature
+    let systemImage: String
+}
+
+
 struct MembershipPrivilegesView: View {
     // MARK: - State Objects
     @StateObject private var iapManager = IAPManager.shared
@@ -37,6 +44,18 @@ struct MembershipPrivilegesView: View {
         // .appleWatch,
         .futureFeatures
     ]
+
+    private var privilegeRows: [PrivilegeRowItem] {
+        [
+            (MembershipFeature.removeAds, "megaphone"),
+            (MembershipFeature.basicRecords, "doc.text"),
+            (MembershipFeature.chartTrends, "chart.xyaxis.line"),
+            (MembershipFeature.familySharing, "person.2"),
+            (MembershipFeature.multipleBabies, "figure.2.and.child.holdinghands"),
+            (MembershipFeature.iCloudSync, "icloud"),
+            (MembershipFeature.futureFeatures, "sparkles")
+        ].map { PrivilegeRowItem(feature: $0.0, systemImage: $0.1) }
+    }
     
     // MARK: - Body
     var body: some View {
@@ -52,7 +71,7 @@ struct MembershipPrivilegesView: View {
                     }
                     
                     // 功能对比卡片
-                    featureComparisonCard
+                    memberPrivilegesCard
                         .padding(.horizontal, 16)
                         .padding(.bottom, 16)
                         .padding(.top, membershipManager.isPremiumMember ? 0 : 16)
@@ -182,79 +201,58 @@ struct MembershipPrivilegesView: View {
         .cornerRadius(Constants.cornerRadius)
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
-    
-    // MARK: - Feature Comparison Card
-    private var featureComparisonCard: some View {
-        VStack(spacing: 0) {
-            // 卡片标题行
-            HStack(spacing: 0) {
-                Text("feature_comparison".localized)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Text("regular_user".localized)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.primary)
-                    .frame(width: 80, alignment: .center)
-                
-                Text("premium_member".localized)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.primary)
-                    .frame(width: 80, alignment: .center)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(Color.accentColor.opacity(0.5))
+
+        
+
+    private var memberPrivilegesCard: some View {
+        VStack(alignment: .center, spacing: 10) {
+            // 使用 Asset 中的 AppIconPreview（App Icon 的 appiconset 无法被 UIImage(named:) 加载）
+            Image("Vip")
+                .resizable()
+                .frame(width: 120, height: 120)
+                .cornerRadius(80)
+
+            Text("membership_exclusive_privileges".localized)
+                .font(.system(size: 14, weight: .semibold))
+                .padding(.bottom, 12)
             
-            // 功能列表
-            ForEach(Array(features.enumerated()), id: \.element) { index, feature in
-                featureRow(feature: feature)
-                
-                if index < features.count - 1 {
-                    Divider()
-                        .background(Color(.separator))
-                        .padding(.leading, 16)
+            ForEach(Array(privilegeRows.enumerated()), id: \.element.feature.rawValue) { index, item in
+                memberPrivilegeRow(feature: item.feature, systemImage: item.systemImage)
+                if index < privilegeRows.count - 1 {
+                    GeometryReader { geometry in
+                        Path { path in
+                            path.move(to: CGPoint(x: 0, y: 0))
+                            path.addLine(to: CGPoint(x: geometry.size.width, y: 0))
+                        }
+                        .stroke(Color.accentColor.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [8, 4]))
+                    }
+                    .frame(height: 1)  // 限制高度，避免 GeometryReader 占满剩余空间导致 item 间留白
+                    .padding(.leading, 36)
                 }
             }
         }
+        .padding()
         .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
     }
     
-    // MARK: - Feature Row
-    private func featureRow(feature: MembershipFeature) -> some View {
-        HStack(spacing: 0) {
+    private func memberPrivilegeRow(feature: MembershipFeature, systemImage: String) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18))
+                .frame(width: 24, height: 24)
+                .foregroundColor(Color.accentColor)
+
             Text(feature.localizedName)
-                .font(.system(size: 14))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
             
-            // 普通用户状态
-            statusIcon(isAvailable: feature.isAvailableForFreeUser)
-                .frame(width: 80, alignment: .center)
+            Spacer(minLength: 20)
             
-            // 高级会员状态（总是可用）
-            statusIcon(isAvailable: true)
-                .frame(width: 80, alignment: .center)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-    }
-    
-    // MARK: - Status Icon
-    private func statusIcon(isAvailable: Bool) -> some View {
-        Group {
-            if isAvailable {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-                    .font(.system(size: 20))
-            } else {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.gray.opacity(0.4))
-                    .font(.system(size: 20))
-            }
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(Color.fromHex("#39855e"))
         }
     }
     
@@ -381,6 +379,7 @@ struct MembershipPrivilegesView: View {
                     handleRestore()
                 }
             }
+
         }
     }
     

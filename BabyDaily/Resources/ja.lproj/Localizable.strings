@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "今日の統計";
+"more_statistics" = "もっと統計";
 "feeding" = "授乳";
 "ongoing" = "進行中";
 "ending" = "終了";
 "quick_actions" = "クイックアクション";
 "all_actions" = "すべてのアクション";
+"more" = "もっと";
 "weight" = "体重";
 "height" = "身長";
 "head" = "頭";
@@ -208,6 +210,13 @@
 "membership_status" = "会員ステータス";
 "expiration_date" = "有効期限";
 "subscription_expiring_today" = "サブスクリプションは本日期限切れです";
+"subscription_expired_message" = "サブスクリプションの有効期限が切れました。プレミアム機能をご利用いただくには更新してください。";
+"subscription_expiring_tomorrow" = "サブスクリプションは明日（%@）に期限切れになります。";
+"subscription_expiring_soon" = "サブスクリプションは%d日後（%@）に期限切れになります。お早めに更新してください。";
+"subscription_reminder_title" = "サブスクリプションリマインダー";
+"subscription_expiring_today_notification" = "サブスクリプションは本日期限切れです。更新してください。";
+"subscription_expiring_tomorrow_notification" = "サブスクリプションは明日期限切れです。お早めに更新してください。";
+"subscription_expiring_soon_notification" = "サブスクリプションは%d日後に期限切れです。お早めに更新してください。";
 "subscription_expiring_soon_reminder" = "サブスクリプションがまもなく期限切れになります。更新してください";
 "membership_active" = "有効";
 "membership_expired" = "期限切れ";
@@ -215,6 +224,7 @@
 "membership_subscription" = "会員サブスクリプション";
 "app_name" = "FeedTrace";
 "feature_comparison" = "機能比較";
+"membership_exclusive_privileges" = "会員限定特典";
 "regular_user" = "一般ユーザー";
 "premium_member" = "プレミアム会員";
 "remove_ads" = "広告を削除";

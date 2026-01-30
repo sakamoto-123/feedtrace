@@ -98,8 +98,8 @@ struct ChartHeaderView: View {
                 GrowthDimensionSegmentView(selectedDimension: $selectedDimension)
             }
         }
-        .padding()
-        .padding(.top, 0)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
         .background(Color.themeCardBackground(for: colorScheme))
     }
 }

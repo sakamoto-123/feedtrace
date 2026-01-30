@@ -24,17 +24,22 @@ public struct DailyStats {
 
 // 统计计算器类，提供公共的统计方法
 public class StatsCalculator {
-    // 获取每日统计数据的公共静态函数
+    /// 从已按天分组的记录中计算每日统计（适用于 RecordListContent 等已有每日 records 的场景）
+    public static func getDailyStatsFromRecords(_ records: [Record]) -> DailyStats {
+        computeStats(from: records)
+    }
+
+    /// 获取指定日期的每日统计数据（会先按日期过滤记录）
     public static func getDailyStats(for date: Date = Date(), from records: [Record]) -> DailyStats {
         let calendar = Calendar.current
-        
-        // 过滤出指定日期的所有记录
         let dayRecords = records.filter { calendar.isDate($0.startTimestamp, inSameDayAs: date) }
-        
-        // 获取用户设置的容量单位
+        return computeStats(from: dayRecords)
+    }
+
+    /// 核心统计逻辑：从某一天的记录列表计算 DailyStats
+    private static func computeStats(from dayRecords: [Record]) -> DailyStats {
         let targetVolumeUnit = UnitManager.shared.volumeUnit.rawValue
-        
-        // 初始化统计变量
+
         var totalFeedingAmount = 0.0
         var totalFeedingCount = 0
         var formulaAmount = 0.0
@@ -43,86 +48,64 @@ public class StatsCalculator {
         var breastMilkCount = 0
         var waterAmount = 0.0
         var waterCount = 0
-        
+
         var sleepCount = 0
         var totalSleepDurationInMinutes = 0.0
-        
+
         var solidFoodRecords: [Record] = []
         var supplementRecords: [Record] = []
-        
-        // 辅助函数：将容量值转换为用户设置的单位
+
         func convertToTargetUnit(value: Double, fromUnit: String?) -> Double {
-            guard let fromUnit = fromUnit, !fromUnit.isEmpty else {
-                // 如果没有单位，假设已经是目标单位
-                return value
-            }
-            
-            // 如果单位相同，直接返回
-            if fromUnit.lowercased() == targetVolumeUnit.lowercased() {
-                return value
-            }
-            
-            // 使用 UnitConverter 进行转换
+            guard let fromUnit = fromUnit, !fromUnit.isEmpty else { return value }
+            if fromUnit.lowercased() == targetVolumeUnit.lowercased() { return value }
             return UnitConverter.convertVolume(value: value, fromUnit: fromUnit, toUnit: targetVolumeUnit)
         }
-        
-        // 遍历记录，计算统计数据
+
         for record in dayRecords {
             switch record.category {
             case "feeding_category":
-                // 喂养记录处理
-                let originalValue = record.value 
+                let originalValue = record.value
                 let convertedValue = convertToTargetUnit(value: originalValue, fromUnit: record.unit)
-                
+
                 switch record.subCategory {
                 case "nursing", "breast_bottle":
-                    // 母乳记录
                     breastMilkAmount += convertedValue
                     breastMilkCount += 1
                     totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "formula":
-                    // 奶粉记录
                     formulaAmount += convertedValue
                     formulaCount += 1
                     totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "water_intake":
-                    // 水记录
                     waterAmount += convertedValue
                     waterCount += 1
                     totalFeedingAmount += convertedValue
                     totalFeedingCount += 1
                 case "solid_food":
-                    // 辅食记录
                     solidFoodRecords.append(record)
                 default:
                     break
                 }
             case "activity_category":
-                // 活动记录处理
                 if record.subCategory == "sleep" {
-                    // 睡眠记录
                     sleepCount += 1
                     if let end = record.endTimestamp {
-                        let durationInMinutes = end.timeIntervalSince(record.startTimestamp) / 60
-                        totalSleepDurationInMinutes += durationInMinutes
+                        totalSleepDurationInMinutes += end.timeIntervalSince(record.startTimestamp) / 60
                     }
                 }
             case "health_category":
-                // 健康记录处理
                 if record.subCategory == "supplement" {
-                    // 补剂记录
                     supplementRecords.append(record)
                 }
             default:
                 break
             }
         }
-        
-        // 转换睡眠时长为小时
+
         let sleepDurationInHours = totalSleepDurationInMinutes / 60
-        
+
         return DailyStats(
             totalFeedingAmount: totalFeedingAmount,
             totalFeedingCount: totalFeedingCount,

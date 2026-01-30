@@ -27,8 +27,8 @@ struct RecordTypeSelector: View {
                 VStack(spacing: 8) {
                     ZStack {
                         Circle()
-                            .fill(isSelected ? action.color.opacity(0.8) : .secondary.opacity(0.1))
-                            .frame(width: 50, height: 50)
+                            .fill(isSelected ? action.color.opacity(0.4) : .secondary.opacity(0.1))
+                            .frame(width: 44, height: 44)
                             .overlay(
                                 Circle()
                                     .stroke(isSelected ? action.color : .secondary.opacity(0.2), lineWidth: 2)
@@ -39,7 +39,7 @@ struct RecordTypeSelector: View {
                     }
                     
                     Text(action.name.localized)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(isSelected ? action.color : .secondary)
                 }
             }
@@ -49,11 +49,12 @@ struct RecordTypeSelector: View {
     
     // 生成所有记录类型按钮
     private var recordTypeButtons: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             // 将所有分类下的记录类型合并到一个列表
             recordTypeButtonsContent
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 0)
+        .padding(.top, 2)
     }
     
     // 分解ForEach循环为单独的计算属性
@@ -819,7 +820,7 @@ struct RecordEditView: View {
                     recordTypeSection
                     mainScrollView
                 }
-                .background(Color.themeListBackground(for: colorScheme))
+                .background(Color.accentColor.opacity(0.1))
                 .navigationTitle(getNavigationTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbarContent() }

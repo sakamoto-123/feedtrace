@@ -103,8 +103,8 @@ struct OngoingRecordCard: View {
             }
             .padding()
             .background(Color.themeCardBackground(for: colorScheme))
-            .cornerRadius(12)
-            .padding(.horizontal, 20)
+            .cornerRadius(Constants.cornerRadius)
+            .padding(.horizontal, 12)
             .navigationDestination(isPresented: $isNavigatingToDetail) {
                 RecordDetailView(recordId: record.id)
             }

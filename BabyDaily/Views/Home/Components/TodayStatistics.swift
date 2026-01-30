@@ -1,7 +1,9 @@
 import SwiftUI
+import CoreData
 
 // 今日统计信息组件
 struct TodayStatistics: View {
+    let baby: Baby
     let todayStats: DailyStats
     let unitManager: UnitManager
     @Environment(\.colorScheme) private var colorScheme
@@ -76,8 +78,20 @@ struct TodayStatistics: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("today_statistics".localized)
-                .font(.headline)
+            HStack {
+                Text("today_statistics".localized)
+                    .font(.headline)
+                Spacer()
+                NavigationLink(destination: StatisticsView(baby: baby)) {
+                    HStack(spacing: 4) {
+                        // Image(systemName: "chart.bar.fill")
+                        //     .font(.system(size: 14))
+                        Text("more_statistics".localized)
+                            .font(.subheadline)
+                    }
+                    .foregroundColor(.accentColor)
+                }
+            }
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], alignment: .leading, spacing: 24) {
                 feedingSection
@@ -89,7 +103,6 @@ struct TodayStatistics: View {
         .padding()
         .background(Color.themeCardBackground(for: colorScheme))
         .cornerRadius(Constants.cornerRadius)
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
+        .padding(.horizontal, 12)
     }
 }

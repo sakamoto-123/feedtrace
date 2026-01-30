@@ -51,8 +51,7 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            List {
+        List {
                 // 宝宝信息
                 Section {
                     HStack(spacing: 4)  {
@@ -103,7 +102,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 8)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         // 点击行的其他区域（非按钮区域）跳转到编辑页面
@@ -116,8 +115,7 @@ struct SettingsView: View {
                 Section {
                     NavigationLink(destination: MembershipPrivilegesView()) {
                         HStack {
-                            Image(systemName: "crown.fill")
-                                .foregroundColor(Color.fromHex("#ffb658"))
+                            Text("👑")
                             Text("membership_privileges".localized)
                             Spacer()
                         }
@@ -307,6 +305,5 @@ struct SettingsView: View {
             .navigationDestination(isPresented: $showFamilyCollaboration) {
                 FamilyCollaborationView()
             }
-        }
     }
 }

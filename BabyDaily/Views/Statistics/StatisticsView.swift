@@ -319,8 +319,7 @@ struct StatisticsView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack {
+        VStack {
                 // 中间：选项卡和时间范围/维度选择
                 ChartHeaderView(selectedTab: $selectedTab, timeRange: $timeRange, selectedDimension: $selectedGrowthDimension)
                 
@@ -352,7 +351,6 @@ struct StatisticsView: View {
             }
             .navigationTitle("statistics".localized)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(.hidden, for: .navigationBar)
             .background(Color.themeListBackground(for: colorScheme))
             // 监听变化，更新数据
             .onAppear {
@@ -367,6 +365,5 @@ struct StatisticsView: View {
             .onChange(of: selectedGrowthDimension) { _, _ in
                 loadData()
             }
-        }
     } // 结束body
 } // 结束结构体

@@ -77,11 +77,18 @@ struct BabyInfoHeader: View {
                 }
                 
                 Spacer()
+                
+                // 右上角：设置入口
+                NavigationLink(destination: SettingsView(baby: baby)) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.accentColor)
+                }
             }
-            .padding(.leading, 20)
+            .padding(.horizontal, 20)
             .padding(.bottom, 12)
         }
-        .padding(.top, 8)
+        .padding(.top, DeviceUtils.isIPad ? 18 : 8)
         .background(Color.themeCardBackground(for: colorScheme))
     }
 }

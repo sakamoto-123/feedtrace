@@ -47,8 +47,8 @@ struct ContentView: View {
                     }
                 }
         } else {
-            // 显示首页（底部Tab栏）
-            MainTabView(baby: babyBinding)
+            // 显示首页（无 Tab 栏）
+            HomeView(baby: babyBinding)
                 .onAppear {
                     // 初始化UserSettingManager，避免重复调用
                     if !hasInitialized {

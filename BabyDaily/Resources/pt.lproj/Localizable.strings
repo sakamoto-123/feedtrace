@@ -14,11 +14,13 @@
 
 // HomeView
 "today_statistics" = "Estatísticas de Hoje";
+"more_statistics" = "Mais estatísticas";
 "feeding" = "Alimentação";
 "ongoing" = "Em Andamento";
 "ending" = "Terminar";
 "quick_actions" = "Ações Rápidas";
 "all_actions" = "Todas as Ações";
+"more" = "Mais";
 "weight" = "Peso";
 "height" = "Altura";
 "head" = "Cabeça";
@@ -218,6 +220,13 @@
 "membership_status" = "Status de Assinatura";
 "expiration_date" = "Data de Expiração";
 "subscription_expiring_today" = "Assinatura expira hoje";
+"subscription_expired_message" = "Sua assinatura expirou. Por favor, renove para continuar aproveitando os recursos premium.";
+"subscription_expiring_tomorrow" = "Sua assinatura expira amanhã (%@).";
+"subscription_expiring_soon" = "Sua assinatura expira em %d dias (%@). Por favor, renove a tempo.";
+"subscription_reminder_title" = "Lembrete de assinatura";
+"subscription_expiring_today_notification" = "Sua assinatura expira hoje. Por favor, renove para continuar.";
+"subscription_expiring_tomorrow_notification" = "Sua assinatura expira amanhã. Por favor, renove a tempo.";
+"subscription_expiring_soon_notification" = "Sua assinatura expira em %d dias. Por favor, renove a tempo.";
 "subscription_expiring_soon_reminder" = "Assinatura expirando em breve, renove por favor";
 "membership_active" = "Ativo";
 "membership_expired" = "Expirado";
@@ -225,6 +234,7 @@
 "membership_subscription" = "Membership Subscription";
 "app_name" = "FeedTrace";
 "feature_comparison" = "Feature Comparison";
+"membership_exclusive_privileges" = "Benefícios exclusivos para membros";
 "regular_user" = "Regular User";
 "premium_member" = "Premium Member";
 "remove_ads" = "Remove Ads";
@@ -237,8 +247,8 @@
 "unlimited_custom_records" = "Unlimited Custom Records";
 "apple_watch_feature" = "Apple Watch (In Development)";
 "future_more_features" = "Future Premium Features";
-"premium_membership_monthly" = "Assinatura Premium (Mensal)";
-"premium_membership_lifetime" = "Assinatura Premium (Vitalícia)";
+"premium_membership_monthly" = "Assinatura(Mensal)";
+"premium_membership_lifetime" = "Assinatura(Vitalícia)";
 "subscribe_accept_terms" = "By subscribing, you agree to our Privacy Policy and Terms of Service.";
 "terms_of_service" = "Terms of Service";
 "redeem_code" = "Redeem Code";
